@@ -1,0 +1,9 @@
+﻿Scenario,Population Growth,Investment,Global Demand,Climate Warming settings,Resource Intensity,Commodity Intensity,COVID-19 Recovery
+Slow Growth,"Lower than Current Trajectory:
+Apply ABS Series C NOM dispersion to BIS OE baseline",Lower than Current Trajectory case,Lower demand than Current Trajectory case,~4⁰C by 2100 from pre-industrial levels,Higher than Current Trajectory case,Higher than Current Trajectory case,Slower pace of recovery and international border reopening is delayed
+Central,BISE OE baseline,BIS OE Baseline,BISE OE Baseline,~2.6⁰C by 2100 from pre-industrial levels,BIS OE baseline,BIS OE baseline,BIS OE baseline
+Sustainable Growth,BISE OE baseline,"Aggregate level is consistent with Current Trajectory, but sector composition reflects more aggressive decarbonisation","Aggregate level is consistent with Current Trajectory, but sector composition reflects more aggressive decarbonisation",~1.8⁰C by 2100 from pre-industrial levels,Lower than Current Trajectory case,Higher than Current Trajectory case,BIS OE baseline
+Rapid Decarbonisation,"Higher than Current Trajectory case:
+Apply ABS Series A NOM dispersion to BIS OE baseline",Higher than Current Trajectory case,Higher demand than Current Trajectory case,<1.5⁰C by 2100 from pre-industrial levels,Lower than Current Trajectory case,Lower than Current Trajectory case,Faster pace of recovery and international border re-opening is fast-tracked
+Export Superpower,"Higher than Current Trajectory case:
+Apply ABS Series A NOM dispersion to BIS OE baseline ",Higher than Current Trajectory case,Higher demand than Current Trajectory case,<1.5⁰C by 2100 from pre-industrial levels,Lower than Current Trajectory case,Lower than Current Trajectory case,Faster pace of recovery and international border re-opening is fast-tracked
