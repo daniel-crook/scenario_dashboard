@@ -17,7 +17,6 @@ ox_setup()
 fp <- dirname(getActiveDocumentContext()$path)
 
 
-
 setwd(fp)
 
 # 0.0 Data Processing -----------------------------------------------------
