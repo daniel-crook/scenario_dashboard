@@ -14,6 +14,7 @@ library(data.table)
 library(kableExtra)
 ox_setup()
 
+
 fp <- dirname(getActiveDocumentContext()$path)
 
 setwd(fp)
