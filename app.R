@@ -16,12 +16,11 @@ ox_setup()
 
 fp <- dirname(getActiveDocumentContext()$path)
 
-
 setwd(fp)
 
 # 0.0 Data Processing -----------------------------------------------------
 
-# source("Data Processing/DataProcessing_AEMO.R")
+#source("data processing/DataProcessing_AEMO.R")
 
 # 0.1 Import Functions ----------------------------------------------------
 

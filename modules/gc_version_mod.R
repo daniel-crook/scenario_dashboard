@@ -22,7 +22,7 @@ gc_version_ui <- function(id) {
                      ns("display"),
                      NULL,
                      c("Level Values", "% y/y"),
-                     selected = "Level Values",
+                     selected = "% y/y",
                      justified = TRUE,
                      status = "primary"
                    )
