@@ -2,7 +2,6 @@
 
 
 
-
 # 1.0 Module UI -----------------------------------------------------------
 
 homepage_ui <- function(id) {
@@ -12,61 +11,70 @@ homepage_ui <- function(id) {
     titlePanel(h1(
       strong("Welcome to the Scenario Dashboard")
     )),
-    
-    mainPanel(
-      fluidRow(
-        h4(
-          "The dashboard has been designed to be used during scenario development, allowing for several comparisons between databases to be conducted (by version, by scenario or by region).
-        The dashboard also includes several off-platform calculated series for further checking of forecasts as well as CAGR/Period average calculations that may be useful during report writing."
-        )
-      ),
-      fluidRow(column(3, h4(
-        strong("AEMO Data Last Updated: "),
-        br(),
-        format(file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
-      )),
-      column(3, h4(
-        strong("GEM Data Last Updated: "),
-        br(),
-        format(file.info("data/GEM_Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
-      )),
-      column(3, h4(
-        strong("GEM Data Last Updated: "),
-        br(),
-        format(file.info("data/GEM_Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
-      )),
-      column(3, h4(
-        strong("GEM Data Last Updated: "),
-        br(),
-        format(file.info("data/GEM_Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
-      ))),
-      h4(
-        strong("Note:"),
-        " i haven't managed to get the buttons to work on this page, for will have to ",
-        strong("use the navbar for navigation"),
-        " for the time being."
+    h5(
+      "The dashboard has been designed to be used during scenario development, allowing for several comparisons between databases to be conducted (by version, by scenario or by region).
+      The dashboard also includes several off-platform calculated series for further checking of forecasts as well as CAGR/Period average calculations that may be useful during report writing.
+      We will continue to develop this dashboard, gradually generalising it so that it can be easily used across all projects and also by others."
+    ),
+    fluidRow(column(3, h4(
+      strong("AEMO Data Last Updated: "),
+      br(),
+      format(file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
+    )),
+    column(3, h4(
+      strong("GEM Data Last Updated: "),
+      br(),
+      format(file.info("data/GEM_Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
+    )),
+    column(3, h4(
+      strong("AID Helper File: "),
+      br(),
+      format(
+        file.info("data processing/Input Files/List_of_Indicators.xlsx")$mtime,
+        format = "%d %b %Y %I:%M %p"
       )
+    )),
+    column(3, h4(
+      strong("GEM Helper File: "),
+      br(),
+      format(
+        file.info("data processing/List_Of_Indicators_GEM.xlsx")$mtime,
+        format = "%d %b %Y %I:%M %p"
+      )
+    ))),
+    h5(
+      strong("Note:"),
+      " i haven't managed to get the buttons to work on this page, for will have to ",
+      strong("use the navbar for navigation"),
+      " for the time being."
     ),
     fluidRow(
       column(3,
              wellPanel(
                style = paste0(
-                 "border: 5px solid; border-color:",
+                 "border: 5px solid; background-color:",
+                 oxgraphs::ox_pallette()[1],"; border-color:",
                  oxgraphs::ox_pallette()[1],
                  "; margin-bottom: 0.5em"
                ),
-               fluidRow(column(
-                 9,
-                 actionButton(
-                   inputId = "vc_button",
-                   h5(strong("Variable Comparison")),
-                   style = paste0(
-                     "background-color:",
-                     oxgraphs::ox_pallette()[1],
-                     "; color: white"
-                   )
-                 )
-               ))
+               h4(strong("Variable Comparison"),
+               style = paste0(
+                 "background-color:",
+                 oxgraphs::ox_pallette()[1],
+                 "; color: white"
+               )),
+               h5("General comparison of AID variables: by version, by scenario or by region.",
+                  style = paste0(
+                    "background-color:",
+                    oxgraphs::ox_pallette()[1],
+                    "; color: white"
+                  )),
+               column(1,h1(icon("fas fa-chart-line"),
+                           style = paste0(
+                             "background-color:",
+                             oxgraphs::ox_pallette()[1],
+                             "; color: white"
+                           )), offset = 9)
              )),
       column(3,
              wellPanel(

@@ -74,7 +74,7 @@ ui <-  tagList(
         tabPanel(h5(icon("fas fa-home"), strong("Home")),
                  homepage_ui("homepage")),
         tabPanel(
-            h5(strong("Variable Comparison")),
+            h5(icon("fas fa-chart-line"), strong("Variable Comparison")),
             tabsetPanel(
                 type = "pills",
                 vc_version_ui("vc_version"),
@@ -83,7 +83,7 @@ ui <-  tagList(
             )
         ),
         tabPanel(
-            h5(strong("State Composition")),
+            h5(icon("fas fa-map-marked-alt"), strong("State Composition")),
             tabsetPanel(
                 type = "pills",
                 sc_version_ui("sc_version"),
@@ -92,7 +92,7 @@ ui <-  tagList(
             )
         ),
         tabPanel(
-            h5(strong("Industry Comparison")),
+            h5(icon("fas fa-industry"), strong("Industry Comparison")),
             tabsetPanel(
                 type = "pills",
                 ic_version_ui("ic_version"),
@@ -102,7 +102,7 @@ ui <-  tagList(
             )
         ),
         tabPanel(
-            h5(strong("GEM Checks")),
+            h5(icon("fas fa-globe-asia"), strong("GEM Checks")),
             tabsetPanel(
                 type = "pills",
                 gc_version_ui("gc_version"),
