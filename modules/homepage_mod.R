@@ -2,6 +2,7 @@
 
 
 
+
 # 1.0 Module UI -----------------------------------------------------------
 
 homepage_ui <- function(id) {
@@ -53,86 +54,142 @@ homepage_ui <- function(id) {
              wellPanel(
                style = paste0(
                  "border: 5px solid; background-color:",
-                 oxgraphs::ox_pallette()[1],"; border-color:",
+                 oxgraphs::ox_pallette()[1],
+                 "; border-color:",
                  oxgraphs::ox_pallette()[1],
                  "; margin-bottom: 0.5em"
                ),
-               h4(strong("Variable Comparison"),
-               style = paste0(
-                 "background-color:",
-                 oxgraphs::ox_pallette()[1],
-                 "; color: white"
+               fluidRow(column(10,h4(
+                 strong("Variable Comparison"),
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[1],
+                   "; color: white"
+                 )
                )),
-               h5("General comparison of AID variables: by version, by scenario or by region.",
-                  style = paste0(
-                    "background-color:",
-                    oxgraphs::ox_pallette()[1],
-                    "; color: white"
-                  )),
-               column(1,h1(icon("fas fa-chart-line"),
-                           style = paste0(
-                             "background-color:",
-                             oxgraphs::ox_pallette()[1],
-                             "; color: white"
-                           )), offset = 9)
+               column(2,
+                      h1(
+                        icon("fas fa-chart-line"),
+                        style = paste0(
+                          "background-color:",
+                          oxgraphs::ox_pallette()[1],
+                          "; color: white; margin-top: 0.1em"
+                        )
+                      ))),
+               h5(
+                 "General comparison of AID variables across scenarios: by version, scenario or region.",
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[1],
+                   "; color: white"
+                 )
+               )
              )),
       column(3,
              wellPanel(
                style = paste0(
-                 "border: 5px solid; border-color:",
+                 "border: 5px solid; background-color:",
+                 oxgraphs::ox_pallette()[2],
+                 "; border-color:",
                  oxgraphs::ox_pallette()[2],
                  "; margin-bottom: 0.5em"
                ),
-               fluidRow(column(
-                 9, actionButton(
-                   "sc_button",
-                   h5(strong("State Composition")),
-                   style = paste0(
-                     "background-color:",
-                     oxgraphs::ox_pallette()[2],
-                     "; color: white"
-                   )
+               fluidRow(column(10,h4(
+                 strong("State Composition"),
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[2],
+                   "; color: white"
                  )
-               ))
+               )),
+               column(2,
+               h1(
+                 icon("fas fa-map-marked-alt"),
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[2],
+                   "; color: white; margin-top: 0.1em"
+                 )
+               ))),
+               h5(
+                 "Compare how the scenarios affect the state compositions for a particular variable: by version, scenario or region.",
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[2],
+                   "; color: white"
+                 )
+               )
              )),
       column(3,
              wellPanel(
                style = paste0(
-                 "border: 5px solid; border-color:",
+                 "border: 5px solid; background-color:",
+                 oxgraphs::ox_pallette()[3],
+                 "; border-color:",
                  oxgraphs::ox_pallette()[3],
                  "; margin-bottom: 0.5em"
                ),
-               fluidRow(column(
-                 9, actionButton(
-                   "ic_button",
-                   h5(strong("Industry Comparison")),
-                   style = paste0(
-                     "background-color:",
-                     oxgraphs::ox_pallette()[3],
-                     "; color: white"
-                   )
+               fluidRow(column(10,h4(
+                 strong("Industry Comparison"),
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[3],
+                   "; color: white"
                  )
-               ))
+               )),
+               column(2,
+                      h1(
+                        icon("fas fa-industry"),
+                        style = paste0(
+                          "background-color:",
+                          oxgraphs::ox_pallette()[3],
+                          "; color: white; margin-top: 0.1em"
+                        )
+                      ))),
+               h5(
+                 "Compare how the scenarios affect an industries GVA share for a region: by version, scenario or region.",
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[3],
+                   "; color: white"
+                 )
+               )
              )),
       column(3,
              wellPanel(
                style = paste0(
-                 "border: 5px solid; border-color:",
+                 "border: 5px solid; background-color:",
+                 oxgraphs::ox_pallette()[5],
+                 "; border-color:",
                  oxgraphs::ox_pallette()[5],
                  "; margin-bottom: 0.5em"
                ),
-               fluidRow(column(
-                 9, actionButton(
-                   "gc_button",
-                   h5(strong("GEM Checks")),
-                   style = paste0(
-                     "background-color:",
-                     oxgraphs::ox_pallette()[5],
-                     "; color: white"
-                   )
+               fluidRow(column(10,h4(
+                 strong("GEM Checks"),
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[5],
+                   "; color: white"
                  )
-               ))
-             ))
+               )),
+               column(2,
+                      h1(
+                        icon("fas fa-globe-asia"),
+                        style = paste0(
+                          "background-color:",
+                          oxgraphs::ox_pallette()[5],
+                          "; color: white; margin-top: 0.1em"
+                        )
+                      ))),
+               h5(
+                 "General variable of GEM variables across scenarios as well as energy specific charts: by version, scenario or region.",
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[5],
+                   "; color: white"
+                 )
+               )
+             )),
     ),
     wellPanel(
       style = paste0(
