@@ -1,4 +1,5 @@
 
+
 # 1.0 Module UI -----------------------------------------------------------
 
 d_region_breakdown_ui <- function(id) {
@@ -97,15 +98,15 @@ d_region_breakdown_ui <- function(id) {
                             ns("Period_start"),
                             label = NULL,
                             value = "2021"
-                          ), ),
+                          ),),
                    column(1,
-                          h4("-", style = "margin-top: 0.2em"), ),
+                          h4("-", style = "margin-top: 0.2em"),),
                    column(3,
                           textInput(
                             ns("Period_end"),
                             label = NULL,
                             value = "2053"
-                          ), ),
+                          ),),
                    style = "margin-bottom: -2em; margin-top: -1em"
                  )
                )
@@ -120,25 +121,25 @@ d_region_breakdown_ui <- function(id) {
 d_region_breakdown_server <- function(input, output, session) {
   # Sort Version Select Input -----------------------------------------------
   observe({
-    rv_list <-
-      data.frame(RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario &
-                                                                 data$Series_ID == "NATTOT"])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
-    rv_list$Release_Date <-
-      parse_date_time(rv_list$Release_Date, "my")
-    
-    rv_list <-
-      arrange(rv_list, desc(Release_Date), desc(Version)) %>%
-      mutate(., RELEASE_VERSION = paste(format(Release_Date, format = "%b%y"), Version, sep = " ")) %>%
-      select(-Release_Date, -Version)
-    
-    updateSelectInput(
-      session,
-      "Version",
-      label = NULL,
-      rv_list$RELEASE_VERSION,
-      selected = as.list(rv_list$RELEASE_VERSION[1])
-    )
-  })
+      rv_list <-
+        data.frame(RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario &
+                                                                   data$Series_ID == "NATTOT"])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
+      rv_list$Release_Date <-
+        parse_date_time(rv_list$Release_Date, "my")
+      
+      rv_list <-
+        arrange(rv_list, desc(Release_Date), desc(Version)) %>%
+        mutate(., RELEASE_VERSION = paste(format(Release_Date, format = "%b%y"), Version, sep = " ")) %>%
+        select(-Release_Date, -Version)
+      
+      updateSelectInput(
+        session,
+        "Version",
+        label = NULL,
+        rv_list$RELEASE_VERSION,
+        selected = as.list(rv_list$RELEASE_VERSION[1])
+      )
+    })
   
   # Update checkboxgroup options based on selected inputs -------------------
   observe({
@@ -177,8 +178,7 @@ d_region_breakdown_server <- function(input, output, session) {
         colnames(d_region_breakdown_data)[2:length(colnames(d_region_breakdown_data))]
       
       input_line <-  str_subset(input, pattern = fixed("Total"))
-      input_bar <-
-        str_subset(input, pattern = fixed("Total"), negate = TRUE)
+      input_bar <- str_subset(input, pattern = fixed("Total"), negate = TRUE)
       rm(input)
       
       fig <-
@@ -191,6 +191,8 @@ d_region_breakdown_server <- function(input, output, session) {
           color = I(ox_pallette()[1])
         ) %>%
         layout(
+          shapes = vline(data[(data$FORECAST_FLAG == "EA") &
+                                (data$variable == input_line[1]), "Dates"]),
           yaxis = list(title = "Persons (000s)"),
           xaxis = list(title = "Year"),
           legend = list(
@@ -199,7 +201,7 @@ d_region_breakdown_server <- function(input, output, session) {
             x = 0.5,
             y = -0.15
           ),
-          barmode = 'stack'
+          barmode = 'relative'
         ) %>%
         layout(title = list(
           text = paste0(
@@ -217,10 +219,18 @@ d_region_breakdown_server <- function(input, output, session) {
             size = 18,
             color = ox_pallette()[2]
           )
-        ))
+        )) %>%
+        add_annotations(
+          x = data[(data$FORECAST_FLAG == "EA") &
+                     (data$variable == input_bar[1]), "Dates"],
+          y = 1,
+          text = "              Forecast",
+          yref = "paper",
+          showarrow = FALSE
+        )
       if (length(input_bar) >= 2) {
         for (i in 2:length(input_bar)) {
-          fig <- fig %>% add_trace(
+          fig <- fig %>% add_bars(
             y = d_region_breakdown_data[[input_bar[i]]],
             color = I(ox_pallette()[i]),
             name = str_before_first(input_bar[i], ", ")
@@ -234,6 +244,7 @@ d_region_breakdown_server <- function(input, output, session) {
         type = 'scatter',
         mode = 'lines'
       )
+      fig
       
     })
   })
