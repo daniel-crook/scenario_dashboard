@@ -153,89 +153,87 @@ d_total_increase_by_region_server <- function(input, output, session) {
   })
   
   # # Render Plot -------------------------------------------------------------
-  # observe({
-  #   output$Plot <- renderPlotly({
-  #     d_region_breakdown_data <-
-  #       filter(data, variable %in% input$Selections) %>%
-  #       transmute(.,
-  #                 Dates = Dates,
-  #                 variable,
-  #                 value = round(as.numeric(value), 2)) %>%
-  #       spread(., variable, value)
-  #     
-  #     input <-
-  #       colnames(d_region_breakdown_data)[2:length(colnames(d_region_breakdown_data))]
-  #     
-  #     input_line <-  str_subset(input, pattern = fixed("Total"))
-  #     input_bar <- str_subset(input, pattern = fixed("Total"), negate = TRUE)
-  #     
-  #     fig <-
-  #       plot_ly(
-  #         d_region_breakdown_data,
-  #         x = ~ Dates,
-  #         y = ~ d_region_breakdown_data[[input_bar[1]]],
-  #         type = 'bar',
-  #         name = str_before_first(input_bar[1], ", "),
-  #         color = I(ox_pallette()[1])
-  #       ) %>%
-  #       layout(
-  #         shapes = vline(data[(data$FORECAST_FLAG == "EA") &
-  #                               (data$variable == input[1]), "Dates"]),
-  #         yaxis = list(title = "Persons (000s)"),
-  #         xaxis = list(title = "Year"),
-  #         legend = list(
-  #           orientation = "h",
-  #           xanchor = "center",
-  #           x = 0.5,
-  #           y = -0.15
-  #         ),
-  #         barmode = 'relative'
-  #       ) %>%
-  #       layout(title = list(
-  #         text = paste0(
-  #           '<b>',
-  #           paste0(
-  #             str_after_first(input_bar[1], ","),
-  #             " - Population Breakdown"
-  #           ),
-  #           '<b>'
-  #         ),
-  #         x = 0.05,
-  #         y = 0.99,
-  #         font = list(
-  #           family = "segoe ui",
-  #           size = 18,
-  #           color = ox_pallette()[2]
-  #         )
-  #       )) %>%
-  #       add_annotations(
-  #         x = data[(data$FORECAST_FLAG == "EA") &
-  #                    (data$variable == input[1]), "Dates"],
-  #         y = 1,
-  #         text = "              Forecast",
-  #         yref = "paper",
-  #         showarrow = FALSE
-  #       )
-  #     if (length(input_bar) >= 2) {
-  #       for (i in 2:length(input_bar)) {
-  #         fig <- fig %>% add_bars(
-  #           y = d_region_breakdown_data[[input_bar[i]]],
-  #           color = I(ox_pallette()[i]),
-  #           name = str_before_first(input_bar[i], ", ")
-  #         )
-  #       }
-  #     }
-  #     fig <- fig %>% add_trace(
-  #       y = d_region_breakdown_data[[input_line[1]]],
-  #       color = I(ox_pallette()[9]),
-  #       name = str_before_first(input_line[1], ", "),
-  #       type = 'scatter',
-  #       mode = 'lines'
-  #     )
-  #     fig
-  #     
-  #   })
-  # })
+  observe({
+    output$Plot <- renderPlotly({
+      d_total_increase_by_region_data <-
+        filter(data, variable %in% input$Selections) %>%
+        transmute(.,
+                  Dates = Dates,
+                  variable,
+                  value = round(as.numeric(value), 2)) %>%
+        spread(., variable, value)
+
+      input <-
+        colnames(d_total_increase_by_region_data)[2:length(colnames(d_total_increase_by_region_data))]
+
+      input_line <-  str_subset(input, pattern = fixed("AUS"))
+      input_bar <- str_subset(input, pattern = fixed("AUS"), negate = TRUE)
+
+      fig <-
+        plot_ly(
+          d_total_increase_by_region_data,
+          x = ~ Dates,
+          y = ~ d_total_increase_by_region_data[[input_bar[1]]],
+          type = 'bar',
+          name = str_after_first(str_before_nth(input_bar[1], ", ",2),", "),
+          color = I(ox_pallette()[1])
+        ) %>%
+        layout(
+          shapes = vline(data[(data$FORECAST_FLAG == "EA") &
+                                (data$variable == input[1]), "Dates"]),
+          yaxis = list(title = "Persons (000s)"),
+          xaxis = list(title = "Year"),
+          legend = list(
+            orientation = "h",
+            xanchor = "center",
+            x = 0.5,
+            y = -0.15
+          ),
+          barmode = 'relative'
+        ) %>%
+        layout(title = list(
+          text = paste0(
+            '<b>',
+            paste0(str_after_nth(input_bar[1], ",", 2),
+                   " - Total Population Increase by Region"),
+            '<b>'
+          ),
+          x = 0.05,
+          y = 0.99,
+          font = list(
+            family = "segoe ui",
+            size = 18,
+            color = ox_pallette()[2]
+          )
+        )) %>%
+        add_annotations(
+          x = data[(data$FORECAST_FLAG == "EA") &
+                     (data$variable == input[1]), "Dates"],
+          y = 1,
+          text = "              Forecast",
+          yref = "paper",
+          showarrow = FALSE
+        )
+      if (length(input_bar) >= 2) {
+        for (i in 2:length(input_bar)) {
+          fig <- fig %>% add_bars(
+            y = d_total_increase_by_region_data[[input_bar[i]]],
+            color = I(ox_pallette()[i]),
+            name = str_after_first(str_before_nth(input_bar[i], ", ",2),", ")
+          )
+        }
+      }
+      fig <- fig %>% add_trace(
+        y = d_total_increase_by_region_data[[input_line[1]]],
+        color = I(ox_pallette()[9]),
+        name = str_after_first(str_before_nth(input_line[1], ", ",2),", "),
+        type = 'scatter',
+        mode = 'lines'
+      )
+      fig
+
+    })
+  })
   
   # # Render Table ------------------------------------------------------------
   # observe({
