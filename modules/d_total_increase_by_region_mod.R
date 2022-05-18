@@ -134,6 +134,28 @@ d_total_increase_by_region_server <- function(input, output, session) {
   
   # Update checkboxgroup options based on selected inputs -------------------
   observe({
+    # state_list <- c("NSW","VIC","QLD","WA","SA","TAS","ACT","NT","AUS")
+    # 
+    # d_input <- data.frame(
+    #   SCENARIO_VALUE = input$Scenario,
+    #   ATTRIBUTE = "Total Population Increase",
+    #   RELEASE_VERSION = input$Release,
+    #   STATE = state_list
+    # ) %>% 
+    #   add.var.col(.)
+    # 
+    # d_input_varlist <- d_input$variable
+    # 
+    # 
+    # 
+    # for(i in state_list) {
+    #   if(length(str_subset(d_input_varlist,pattern = fixed(i)))) {
+    #     if(!(exists("d_input_f"))){
+    #       d_input_f <- NULL
+    #     }
+    #     d_input_f <- append(d_input_f,str_subset(d_input_varlist, pattern = fixed(i)))}
+    # }
+    
     updatePrettyCheckboxGroup(
       session,
       "Selections",
@@ -162,12 +184,22 @@ d_total_increase_by_region_server <- function(input, output, session) {
                   variable,
                   value = round(as.numeric(value), 2)) %>%
         spread(., variable, value)
-
+      
       input <-
         colnames(d_total_increase_by_region_data)[2:length(colnames(d_total_increase_by_region_data))]
+      
+      state_list <- c("NSW","VIC","QLD","WA","SA","TAS","ACT","NT","AUS")
+      
+      for(i in state_list) {
+        if(length(str_subset(input,pattern = fixed(i)))) {
+          if(!(exists("input_f"))){
+            input_f <- NULL
+          }
+          input_f <- append(input_f,str_subset(input, pattern = fixed(i)))}
+      }
 
-      input_line <-  str_subset(input, pattern = fixed("AUS"))
-      input_bar <- str_subset(input, pattern = fixed("AUS"), negate = TRUE)
+      input_line <-  str_subset(input_f, pattern = fixed("AUS"))
+      input_bar <- str_subset(input_f, pattern = fixed("AUS"), negate = TRUE)
 
       fig <-
         plot_ly(
