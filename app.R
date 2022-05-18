@@ -105,7 +105,7 @@ ui <-  tagList(
             tabsetPanel(
                 type = "pills",
                 d_region_breakdown_ui("d_region_breakdown"),
-                tabPanel("Region Contribution To Total Population Change")
+                d_total_increase_by_region_ui("d_total_increase_by_region")
             )
         ),
         tabPanel(
@@ -141,6 +141,7 @@ server <- function(input, output, session) {
     callModule(ic_variable_server, "ic_variable")
     
     callModule(d_region_breakdown_server, "d_region_breakdown")
+    callModule(d_total_increase_by_region_server, "d_total_increase_by_region")
     
     callModule(gc_version_server, "gc_version")
     callModule(gc_scenario_server, "gc_scenario")

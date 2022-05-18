@@ -2,9 +2,9 @@
 
 # 1.0 Module UI -----------------------------------------------------------
 
-d_region_breakdown_ui <- function(id) {
+d_total_increase_by_region_ui <- function(id) {
   ns = NS(id)
-  tabPanel("By Region Population Breakdown",
+  tabPanel("Total Population Increase by Region",
            sidebarLayout(
              sidebarPanel(
                chooseSliderSkin(skin = "Shiny", color = ox_pallette()[2]),
@@ -45,21 +45,14 @@ d_region_breakdown_ui <- function(id) {
                    "; margin-bottom: 0.5em"
                  ),
                  fluidRow(
-                   column(3,
-                          selectInput(
-                            ns("State"),
-                            label = h4(str_to_title("State"), style = "margin-bottom:-0.1em"),
-                            sort(unique(data$STATE)),
-                            selectize = FALSE
-                          )),
-                   column(5,
+                   column(6,
                           selectInput(
                             ns("Scenario"),
                             label = h4(str_to_title("Scenario"), style = "margin-bottom:-0.1em"),
-                            sort(unique(data$SCENARIO_VALUE[data$Series_ID == "NATTOT"])),
+                            sort(unique(data$SCENARIO_VALUE[data$Series_ID == "POPINC"])),
                             selectize = FALSE
                           )),
-                   column(4,
+                   column(6,
                           selectInput(
                             ns("Version"),
                             label = h4(str_to_title("Version"), style = "margin-bottom:-0.1em"),
@@ -78,12 +71,10 @@ d_region_breakdown_ui <- function(id) {
                    prettyCheckboxGroup(
                      ns("Selections"),
                      label = NULL,
-                     choices = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
-                                                      data$STATE == "ACT" &
+                     choices = unique(data$variable[data$Series_ID %in% c("POPINC")  &
                                                       data$SCENARIO_VALUE == "Central" &
                                                       data$RELEASE_VERSION == "May22 V1"]),
-                     selected = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
-                                                       data$STATE == "ACT" &
+                     selected = unique(data$variable[data$Series_ID %in% c("POPINC") & 
                                                        data$SCENARIO_VALUE == "Central" &
                                                        data$RELEASE_VERSION == "May22 V1"]),
                      shape = "round",
@@ -118,12 +109,12 @@ d_region_breakdown_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-d_region_breakdown_server <- function(input, output, session) {
+d_total_increase_by_region_server <- function(input, output, session) {
   # Sort Version Select Input -----------------------------------------------
   observe({
       rv_list <-
         data.frame(RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario &
-                                                                   data$Series_ID == "NATTOT"])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
+                                                                   data$Series_ID == "POPINC"])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
       rv_list$Release_Date <-
         parse_date_time(rv_list$Release_Date, "my")
       
@@ -147,12 +138,10 @@ d_region_breakdown_server <- function(input, output, session) {
       session,
       "Selections",
       label = NULL,
-      choices = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
-                                       data$STATE == input$State &
+      choices = unique(data$variable[data$Series_ID %in% c("POPINC") &
                                        data$SCENARIO_VALUE == input$Scenario &
                                        data$RELEASE_VERSION == input$Version]),
-      selected = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
-                                        data$STATE == input$State &
+      selected = unique(data$variable[data$Series_ID %in% c("POPINC")  &
                                         data$SCENARIO_VALUE == input$Scenario &
                                         data$RELEASE_VERSION == input$Version]),
       prettyOptions = list(
@@ -164,89 +153,89 @@ d_region_breakdown_server <- function(input, output, session) {
   })
   
   # # Render Plot -------------------------------------------------------------
-  observe({
-    output$Plot <- renderPlotly({
-      d_region_breakdown_data <-
-        filter(data, variable %in% input$Selections) %>%
-        transmute(.,
-                  Dates = Dates,
-                  variable,
-                  value = round(as.numeric(value), 2)) %>%
-        spread(., variable, value)
-      
-      input <-
-        colnames(d_region_breakdown_data)[2:length(colnames(d_region_breakdown_data))]
-      
-      input_line <-  str_subset(input, pattern = fixed("Total"))
-      input_bar <- str_subset(input, pattern = fixed("Total"), negate = TRUE)
-      
-      fig <-
-        plot_ly(
-          d_region_breakdown_data,
-          x = ~ Dates,
-          y = ~ d_region_breakdown_data[[input_bar[1]]],
-          type = 'bar',
-          name = str_before_first(input_bar[1], ", "),
-          color = I(ox_pallette()[1])
-        ) %>%
-        layout(
-          shapes = vline(data[(data$FORECAST_FLAG == "EA") &
-                                (data$variable == input[1]), "Dates"]),
-          yaxis = list(title = "Persons (000s)"),
-          xaxis = list(title = "Year"),
-          legend = list(
-            orientation = "h",
-            xanchor = "center",
-            x = 0.5,
-            y = -0.15
-          ),
-          barmode = 'relative'
-        ) %>%
-        layout(title = list(
-          text = paste0(
-            '<b>',
-            paste0(
-              str_after_first(input_bar[1], ","),
-              " - Population Breakdown"
-            ),
-            '<b>'
-          ),
-          x = 0.05,
-          y = 0.99,
-          font = list(
-            family = "segoe ui",
-            size = 18,
-            color = ox_pallette()[2]
-          )
-        )) %>%
-        add_annotations(
-          x = data[(data$FORECAST_FLAG == "EA") &
-                     (data$variable == input[1]), "Dates"],
-          y = 1,
-          text = "              Forecast",
-          yref = "paper",
-          showarrow = FALSE
-        )
-      if (length(input_bar) >= 2) {
-        for (i in 2:length(input_bar)) {
-          fig <- fig %>% add_bars(
-            y = d_region_breakdown_data[[input_bar[i]]],
-            color = I(ox_pallette()[i]),
-            name = str_before_first(input_bar[i], ", ")
-          )
-        }
-      }
-      fig <- fig %>% add_trace(
-        y = d_region_breakdown_data[[input_line[1]]],
-        color = I(ox_pallette()[9]),
-        name = str_before_first(input_line[1], ", "),
-        type = 'scatter',
-        mode = 'lines'
-      )
-      fig
-      
-    })
-  })
+  # observe({
+  #   output$Plot <- renderPlotly({
+  #     d_region_breakdown_data <-
+  #       filter(data, variable %in% input$Selections) %>%
+  #       transmute(.,
+  #                 Dates = Dates,
+  #                 variable,
+  #                 value = round(as.numeric(value), 2)) %>%
+  #       spread(., variable, value)
+  #     
+  #     input <-
+  #       colnames(d_region_breakdown_data)[2:length(colnames(d_region_breakdown_data))]
+  #     
+  #     input_line <-  str_subset(input, pattern = fixed("Total"))
+  #     input_bar <- str_subset(input, pattern = fixed("Total"), negate = TRUE)
+  #     
+  #     fig <-
+  #       plot_ly(
+  #         d_region_breakdown_data,
+  #         x = ~ Dates,
+  #         y = ~ d_region_breakdown_data[[input_bar[1]]],
+  #         type = 'bar',
+  #         name = str_before_first(input_bar[1], ", "),
+  #         color = I(ox_pallette()[1])
+  #       ) %>%
+  #       layout(
+  #         shapes = vline(data[(data$FORECAST_FLAG == "EA") &
+  #                               (data$variable == input[1]), "Dates"]),
+  #         yaxis = list(title = "Persons (000s)"),
+  #         xaxis = list(title = "Year"),
+  #         legend = list(
+  #           orientation = "h",
+  #           xanchor = "center",
+  #           x = 0.5,
+  #           y = -0.15
+  #         ),
+  #         barmode = 'relative'
+  #       ) %>%
+  #       layout(title = list(
+  #         text = paste0(
+  #           '<b>',
+  #           paste0(
+  #             str_after_first(input_bar[1], ","),
+  #             " - Population Breakdown"
+  #           ),
+  #           '<b>'
+  #         ),
+  #         x = 0.05,
+  #         y = 0.99,
+  #         font = list(
+  #           family = "segoe ui",
+  #           size = 18,
+  #           color = ox_pallette()[2]
+  #         )
+  #       )) %>%
+  #       add_annotations(
+  #         x = data[(data$FORECAST_FLAG == "EA") &
+  #                    (data$variable == input[1]), "Dates"],
+  #         y = 1,
+  #         text = "              Forecast",
+  #         yref = "paper",
+  #         showarrow = FALSE
+  #       )
+  #     if (length(input_bar) >= 2) {
+  #       for (i in 2:length(input_bar)) {
+  #         fig <- fig %>% add_bars(
+  #           y = d_region_breakdown_data[[input_bar[i]]],
+  #           color = I(ox_pallette()[i]),
+  #           name = str_before_first(input_bar[i], ", ")
+  #         )
+  #       }
+  #     }
+  #     fig <- fig %>% add_trace(
+  #       y = d_region_breakdown_data[[input_line[1]]],
+  #       color = I(ox_pallette()[9]),
+  #       name = str_before_first(input_line[1], ", "),
+  #       type = 'scatter',
+  #       mode = 'lines'
+  #     )
+  #     fig
+  #     
+  #   })
+  # })
   
   # # Render Table ------------------------------------------------------------
   # observe({
