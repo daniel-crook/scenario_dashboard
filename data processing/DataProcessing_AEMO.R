@@ -368,7 +368,13 @@ for (i in file) {
             SVCSGVALCC = GVAG1LCC + GVAG2LCC + GVAHLCC + GVAI1LCC +
               GVAI2LCC + GVAJLCC + GVAK1LCC + GVAK2LCC + GVAK3LCC +
               GVALLCC + GVAMLCC + GVANLCC + GVAOLCC + GVAPLCC
-          ) %>%
+          ) 
+        if(j == "AUS") {temp_df <- temp_df %>%
+          dplyr::mutate(
+            POPINC = NOMTOT + NATTOT)} else {temp_df <- temp_df %>%
+                                              dplyr::mutate(
+                                                POPINC = NOMTOT + NATTOT + NIMTOT)}
+        temp_df <- temp_df %>%
           dplyr::select(-GCLCC, -CLCC, -GILCC, -IFLCC) %>%
           tidyr::gather(key = Series_ID,
                         value = value,
@@ -377,6 +383,7 @@ for (i in file) {
         Output_Data <- Output_Data %>% bind_rows(temp_df)
       }
     }
+    
     
     # 8.0 Extending Forecasts past FY50 and adding hist/fc column -------------
     {

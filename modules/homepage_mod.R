@@ -159,6 +159,41 @@ homepage_ui <- function(id) {
              wellPanel(
                style = paste0(
                  "border: 5px solid; background-color:",
+                 oxgraphs::ox_pallette()[4],
+                 "; border-color:",
+                 oxgraphs::ox_pallette()[4],
+                 "; margin-bottom: 0.5em"
+               ),
+               fluidRow(column(10,h4(
+                 strong("Demographics"),
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[4],
+                   "; color: white"
+                 )
+               )),
+               column(2,
+                      h1(
+                        icon("fas fa-user"),
+                        style = paste0(
+                          "background-color:",
+                          oxgraphs::ox_pallette()[4],
+                          "; color: white; margin-top: 0.1em"
+                        )
+                      ))),
+               h5(
+                 "Compare the demographic outlook across scenarios, with a further breakdown on population growth.",
+                 style = paste0(
+                   "background-color:",
+                   oxgraphs::ox_pallette()[4],
+                   "; color: white"
+                 )
+               )
+             )),
+      column(3,
+             wellPanel(
+               style = paste0(
+                 "border: 5px solid; background-color:",
                  oxgraphs::ox_pallette()[5],
                  "; border-color:",
                  oxgraphs::ox_pallette()[5],

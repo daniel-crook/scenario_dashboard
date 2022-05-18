@@ -14,7 +14,6 @@ library(data.table)
 library(kableExtra)
 ox_setup()
 
-
 fp <- dirname(getActiveDocumentContext()$path)
 
 setwd(fp)
@@ -102,6 +101,14 @@ ui <-  tagList(
             )
         ),
         tabPanel(
+            h5(icon("fas fa-user"), strong("Demographics")),
+            tabsetPanel(
+                type = "pills",
+                d_region_pop_breakdown_ui("d_region_pop_breakdown"),
+                tabPanel("Region Contribution To Total Population Change")
+            )
+        ),
+        tabPanel(
             h5(icon("fas fa-globe-asia"), strong("GEM Checks")),
             tabsetPanel(
                 type = "pills",
@@ -132,6 +139,8 @@ server <- function(input, output, session) {
     callModule(ic_scenario_server, "ic_scenario")
     callModule(ic_region_server, "ic_region")
     callModule(ic_variable_server, "ic_variable")
+    
+    callModule(d_region_pop_breakdown_server, "d_region_pop_breakdown")
     
     callModule(gc_version_server, "gc_version")
     callModule(gc_scenario_server, "gc_scenario")
