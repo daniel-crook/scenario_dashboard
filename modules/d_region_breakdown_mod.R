@@ -1,10 +1,9 @@
 
-
 # 1.0 Module UI -----------------------------------------------------------
 
-d_region_pop_breakdown_ui <- function(id) {
+d_region_breakdown_ui <- function(id) {
   ns = NS(id)
-  tabPanel("By Region Populatio Breakdown",
+  tabPanel("By Region Population Breakdown",
            sidebarLayout(
              sidebarPanel(
                chooseSliderSkin(skin = "Shiny", color = ox_pallette()[2]),
@@ -78,12 +77,14 @@ d_region_pop_breakdown_ui <- function(id) {
                    prettyCheckboxGroup(
                      ns("Selections"),
                      label = NULL,
-                     choices = unique(data$variable[data$STATE == "ACT" &
+                     choices = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
+                                                      data$STATE == "ACT" &
                                                       data$SCENARIO_VALUE == "Central" &
-                                                      data$RELEASE_VERSION == "May22 V1"])[1],
-                     selected = unique(data$variable[data$STATE == "ACT" &
+                                                      data$RELEASE_VERSION == "May22 V1"]),
+                     selected = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
+                                                       data$STATE == "ACT" &
                                                        data$SCENARIO_VALUE == "Central" &
-                                                       data$RELEASE_VERSION == "May22 V1"])[1],
+                                                       data$RELEASE_VERSION == "May22 V1"]),
                      shape = "round",
                      outline = TRUE,
                      status = "primary"
@@ -96,15 +97,15 @@ d_region_pop_breakdown_ui <- function(id) {
                             ns("Period_start"),
                             label = NULL,
                             value = "2021"
-                          ),),
+                          ), ),
                    column(1,
-                          h4("-", style = "margin-top: 0.2em"),),
+                          h4("-", style = "margin-top: 0.2em"), ),
                    column(3,
                           textInput(
                             ns("Period_end"),
                             label = NULL,
                             value = "2053"
-                          ),),
+                          ), ),
                    style = "margin-bottom: -2em; margin-top: -1em"
                  )
                )
@@ -116,11 +117,12 @@ d_region_pop_breakdown_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-d_region_pop_breakdown_server <- function(input, output, session) {
+d_region_breakdown_server <- function(input, output, session) {
   # Sort Version Select Input -----------------------------------------------
   observe({
     rv_list <-
-      data.frame(RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario & data$Series_ID == "NATTOT"])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
+      data.frame(RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario &
+                                                                 data$Series_ID == "NATTOT"])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
     rv_list$Release_Date <-
       parse_date_time(rv_list$Release_Date, "my")
     
@@ -138,120 +140,104 @@ d_region_pop_breakdown_server <- function(input, output, session) {
     )
   })
   
-  # # Update checkboxgroup options based on selected inputs -------------------
+  # Update checkboxgroup options based on selected inputs -------------------
   observe({
-    if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
-                             data$RELEASE_VERSION == input$Version &
-                             data$STATE == input$State]) >= 1) {
-      vars <- c("NOMTOT","NIMTOT","NATTOT","POPINC")
-      
-    version_list <-
-      data.frame(
-        ATTRIBUTE = unique(data$ATTRIBUTE[data$Series_ID %in% vars &
-                                            data$SCENARIO_VALUE == input$Scenario &
-                                            data$RELEASE_VERSION == input$Version]),
-        STATE = input$State,
-        SCENARIO_VALUE = input$Scenario,
-        RELEASE_VERSION = input$Version
-      )  %>%
-      add.var.col(.)
-    
-    
-    print(unique(data$ATTRIBUTE[data$Series_ID %in% vars &
-                                  data$SCENARIO_VALUE == "Central" &
-                                  data$RELEASE_VERSION == "May22 V1" &
-                                  data$STATE == "ACT"]))
-
     updatePrettyCheckboxGroup(
       session,
       "Selections",
       label = NULL,
-      sort(version_list$variable),
-      selected = sort(version_list$variable)[1:4],
+      choices = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
+                                       data$STATE == input$State &
+                                       data$SCENARIO_VALUE == input$Scenario &
+                                       data$RELEASE_VERSION == input$Version]),
+      selected = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
+                                        data$STATE == input$State &
+                                        data$SCENARIO_VALUE == input$Scenario &
+                                        data$RELEASE_VERSION == input$Version]),
       prettyOptions = list(
         shape = "round",
         outline = TRUE,
         status = "primary"
       )
     )
-    }
   })
   
   # # Render Plot -------------------------------------------------------------
-  # observe({
-  #   output$Plot <- renderPlotly({
-  #     bar_dates <- seq(2020, 2050, 10)
-  #     
-  #     ic_variable_data <- filter(data,
-  #                                ic_variable %in% unique(data$ic_variable[data$variable %in% input$Selections]))
-  #     
-  #     ic_variable_data_a <- filter(ic_variable_data,
-  #                                  variable %in% input$Selections)
-  #     ic_variable_data_b <-
-  #       filter(
-  #         ic_variable_data,
-  #         Series_ID %in% c("GVAA_BLCC", "INDPRODLCC", "GVAFLCC", "SVCSGVALCC")
-  #       )
-  #     ic_variable_data_b <-
-  #       aggregate(
-  #         x = ic_variable_data_b$value,
-  #         by = list(
-  #           ic_variable_data_b$Dates,
-  #           ic_variable_data_b$ic_variable
-  #         ),
-  #         FUN = sum
-  #       ) %>%
-  #       transmute(.,
-  #                 Dates = Group.1,
-  #                 ic_variable = Group.2,
-  #                 GVATOT = x)
-  #     ic_variable_data <- merge(ic_variable_data_a,
-  #                               ic_variable_data_b,
-  #                               by = c("Dates", "ic_variable")) %>%
-  #       transmute(.,
-  #                 Dates,
-  #                 variable,
-  #                 value = round(VALUE / GVATOT * 100, 2))
-  #     if (input$display != "Line chart") {
-  #       ic_variable_data <-
-  #         trail_avg(ic_variable_data, bar_dates[2] - bar_dates[1]) %>%
-  #         mutate(., value = round(value, 2)) %>%
-  #         filter(., Dates %in% bar_dates)
-  #       ic_variable_data$Dates <- as.factor(ic_variable_data$Dates)
-  #     }
-  #     ic_variable_data <- spread(ic_variable_data, variable, value)
-  #     
-  #     fig <-
-  #       if (input$display != "Line chart") {
-  #         bar.plot(ic_variable_data,
-  #                  input$Selections,
-  #                  "% of Total GVA",
-  #                  "%")
-  #       } else {
-  #         line.plot(ic_variable_data,
-  #                   input$Selections,
-  #                   "% of Total GVA",
-  #                   "%")
-  #       }
-  #     fig <- fig %>%
-  #       layout(title = list(
-  #         text = paste0(
-  #           '<b>',
-  #           paste(input$State, input$Scenario, input$Version, sep = ", "),
-  #           " - By Variable Comparison",
-  #           '<b>'
-  #         ),
-  #         x = 0.04,
-  #         font = list(
-  #           family = "segoe ui",
-  #           size = 18,
-  #           color = ox_pallette()[2]
-  #         )
-  #       ))
-  #     
-  #   })
-  # })
-  # 
+  observe({
+    output$Plot <- renderPlotly({
+      d_region_breakdown_data <-
+        filter(data, variable %in% input$Selections) %>%
+        transmute(.,
+                  Dates = Dates,
+                  variable,
+                  value = round(as.numeric(value), 2)) %>%
+        spread(., variable, value)
+      
+      input <-
+        colnames(d_region_breakdown_data)[2:length(colnames(d_region_breakdown_data))]
+      
+      input_line <-  str_subset(input, pattern = fixed("Total"))
+      input_bar <-
+        str_subset(input, pattern = fixed("Total"), negate = TRUE)
+      rm(input)
+      
+      fig <-
+        plot_ly(
+          d_region_breakdown_data,
+          x = ~ Dates,
+          y = ~ d_region_breakdown_data[[input_bar[1]]],
+          type = 'bar',
+          name = str_before_first(input_bar[1], ", "),
+          color = I(ox_pallette()[1])
+        ) %>%
+        layout(
+          yaxis = list(title = "Persons (000s)"),
+          xaxis = list(title = "Year"),
+          legend = list(
+            orientation = "h",
+            xanchor = "center",
+            x = 0.5,
+            y = -0.15
+          ),
+          barmode = 'stack'
+        ) %>%
+        layout(title = list(
+          text = paste0(
+            '<b>',
+            paste0(
+              str_after_first(input_bar[1], ","),
+              " - Population Breakdown"
+            ),
+            '<b>'
+          ),
+          x = 0.05,
+          y = 0.99,
+          font = list(
+            family = "segoe ui",
+            size = 18,
+            color = ox_pallette()[2]
+          )
+        ))
+      if (length(input_bar) >= 2) {
+        for (i in 2:length(input_bar)) {
+          fig <- fig %>% add_trace(
+            y = d_region_breakdown_data[[input_bar[i]]],
+            color = I(ox_pallette()[i]),
+            name = str_before_first(input_bar[i], ", ")
+          )
+        }
+      }
+      fig <- fig %>% add_trace(
+        y = d_region_breakdown_data[[input_line[1]]],
+        color = I(ox_pallette()[9]),
+        name = str_before_first(input_line[1], ", "),
+        type = 'scatter',
+        mode = 'lines'
+      )
+      
+    })
+  })
+  
   # # Render Table ------------------------------------------------------------
   # observe({
   #   if (length(input$Selections) >= 2) {
@@ -267,7 +253,7 @@ d_region_pop_breakdown_server <- function(input, output, session) {
   #   } else {
   #     common_dates <- data$Dates[data$variable == input$Selections[1]]
   #   }
-  #   
+  #
   #   period_dates <-
   #     c(
   #       custom.min(common_dates),
@@ -279,7 +265,7 @@ d_region_pop_breakdown_server <- function(input, output, session) {
   #       input$Period_start,
   #       input$Period_end
   #     )
-  #   
+  #
   #   period_names <-
   #     c("2000s",
   #       "2010s",
@@ -288,11 +274,11 @@ d_region_pop_breakdown_server <- function(input, output, session) {
   #       "Long run",
   #       "",
   #       "Custom Period")
-  #   
+  #
   #   output$Table <- renderTable({
   #     ic_variable_table_data <- filter(data,
   #                                      ic_variable %in% unique(data$ic_variable[data$variable %in% input$Selections]))
-  #     
+  #
   #     ic_variable_table_data_a <- filter(ic_variable_table_data,
   #                                        variable %in% input$Selections)
   #     ic_variable_table_data_b <-
@@ -322,7 +308,7 @@ d_region_pop_breakdown_server <- function(input, output, session) {
   #                 Dates,
   #                 variable,
   #                 value = round(VALUE / GVATOT * 100, 2))
-  #     
+  #
   #     for (i in c(2:6, length(period_dates))) {
   #       ic_variable_table_data_1 <-
   #         ic_variable_table_data %>%
@@ -342,10 +328,10 @@ d_region_pop_breakdown_server <- function(input, output, session) {
   #           variable,
   #           value = round(value, 2)
   #         )
-  #       
+  #
   #       ic_variable_table_data_1 <-
   #         spread(ic_variable_table_data_1, variable, value)
-  #       
+  #
   #       if (i == 2) {
   #         ic_variable_p_avg_table <- ic_variable_table_data_1
   #       } else {
