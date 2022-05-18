@@ -1,17 +1,28 @@
 rm(list = ls())
 
-library(shiny)
-library(bslib)
-library(htmltools)
-library(shinyWidgets)
-library(stringi)
-library(stringr)
-library(oxgraphs)
-library(plotly)
-library(DT)
-library(strex)
-library(data.table)
-library(kableExtra)
+list.of.packages <-
+    c(
+        "shiny",
+        "bslib",
+        "htmltools",
+        "shinyWidgets",
+        "stringi",
+        "stringr",
+        "oxgraphs",
+        "plotly",
+        "DT",
+        "strex",
+        "data.table",
+        "kableExtra"
+    )
+
+new.packages <- list.of.packages[!(list.of.packages %in%
+                                       installed.packages()[, "Package"])]
+if (length(new.packages)) {
+    install.packages(new.packages)
+}
+invisible(lapply(list.of.packages, require, character.only = TRUE))
+
 ox_setup()
 
 fp <- dirname(getActiveDocumentContext()$path)
@@ -123,7 +134,6 @@ ui <-  tagList(
 # 4.0 Server --------------------------------------------------------------
 
 server <- function(input, output, session) {
-    
     #callModule(homepage_server, "homepage")
     homepage_server("homepage", parentSession = session)
     
@@ -141,7 +151,8 @@ server <- function(input, output, session) {
     callModule(ic_variable_server, "ic_variable")
     
     callModule(d_region_breakdown_server, "d_region_breakdown")
-    callModule(d_total_increase_by_region_server, "d_total_increase_by_region")
+    callModule(d_total_increase_by_region_server,
+               "d_total_increase_by_region")
     
     callModule(gc_version_server, "gc_version")
     callModule(gc_scenario_server, "gc_scenario")
