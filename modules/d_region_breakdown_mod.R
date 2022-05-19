@@ -1,5 +1,4 @@
 
-
 # 1.0 Module UI -----------------------------------------------------------
 
 d_region_breakdown_ui <- function(id) {
@@ -8,36 +7,32 @@ d_region_breakdown_ui <- function(id) {
            sidebarLayout(
              sidebarPanel(
                chooseSliderSkin(skin = "Shiny", color = ox_pallette()[2]),
-               # wellPanel(
-               #   style = paste0(
-               #     "border: 5px solid; border-color:",
-               #     oxgraphs::ox_pallette()[2],
-               #     "; margin-bottom: 0.5em"
-               #   ),
-               #   fluidRow(column(
-               #     2, h4("Display:", style = "margin-top: 0.15em")
-               #   ),
-               #   column(
-               #     5,
-               #     radioGroupButtons(
-               #       ns("display"),
-               #       NULL,
-               #       choices = c("Line chart", "Bar chart"),
-               #       selected = "Line chart",
-               #       justified = TRUE,
-               #       status = "primary"
-               #     )
-               #   ),
-               #   column(
-               #     5,
-               #     actionGroupButtons(
-               #       inputIds = c(ns("pvt"), ns("pub"), ns("mcu"), ns("reset")),
-               #       labels = c("Pvt S", "Pub S", "MCU", "Reset"),
-               #       status = "primary"
-               #   )
-               #   ),
-               #   style = "margin-bottom:-2.0em; margin-top:-0.75em")
-               # ),
+               wellPanel(
+                 style = paste0(
+                   "border: 5px solid; border-color:",
+                   oxgraphs::ox_pallette()[2],
+                   "; margin-bottom: 0.5em"
+                 ),
+                 fluidRow(column(
+                   2, h4("Display:",
+                         style = "margin-top: 0.25em"
+                         )
+                 ),
+                 column(
+                   5,
+                   switchInput(
+                     inputId = ns("title"),
+                     label = "Title",
+                     value = TRUE,
+                     size = 'large',
+                     onLabel = "ON",
+                     offLabel = "OFF",
+                     onStatus = "primary",
+                     offStatus = "primary"
+                   )
+                 ),
+                 style = "margin-bottom:-2.0em; margin-top:-0.75em")
+               ),
                wellPanel(
                  style = paste0(
                    "border: 5px solid; border-color:",
@@ -166,7 +161,7 @@ d_region_breakdown_server <- function(id, data) {
   
   # # Render Plot -------------------------------------------------------------
   observe({
-    output$Plot <- renderPlotly({
+      output$Plot <- renderPlotly({
       d_region_breakdown_data <-
         filter(data, variable %in% input$Selections) %>%
         transmute(.,
@@ -175,11 +170,11 @@ d_region_breakdown_server <- function(id, data) {
                   value = round(as.numeric(value), 2)) %>%
         spread(., variable, value)
       
-      input <-
+      input_names <-
         colnames(d_region_breakdown_data)[2:length(colnames(d_region_breakdown_data))]
       
-      input_line <-  str_subset(input, pattern = fixed("Total"))
-      input_bar <- str_subset(input, pattern = fixed("Total"), negate = TRUE)
+      input_line <-  str_subset(input_names, pattern = fixed("Total"))
+      input_bar <- str_subset(input_names, pattern = fixed("Total"), negate = TRUE)
       
       fig <-
         plot_ly(
@@ -192,7 +187,7 @@ d_region_breakdown_server <- function(id, data) {
         ) %>%
         layout(
           shapes = vline(data[(data$FORECAST_FLAG == "EA") &
-                                (data$variable == input[1]), "Dates"]),
+                                (data$variable == input_names[1]), "Dates"]),
           yaxis = list(title = "Persons (000s)"),
           xaxis = list(title = "Year"),
           legend = list(
@@ -203,26 +198,9 @@ d_region_breakdown_server <- function(id, data) {
           ),
           barmode = 'relative'
         ) %>%
-        layout(title = list(
-          text = paste0(
-            '<b>',
-            paste0(
-              str_after_first(input_bar[1], ","),
-              " - Population Breakdown"
-            ),
-            '<b>'
-          ),
-          x = 0.05,
-          y = 0.99,
-          font = list(
-            family = "segoe ui",
-            size = 18,
-            color = ox_pallette()[2]
-          )
-        )) %>%
         add_annotations(
           x = data[(data$FORECAST_FLAG == "EA") &
-                     (data$variable == input[1]), "Dates"],
+                     (data$variable == input_names[1]), "Dates"],
           y = 1,
           text = "              Forecast",
           yref = "paper",
@@ -244,6 +222,26 @@ d_region_breakdown_server <- function(id, data) {
         type = 'scatter',
         mode = 'lines'
       )
+      if (input$title == TRUE) {
+      fig <- fig %>%
+        layout(title = list(
+          text = paste0(
+            '<b>',
+            paste0(
+              str_after_first(input_bar[1], ","),
+              " - Population Breakdown"
+            ),
+            '<b>'
+          ),
+          x = 0.05,
+          y = 0.99,
+          font = list(
+            family = "segoe ui",
+            size = 18,
+            color = ox_pallette()[2]
+          )
+        )) }
+      
       fig
       
     })

@@ -43,9 +43,8 @@ homepage_ui <- function(id) {
     ))),
     h5(
       strong("Note:"),
-      " i haven't managed to get the buttons to work on this page, for will have to ",
-      strong("use the navbar for navigation"),
-      " for the time being."
+      " i haven't managed to get the buttons to work on this page, for the time being you will have to ",
+      strong("use the navbar for navigation.")
     ),
     fluidRow(
       column(3,
@@ -241,12 +240,22 @@ homepage_ui <- function(id) {
       ),
       actionBttn(ns("refresh"),
                  label = "Refresh"),
-      shinyDirButton(ns("directory"), "Folder select", "Please select a folder"),
+      shinyDirButton(
+        ns("directory"),
+        "Folder select",
+        "Please select a folder",
+        style = paste0(
+          "background-color:",
+          oxgraphs::ox_pallette()[2],
+          "; color: white"
+        )
+      ),
       verbatimTextOutput(ns("directorypath")),
       #tableOutput(ns("Table"))
     )
   )
 }
+
 
 # 2.0 Module Server -------------------------------------------------------
 
@@ -268,7 +277,6 @@ homepage_server <- function(id) {
       volumes <-
         c(
           Local = getVolumes()()[["Windows (C:)"]],
-          "S Drive" = getVolumes()()[["(S:)"]],
           Home = fs::path_home()
         )
       shinyDirChoose(
@@ -295,6 +303,7 @@ homepage_server <- function(id) {
     })
     
     observeEvent(input$refresh, {
+      source("data/refresh_AID_data.R", local = TRUE)
       session$reload()
     })
     
