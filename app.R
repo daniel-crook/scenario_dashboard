@@ -13,7 +13,9 @@ list.of.packages <-
         "DT",
         "strex",
         "data.table",
-        "kableExtra"
+        "kableExtra",
+        "shinyFiles",
+        "shinyjs"
     )
 
 new.packages <- list.of.packages[!(list.of.packages %in%
@@ -134,8 +136,8 @@ ui <-  tagList(
 # 4.0 Server --------------------------------------------------------------
 
 server <- function(input, output, session) {
-    #callModule(homepage_server, "homepage")
-    homepage_server("homepage", parentSession = session)
+    
+    callModule(homepage_server,"homepage")
     
     callModule(vc_version_server, "vc_version")
     callModule(vc_scenario_server, "vc_scenario")

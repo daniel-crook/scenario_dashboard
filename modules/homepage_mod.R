@@ -1,8 +1,5 @@
 
 
-
-
-
 # 1.0 Module UI -----------------------------------------------------------
 
 homepage_ui <- function(id) {
@@ -59,7 +56,7 @@ homepage_ui <- function(id) {
                  oxgraphs::ox_pallette()[1],
                  "; margin-bottom: 0.5em"
                ),
-               fluidRow(column(10,h4(
+               fluidRow(column(10, h4(
                  strong("Variable Comparison"),
                  style = paste0(
                    "background-color:",
@@ -94,7 +91,7 @@ homepage_ui <- function(id) {
                  oxgraphs::ox_pallette()[2],
                  "; margin-bottom: 0.5em"
                ),
-               fluidRow(column(10,h4(
+               fluidRow(column(10, h4(
                  strong("State Composition"),
                  style = paste0(
                    "background-color:",
@@ -103,14 +100,14 @@ homepage_ui <- function(id) {
                  )
                )),
                column(2,
-               h1(
-                 icon("fas fa-map-marked-alt"),
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[2],
-                   "; color: white; margin-top: 0.1em"
-                 )
-               ))),
+                      h1(
+                        icon("fas fa-map-marked-alt"),
+                        style = paste0(
+                          "background-color:",
+                          oxgraphs::ox_pallette()[2],
+                          "; color: white; margin-top: 0.1em"
+                        )
+                      ))),
                h5(
                  "Compare how the scenarios affect the state compositions for a particular variable: by version, scenario or region.",
                  style = paste0(
@@ -129,7 +126,7 @@ homepage_ui <- function(id) {
                  oxgraphs::ox_pallette()[3],
                  "; margin-bottom: 0.5em"
                ),
-               fluidRow(column(10,h4(
+               fluidRow(column(10, h4(
                  strong("Industry Comparison"),
                  style = paste0(
                    "background-color:",
@@ -164,7 +161,7 @@ homepage_ui <- function(id) {
                  oxgraphs::ox_pallette()[4],
                  "; margin-bottom: 0.5em"
                ),
-               fluidRow(column(10,h4(
+               fluidRow(column(10, h4(
                  strong("Demographics"),
                  style = paste0(
                    "background-color:",
@@ -199,7 +196,7 @@ homepage_ui <- function(id) {
                  oxgraphs::ox_pallette()[5],
                  "; margin-bottom: 0.5em"
                ),
-               fluidRow(column(10,h4(
+               fluidRow(column(10, h4(
                  strong("GEM Checks"),
                  style = paste0(
                    "background-color:",
@@ -234,60 +231,72 @@ homepage_ui <- function(id) {
       ),
       h3(strong("Scenario Descriptions:")),
       tableOutput(ns("Table"))
+    ),
+    wellPanel(
+      style = paste0(
+        "border: 5px solid; border-color:",
+        oxgraphs::ox_pallette()[9],
+        "; margin-bottom: 0.5em"
+      ),
+      actionBttn(ns("refresh"),
+                 label = "Refresh"),
+      shinyDirButton(ns("directory"), "Folder select", "Please select a folder"),
+      verbatimTextOutput(ns("directorypath")),
+      #tableOutput(ns("Table"))
     )
   )
 }
 
 # 2.0 Module Server -------------------------------------------------------
 
-homepage_server <- function(id, parentSession) {
-  moduleServer(id, function(input, output, session) {
-    # Variable Comparison Button ----------------------------------------------
-    observeEvent(input$vc_button, {
-      updateTabsetPanel(
-        session = parentSession,
-        inputId = input$navbar,
-        selected = h5(strong("Variable Comparison"))
+homepage_server <- function(input, output, session) {
+  observe({
+    output$Table <- function() {
+      kbl(scenario_table, format = "html") %>%
+        kable_styling(
+          bootstrap_options = c("striped", "hover", "condensed"),
+          full_width = T
+        ) %>%
+        column_spec(1, bold = T) %>%
+        row_spec(c(0:length(scenario_table$Scenario)), extra_css = "border-bottom: 1px solid; border-top: 1px solid;")
+    }
+  })
+  
+  observe({
+    volumes <-
+      c(
+        Local = getVolumes()()[["Windows (C:)"]],
+        "S Drive" = getVolumes()()[["(S:)"]],
+        Home = fs::path_home()
       )
-    })
+    shinyDirChoose(
+      input,
+      "directory",
+      roots = volumes,
+      session = session,
+      restrictions = system.file(package = "base"),
+      allowDirCreate = FALSE
+    )
+    if (!(is.integer(input$directory))) {
+    source("data processing/DataProcessing_AEMO_input_directory.R", local = TRUE)
+    }
     
-    observeEvent(input$sc_button, {
-      updateNavbarPage(
-        session = parentSession,
-        inputId = input$navbar,
-        selected = h5(strong("State Composition"))
-      )
-    })
-    
-    observeEvent(input$ic_button, {
-      updateNavbarPage(
-        session = parentSession,
-        inputId = input$navbar,
-        selected = h5(strong("Industry Comparison"))
-      )
-    })
-    
-    observeEvent(input$gc_button, {
-      updateNavbarPage(
-        session = parentSession,
-        inputId = input$navbar,
-        selected = h5(strong("GEM_Checks"))
-      )
-    })
-    
-    observe({
-      output$Table <- function() {
-        kbl(scenario_table, format = "html") %>%
-          kable_styling(
-            bootstrap_options = c("striped", "hover", "condensed"),
-            full_width = T
-          ) %>%
-          column_spec(1, bold = T) %>%
-          row_spec(c(0:length(scenario_table$Scenario)), extra_css = "border-bottom: 1px solid; border-top: 1px solid;")
+    output$directorypath <- renderPrint({
+      if (is.integer(input$directory)) {
+        cat("No directory has been selected (shinyDirChoose)")
+      } else {
+        file.path(parseDirPath(volumes, input$directory), "/")
       }
     })
+    
   })
+  
+  observeEvent(input$refresh, {
+    session$reload()
+  })
+  
 }
+
 
 # 3.0 Test Module ---------------------------------------------------------
 
