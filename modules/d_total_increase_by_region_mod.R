@@ -109,7 +109,8 @@ d_total_increase_by_region_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-d_total_increase_by_region_server <- function(input, output, session) {
+d_total_increase_by_region_server <- function(id, data) {
+  moduleServer(id, function(input, output, session) {
   # Sort Version Select Input -----------------------------------------------
   observe({
       rv_list <-
@@ -374,4 +375,5 @@ d_total_increase_by_region_server <- function(input, output, session) {
   #   spacing = "s", striped = TRUE, hover = TRUE, align = "l")
   # })
   
+})
 }

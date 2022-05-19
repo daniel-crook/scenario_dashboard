@@ -1,9 +1,4 @@
 
-
-
-
-
-
 # 1.0 Module UI -----------------------------------------------------------
 
 sc_region_ui <- function(id) {
@@ -106,15 +101,15 @@ sc_region_ui <- function(id) {
                             ns("Period_start"),
                             label = NULL,
                             value = "2021"
-                          ),),
+                          ), ),
                    column(1,
-                          h4("-", style = "margin-top: 0.2em"),),
+                          h4("-", style = "margin-top: 0.2em"), ),
                    column(3,
                           textInput(
                             ns("Period_end"),
                             label = NULL,
                             value = "2053"
-                          ),),
+                          ), ),
                    style = "margin-bottom: -2em; margin-top: -1em"
                  )
                )
@@ -126,118 +121,37 @@ sc_region_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-sc_region_server <- function(input, output, session) {
-  observe({
-    rv_list <-
-      data.frame(RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
-    rv_list$Release_Date <-
-      parse_date_time(rv_list$Release_Date, "my")
-    
-    rv_list <-
-      arrange(rv_list, desc(Release_Date), desc(Version)) %>%
-      mutate(., RELEASE_VERSION = paste(format(Release_Date, format = "%b%y"), Version, sep = " ")) %>%
-      select(-Release_Date, -Version)
-    
-    updateSelectInput(
-      session,
-      "Version",
-      label = NULL,
-      rv_list$RELEASE_VERSION,
-      selected = as.list(rv_list$RELEASE_VERSION[1])
-    )
-  })
-  
-  observe({
-    updateSelectInput(session,
-                      "Attribute",
-                      label = NULL,
-                      sort(unique(data$ATTRIBUTE[data$STATE == "NSW" &
-                                                   data$RELEASE_VERSION == input$Version])))
-  })
-  
-  observeEvent(input$big4, {
-    states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
-    
-    version_list <-
-      data.frame(
-        ATTRIBUTE = input$Attribute,
-        STATE = states,
-        SCENARIO_VALUE = input$Scenario,
-        RELEASE_VERSION = input$Version
-      )  %>%
-      add.var.col(.)
-    
-    updatePrettyCheckboxGroup(
-      session,
-      "Selections",
-      label = NULL,
-      as.list(version_list$variable),
-      selected = as.list(version_list$variable[1:4]),
-      prettyOptions = list(
-        shape = "round",
-        outline = TRUE,
-        status = "primary"
+sc_region_server <- function(id, data) {
+  moduleServer(id, function(input, output, session) {
+    observe({
+      rv_list <-
+        data.frame(RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
+      rv_list$Release_Date <-
+        parse_date_time(rv_list$Release_Date, "my")
+      
+      rv_list <-
+        arrange(rv_list, desc(Release_Date), desc(Version)) %>%
+        mutate(., RELEASE_VERSION = paste(format(Release_Date, format = "%b%y"), Version, sep = " ")) %>%
+        select(-Release_Date, -Version)
+      
+      updateSelectInput(
+        session,
+        "Version",
+        label = NULL,
+        rv_list$RELEASE_VERSION,
+        selected = as.list(rv_list$RELEASE_VERSION[1])
       )
-    )
-  })
-  
-  observeEvent(input$small4, {
-    states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+    })
     
-    version_list <-
-      data.frame(
-        ATTRIBUTE = input$Attribute,
-        STATE = states,
-        SCENARIO_VALUE = input$Scenario,
-        RELEASE_VERSION = input$Version
-      )  %>%
-      add.var.col(.)
+    observe({
+      updateSelectInput(session,
+                        "Attribute",
+                        label = NULL,
+                        sort(unique(data$ATTRIBUTE[data$STATE == "NSW" &
+                                                     data$RELEASE_VERSION == input$Version])))
+    })
     
-    updatePrettyCheckboxGroup(
-      session,
-      "Selections",
-      label = NULL,
-      as.list(version_list$variable),
-      selected = as.list(version_list$variable[5:8]),
-      prettyOptions = list(
-        shape = "round",
-        outline = TRUE,
-        status = "primary"
-      )
-    )
-  })
-  
-  observeEvent(input$all, {
-    states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
-    
-    version_list <-
-      data.frame(
-        ATTRIBUTE = input$Attribute,
-        STATE = states,
-        SCENARIO_VALUE = input$Scenario,
-        RELEASE_VERSION = input$Version
-      )  %>%
-      add.var.col(.)
-    
-    updatePrettyCheckboxGroup(
-      session,
-      "Selections",
-      label = NULL,
-      as.list(version_list$variable),
-      selected = as.list(version_list$variable[1:8]),
-      prettyOptions = list(
-        shape = "round",
-        outline = TRUE,
-        status = "primary"
-      )
-    )
-  })
-  
-  ### --- update checkboxgroup options based on select inputs --- ###
-  observe({
-    if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
-                             data$RELEASE_VERSION == input$Version &
-                             data$ATTRIBUTE == input$Attribute]) >= 1) {
+    observeEvent(input$big4, {
       states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
       
       version_list <-
@@ -245,11 +159,9 @@ sc_region_server <- function(input, output, session) {
           ATTRIBUTE = input$Attribute,
           STATE = states,
           SCENARIO_VALUE = input$Scenario,
-          RELEASE_VERSION = input$Version,
-          Series_ID = unique(data$Series_ID[data$ATTRIBUTE == input$Attribute])
+          RELEASE_VERSION = input$Version
         )  %>%
-        add.var.col(.) %>%
-        add.sc.col(.)
+        add.var.col(.)
       
       updatePrettyCheckboxGroup(
         session,
@@ -263,137 +175,228 @@ sc_region_server <- function(input, output, session) {
           status = "primary"
         )
       )
-    }
-  })
-  
-  observe({
-    bar_dates <- seq(2020, 2050, 10)
-    
-    sc_region_data <- filter(data,
-                             sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
-    sc_region_data_a <-
-      filter(sc_region_data, STATE %in% unique(data$STATE[data$variable %in% input$Selections]))
-    sc_region_data_b <-
-      filter(sc_region_data, STATE == "AUS") %>%
-      transmute(., Dates, SCENARIO_VALUE, RELEASE_VERSION, AUS_VALUE = VALUE)
-    sc_region_data <- merge(
-      sc_region_data_a,
-      sc_region_data_b,
-      by = c("Dates", "SCENARIO_VALUE", "RELEASE_VERSION")
-    ) %>%
-      transmute(.,
-                Dates,
-                variable,
-                value = round(VALUE / AUS_VALUE * 100, 2))
-    if (input$display != "Line chart") {
-      sc_region_data <-
-        trail_avg(sc_region_data, bar_dates[2] - bar_dates[1]) %>%
-        mutate(., value = round(value, 2)) %>%
-        filter(., Dates %in% bar_dates)
-      sc_region_data$Dates <- as.factor(sc_region_data$Dates)
-    }
-    sc_region_data <- spread(sc_region_data, variable, value)
-    
-    output$Plot <- renderPlotly({
-      fig <-
-        if (input$display != "Line chart") {
-          bar.plot(sc_region_data, input$Selections, "% of National", "%")
-        } else {
-          line.plot(sc_region_data, input$Selections, "% of National", "%")
-        }
     })
-  })
-  
-  observe({
-    if (length(input$Selections) >= 2) {
-      for (i in 2:length(input$Selections)) {
-        if (i == 2) {
-          common_dates <-
-            intersect(data$Dates[data$variable == input$Selections[1]], data$Dates[data$variable == input$Selections[i]])
-        } else {
-          common_dates <-
-            intersect(common_dates, data$Dates[data$variable == input$Selections[i]])
-        }
-      }
-    } else {
-      common_dates <- data$Dates[data$variable == input$Selections[1]]
-    }
     
-    period_dates <-
-      c(
-        custom.min(common_dates),
-        "2010",
-        "2021",
-        "2025",
-        "2030",
-        custom.max(common_dates),
-        input$Period_start,
-        input$Period_end
+    observeEvent(input$small4, {
+      states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+      
+      version_list <-
+        data.frame(
+          ATTRIBUTE = input$Attribute,
+          STATE = states,
+          SCENARIO_VALUE = input$Scenario,
+          RELEASE_VERSION = input$Version
+        )  %>%
+        add.var.col(.)
+      
+      updatePrettyCheckboxGroup(
+        session,
+        "Selections",
+        label = NULL,
+        as.list(version_list$variable),
+        selected = as.list(version_list$variable[5:8]),
+        prettyOptions = list(
+          shape = "round",
+          outline = TRUE,
+          status = "primary"
+        )
       )
+    })
     
-    period_names <-
-      c("2000s",
-        "2010s",
-        "Short run",
-        "Medium run",
-        "Long run",
-        "",
-        "Custom Period")
+    observeEvent(input$all, {
+      states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+      
+      version_list <-
+        data.frame(
+          ATTRIBUTE = input$Attribute,
+          STATE = states,
+          SCENARIO_VALUE = input$Scenario,
+          RELEASE_VERSION = input$Version
+        )  %>%
+        add.var.col(.)
+      
+      updatePrettyCheckboxGroup(
+        session,
+        "Selections",
+        label = NULL,
+        as.list(version_list$variable),
+        selected = as.list(version_list$variable[1:8]),
+        prettyOptions = list(
+          shape = "round",
+          outline = TRUE,
+          status = "primary"
+        )
+      )
+    })
     
-    output$Table <- renderTable({
-      sc_region_table_data <- filter(data,
-                                     sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
-      sc_region_table_data_a <-
-        filter(sc_region_table_data, STATE %in% unique(data$STATE[data$variable %in% input$Selections]))
-      sc_region_table_data_b <-
-        filter(sc_region_table_data, STATE == "AUS") %>%
+    ### --- update checkboxgroup options based on select inputs --- ###
+    observe({
+      if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
+                               data$RELEASE_VERSION == input$Version &
+                               data$ATTRIBUTE == input$Attribute]) >= 1) {
+        states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+        
+        version_list <-
+          data.frame(
+            ATTRIBUTE = input$Attribute,
+            STATE = states,
+            SCENARIO_VALUE = input$Scenario,
+            RELEASE_VERSION = input$Version,
+            Series_ID = unique(data$Series_ID[data$ATTRIBUTE == input$Attribute])
+          )  %>%
+          add.var.col(.) %>%
+          add.sc.col(.)
+        
+        updatePrettyCheckboxGroup(
+          session,
+          "Selections",
+          label = NULL,
+          as.list(version_list$variable),
+          selected = as.list(version_list$variable[1:4]),
+          prettyOptions = list(
+            shape = "round",
+            outline = TRUE,
+            status = "primary"
+          )
+        )
+      }
+    })
+    
+    observe({
+      bar_dates <- seq(2020, 2050, 10)
+      
+      sc_region_data <- filter(data,
+                               sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
+      sc_region_data_a <-
+        filter(sc_region_data, STATE %in% unique(data$STATE[data$variable %in% input$Selections]))
+      sc_region_data_b <-
+        filter(sc_region_data, STATE == "AUS") %>%
         transmute(., Dates, SCENARIO_VALUE, RELEASE_VERSION, AUS_VALUE = VALUE)
-      sc_region_table_data <- merge(
-        sc_region_table_data_a,
-        sc_region_table_data_b,
+      sc_region_data <- merge(
+        sc_region_data_a,
+        sc_region_data_b,
         by = c("Dates", "SCENARIO_VALUE", "RELEASE_VERSION")
       ) %>%
         transmute(.,
                   Dates,
                   variable,
                   value = round(VALUE / AUS_VALUE * 100, 2))
-      
-      for (i in c(2:6, length(period_dates))) {
-        sc_region_table_data_1 <-
-          sc_region_table_data %>%
-          trail_avg(., p = {
-            as.numeric(period_dates[i]) - as.numeric(period_dates[i - 1])
-          }) %>%
-          filter(., Dates == period_dates[i]) %>%
-          transmute(
-            Period = paste0(
-              period_names[i - 1],
-              " (",
-              period_dates[i - 1],
-              " - ",
-              period_dates[i],
-              ")"
-            ),
-            variable,
-            value = round(value, 2)
-          )
-        
-        sc_region_table_data_1 <-
-          spread(sc_region_table_data_1, variable, value)
-        
-        if (i == 2) {
-          sc_region_p_avg_table <- sc_region_table_data_1
-        } else {
-          sc_region_p_avg_table <-
-            rbind(sc_region_p_avg_table, sc_region_table_data_1)
-        }
+      if (input$display != "Line chart") {
+        sc_region_data <-
+          trail_avg(sc_region_data, bar_dates[2] - bar_dates[1]) %>%
+          mutate(., value = round(value, 2)) %>%
+          filter(., Dates %in% bar_dates)
+        sc_region_data$Dates <- as.factor(sc_region_data$Dates)
       }
-      sc_region_p_avg_table <-
-        sc_region_p_avg_table[, append("Period", input$Selections)]
-    },
-    spacing = "s", striped = TRUE, hover = TRUE, align = "l")
+      sc_region_data <- spread(sc_region_data, variable, value)
+      
+      output$Plot <- renderPlotly({
+        fig <-
+          if (input$display != "Line chart") {
+            bar.plot(sc_region_data,
+                     input$Selections,
+                     "% of National",
+                     "%")
+          } else {
+            line.plot(sc_region_data,
+                      input$Selections,
+                      "% of National",
+                      "%")
+          }
+      })
+    })
+    
+    observe({
+      if (length(input$Selections) >= 2) {
+        for (i in 2:length(input$Selections)) {
+          if (i == 2) {
+            common_dates <-
+              intersect(data$Dates[data$variable == input$Selections[1]], data$Dates[data$variable == input$Selections[i]])
+          } else {
+            common_dates <-
+              intersect(common_dates, data$Dates[data$variable == input$Selections[i]])
+          }
+        }
+      } else {
+        common_dates <- data$Dates[data$variable == input$Selections[1]]
+      }
+      
+      period_dates <-
+        c(
+          custom.min(common_dates),
+          "2010",
+          "2021",
+          "2025",
+          "2030",
+          custom.max(common_dates),
+          input$Period_start,
+          input$Period_end
+        )
+      
+      period_names <-
+        c("2000s",
+          "2010s",
+          "Short run",
+          "Medium run",
+          "Long run",
+          "",
+          "Custom Period")
+      
+      output$Table <- renderTable({
+        sc_region_table_data <- filter(data,
+                                       sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
+        sc_region_table_data_a <-
+          filter(sc_region_table_data, STATE %in% unique(data$STATE[data$variable %in% input$Selections]))
+        sc_region_table_data_b <-
+          filter(sc_region_table_data, STATE == "AUS") %>%
+          transmute(., Dates, SCENARIO_VALUE, RELEASE_VERSION, AUS_VALUE = VALUE)
+        sc_region_table_data <- merge(
+          sc_region_table_data_a,
+          sc_region_table_data_b,
+          by = c("Dates", "SCENARIO_VALUE", "RELEASE_VERSION")
+        ) %>%
+          transmute(.,
+                    Dates,
+                    variable,
+                    value = round(VALUE / AUS_VALUE * 100, 2))
+        
+        for (i in c(2:6, length(period_dates))) {
+          sc_region_table_data_1 <-
+            sc_region_table_data %>%
+            trail_avg(., p = {
+              as.numeric(period_dates[i]) - as.numeric(period_dates[i - 1])
+            }) %>%
+            filter(., Dates == period_dates[i]) %>%
+            transmute(
+              Period = paste0(
+                period_names[i - 1],
+                " (",
+                period_dates[i - 1],
+                " - ",
+                period_dates[i],
+                ")"
+              ),
+              variable,
+              value = round(value, 2)
+            )
+          
+          sc_region_table_data_1 <-
+            spread(sc_region_table_data_1, variable, value)
+          
+          if (i == 2) {
+            sc_region_p_avg_table <- sc_region_table_data_1
+          } else {
+            sc_region_p_avg_table <-
+              rbind(sc_region_p_avg_table, sc_region_table_data_1)
+          }
+        }
+        sc_region_p_avg_table <-
+          sc_region_p_avg_table[, append("Period", input$Selections)]
+      },
+      spacing = "s", striped = TRUE, hover = TRUE, align = "l")
+    })
+    
   })
-  
 }
 
 # 3.0 Test Module ---------------------------------------------------------

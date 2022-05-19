@@ -187,12 +187,16 @@ for (i in file) {
     
     # 5.0 Get AID Data --------------------------------------------------------
     {
+      # a quick work around for the "space" bug in the read_oedb function
+      old_wd <- getwd()
+      setwd(AID_db_folder)
       AID_db <-
         oxgraphs::oxaiddb(
-          db = AID_db_filepath,
+          db = i,
           sect = list.of.indicators$Sector[list.of.indicators$Database == "AID"],
           vars = list.of.indicators$Mnemonic[list.of.indicators$Database == "AID"]
         )
+      setwd(old_wd)
       
       #saveRDS(AID_db[[1]], file = file.path("data processing/RDS Files/AID_db_", Scenario_name, ".rds")))
       AID_db_States <- AID_db[[1]] %>%

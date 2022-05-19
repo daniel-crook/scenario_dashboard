@@ -123,7 +123,8 @@ vc_version_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-vc_version_server <- function(input, output, session) {
+vc_version_server <- function(id, data) {
+  moduleServer(id, function(input, output, session) {
   
 # State/National Button Update --------------------------------------------
   observe({
@@ -335,6 +336,7 @@ vc_version_server <- function(input, output, session) {
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
   })
   
+})
 }
 
 # 3.0 Test Module ---------------------------------------------------------

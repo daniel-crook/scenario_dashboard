@@ -113,7 +113,8 @@ ic_version_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-ic_version_server <- function(input, output, session) {
+ic_version_server <- function(id, data) {
+  moduleServer(id, function(input, output, session) {
   
 
 # Update checkboxgroup options based on selected inputs -------------------
@@ -332,4 +333,5 @@ ic_version_server <- function(input, output, session) {
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
   })
   
+})
 }

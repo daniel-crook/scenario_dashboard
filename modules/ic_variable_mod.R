@@ -117,7 +117,8 @@ ic_variable_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-ic_variable_server <- function(input, output, session) {
+ic_variable_server <- function(id, data) {
+  moduleServer(id, function(input, output, session) {
   # Sort Version Select Input -----------------------------------------------
   observe({
     rv_list <-
@@ -496,4 +497,5 @@ ic_variable_server <- function(input, output, session) {
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
   })
   
+})
 }

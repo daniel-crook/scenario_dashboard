@@ -97,7 +97,8 @@ ic_scenario_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-ic_scenario_server <- function(input, output, session) {
+ic_scenario_server <- function(id, data) {
+  moduleServer(id, function(input, output, session) {
   ## --- update checkboxgroup options based on select inputs --- ###
   observe({
     data_f <- filter(data, data$ATTRIBUTE == input$Attribute)
@@ -296,4 +297,5 @@ ic_scenario_server <- function(input, output, session) {
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
   })
   
+})
 }

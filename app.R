@@ -1,3 +1,6 @@
+
+
+
 rm(list = ls())
 
 list.of.packages <-
@@ -41,7 +44,7 @@ source("functions/functions.R")
 
 # 0.2 Import Processed AID Data -------------------------------------------
 
-source("data/import_data.R")
+#source("data/import_data.R")
 
 # 0.3 Import GEM Data -----------------------------------------------------
 
@@ -136,26 +139,24 @@ ui <-  tagList(
 # 4.0 Server --------------------------------------------------------------
 
 server <- function(input, output, session) {
+    data <- homepage_server("homepage")
     
-    callModule(homepage_server,"homepage")
-    
-    callModule(vc_version_server, "vc_version")
-    callModule(vc_scenario_server, "vc_scenario")
-    callModule(vc_region_server, "vc_region")
-    
-    callModule(sc_version_server, "sc_version")
-    callModule(sc_scenario_server, "sc_scenario")
-    callModule(sc_region_server, "sc_region")
-    
-    callModule(ic_version_server, "ic_version")
-    callModule(ic_scenario_server, "ic_scenario")
-    callModule(ic_region_server, "ic_region")
-    callModule(ic_variable_server, "ic_variable")
-    
-    callModule(d_region_breakdown_server, "d_region_breakdown")
-    callModule(d_total_increase_by_region_server,
-               "d_total_increase_by_region")
-    
+    vc_version_server("vc_version", data)
+    vc_scenario_server("vc_scenario", data)
+    vc_region_server("vc_region", data)
+
+    sc_version_server("sc_version", data)
+    sc_scenario_server("sc_scenario", data)
+    sc_region_server("sc_region", data)
+
+    ic_version_server("ic_version", data)
+    ic_scenario_server("ic_scenario", data)
+    ic_region_server("ic_region", data)
+    ic_variable_server("ic_variable", data)
+
+    d_region_breakdown_server("d_region_breakdown", data)
+    d_total_increase_by_region_server("d_total_increase_by_region", data)
+
     callModule(gc_version_server, "gc_version")
     callModule(gc_scenario_server, "gc_scenario")
     #bs_themer()
@@ -163,4 +164,8 @@ server <- function(input, output, session) {
 
 # 5.0 Run App -------------------------------------------------------------
 
-shinyApp(ui = ui, server = server, options = list(launch.browser=TRUE))
+shinyApp(
+    ui = ui,
+    server = server,
+    options = list(launch.browser = TRUE)
+)

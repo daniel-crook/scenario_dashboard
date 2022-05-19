@@ -1,5 +1,6 @@
 
 
+
 # 1.0 Module UI -----------------------------------------------------------
 
 homepage_ui <- function(id) {
@@ -249,52 +250,57 @@ homepage_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-homepage_server <- function(input, output, session) {
-  observe({
-    output$Table <- function() {
-      kbl(scenario_table, format = "html") %>%
-        kable_styling(
-          bootstrap_options = c("striped", "hover", "condensed"),
-          full_width = T
-        ) %>%
-        column_spec(1, bold = T) %>%
-        row_spec(c(0:length(scenario_table$Scenario)), extra_css = "border-bottom: 1px solid; border-top: 1px solid;")
-    }
-  })
-  
-  observe({
-    volumes <-
-      c(
-        Local = getVolumes()()[["Windows (C:)"]],
-        "S Drive" = getVolumes()()[["(S:)"]],
-        Home = fs::path_home()
-      )
-    shinyDirChoose(
-      input,
-      "directory",
-      roots = volumes,
-      session = session,
-      restrictions = system.file(package = "base"),
-      allowDirCreate = FALSE
-    )
-    if (!(is.integer(input$directory))) {
-    source("data processing/DataProcessing_AEMO_input_directory.R", local = TRUE)
-    }
-    
-    output$directorypath <- renderPrint({
-      if (is.integer(input$directory)) {
-        cat("No directory has been selected (shinyDirChoose)")
-      } else {
-        file.path(parseDirPath(volumes, input$directory), "/")
+homepage_server <- function(id) {
+  moduleServer(id, function(input, output, session, data) {
+    observe({
+      output$Table <- function() {
+        kbl(scenario_table, format = "html") %>%
+          kable_styling(
+            bootstrap_options = c("striped", "hover", "condensed"),
+            full_width = T
+          ) %>%
+          column_spec(1, bold = T) %>%
+          row_spec(c(0:length(scenario_table$Scenario)), extra_css = "border-bottom: 1px solid; border-top: 1px solid;")
       }
     })
     
+    observe({
+      volumes <-
+        c(
+          Local = getVolumes()()[["Windows (C:)"]],
+          "S Drive" = getVolumes()()[["(S:)"]],
+          Home = fs::path_home()
+        )
+      shinyDirChoose(
+        input,
+        "directory",
+        roots = volumes,
+        session = session,
+        restrictions = system.file(package = "base"),
+        allowDirCreate = FALSE
+      )
+      if (!(is.integer(input$directory))) {
+        source("data processing/DataProcessing_AEMO_input_directory.R",
+               local = TRUE)
+      }
+      
+      output$directorypath <- renderPrint({
+        if (is.integer(input$directory)) {
+          cat("No directory has been selected (shinyDirChoose)")
+        } else {
+          file.path(parseDirPath(volumes, input$directory), "/")
+        }
+      })
+      
+    })
+    
+    observeEvent(input$refresh, {
+      session$reload()
+    })
+    
+    source("data/import_data.R", local = TRUE)
+    return(data)
   })
-  
-  observeEvent(input$refresh, {
-    session$reload()
-  })
-  
 }
 
 
