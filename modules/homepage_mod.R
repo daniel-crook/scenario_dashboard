@@ -18,7 +18,8 @@ homepage_ui <- function(id) {
     fluidRow(column(3, h4(
       strong("AEMO Data Last Updated: "),
       br(),
-      format(file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
+      uiOutput(ns("AID_data_update_date"))
+      #format(file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
     )),
     column(3, h4(
       strong("GEM Data Last Updated: "),
@@ -307,10 +308,15 @@ homepage_server <- function(id) {
       session$reload()
     })
     
+    observe({
+      output$AID_data_update_date <- renderUI({paste0(format(file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p"))})
+    })
+    
     source("data/import_data.R", local = TRUE)
     return(data)
   })
 }
+
 
 
 # 3.0 Test Module ---------------------------------------------------------
