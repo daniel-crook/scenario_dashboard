@@ -139,6 +139,7 @@ ui <-  tagList(
 # 4.0 Server --------------------------------------------------------------
 
 server <- function(input, output, session) {
+    
     data <- homepage_server("homepage")
     
     vc_version_server("vc_version", data)
