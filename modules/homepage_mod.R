@@ -79,8 +79,7 @@ homepage_ui <- function(id) {
                                                                              "; color: white"
                                                                            )
                                                                          ))))
-      ) shinyWidgets::actionBttn()
-      shinyWidgets::circleButton()
+      ) 
     )),
     fluidRow(column(3, h4(
       strong("GEM Data Last Updated: "),
