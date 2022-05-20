@@ -47,7 +47,7 @@ source("functions/functions.R")
 
 # 0.2 Import Processed AID Data -------------------------------------------
 
-#source("data/import_data.R")
+source("data/import_data.R")
 
 # 0.3 Import GEM Data -----------------------------------------------------
 
