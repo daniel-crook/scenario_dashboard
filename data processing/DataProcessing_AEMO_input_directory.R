@@ -28,12 +28,18 @@ start_time <- Sys.time()
   est_actual_end_yr <- 2022
   end_yr <- 2054
   
-  #invisible(readline(prompt = "Have you updated your db folder? If yes, press [enter] to proceed"))
-  AID_db_folder <- file.path(parseDirPath(volumes, input$directory), "/")
+  volumes <- getVolumes()()
   
-}
+  if (!(is.integer(input$aid_directory))) {
+    AID_db_folder <- file.path(parseDirPath(volumes, input$aid_directory), "/")
+    file <- list.files(AID_db_folder)
+  } else if (!(is.integer(input$aid_file))) {
+    full_db_path <-  file.path(parseFilePaths(volumes, input$aid_file))[4]
+    AID_db_folder <- paste0(str_before_last(full_db_path,"/"),"/")
+    file <- str_after_last(full_db_path,"/")
+  }
 
-file <- list.files(AID_db_folder)
+}
 
 for (i in file) {
   print(i)

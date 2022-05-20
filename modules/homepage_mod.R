@@ -1,6 +1,7 @@
 
 
 
+
 # 1.0 Module UI -----------------------------------------------------------
 
 homepage_ui <- function(id) {
@@ -15,46 +16,73 @@ homepage_ui <- function(id) {
       The dashboard also includes several off-platform calculated series for further checking of forecasts as well as CAGR/Period average calculations that may be useful during report writing.
       We will continue to develop this dashboard, gradually generalising it so that it can be easily used across all projects and also by others."
     ),
-    fluidRow(column(6,
-    wellPanel(
-      style = paste0(
-        "border: 5px solid; border-color:",
-        oxgraphs::ox_pallette()[9],
-        "; margin-bottom: 0.5em"
-      ),
-      h4(strong("Updating AID Data"),
-      uiOutput(ns("AID_data_update_date"))),
-      fluidRow(
-        shinyDirButton(
-        ns("directory"),
-        "Select Folder",
-        "Please select a folder",
-        buttonType = 'md',
+    fluidRow(column(
+      6,
+      wellPanel(
         style = paste0(
-          "background-color:",
-          oxgraphs::ox_pallette()[2],
-          "; color: white; margin-left:1.25em"
-        )
-      ),
-      h4("or", style = "margin-top:0.2em; margin-left:0.5em; margin-right:0.5em"),
-      
-      shinyDirButton(
-        ns("files"),
-        "Select File",
-        "Please select a folder",
-        buttonType = 'md',
-        style = paste0(
-          "background-color:",
-          oxgraphs::ox_pallette()[2],
-          "; color: white"
-        )
-      )),
-      h4(verbatimTextOutput(ns("directorypath"))),
-      actionBttn(ns("refresh"),
-                 label = "Refresh")
-    ))),
-    fluidRow(
-    column(3, h4(
+          "border: 5px solid; border-color:",
+          oxgraphs::ox_pallette()[9],
+          "; margin-bottom: 0.5em"
+        ),
+        h4(strong("Updating AID Data"),
+           uiOutput(ns(
+             "AID_data_update_date"
+           ))),
+        fluidRow(column(4, fluidRow(h4("1.", style = "margin-top:0.2em; margin-left:0.75em"),
+          
+            shinyDirButton(
+              ns("aid_directory"),
+              "Select Folder",
+              "Please select a folder",
+              buttonType = 'md',
+              style = paste0(
+                "background-color:",
+                oxgraphs::ox_pallette()[2],
+                "; color: white; margin-left:1.25em"
+              )
+            ),
+            h4("or", style = "margin-top:0.2em; margin-left:0.5em; margin-right:0.5em"),
+            
+            shinyFilesButton(
+              ns("aid_file"),
+              "Select File",
+              "Please select a folder",
+              multiple = F,
+              buttonType = 'md',
+              style = paste0(
+                "background-color:",
+                oxgraphs::ox_pallette()[2],
+                "; color: white"
+              )
+            ))),
+          column(8,h4(verbatimTextOutput(ns("directorypath")), style = "margin-top:0em"))
+        ),
+        fluidRow(column(4, fluidRow(h4("2.", style = "margin-top:0.2em; margin-left:0.75em; margin-right:0.75em"),
+                                                                         actionButton(
+                                                                           ns("process_folder_file"),
+                                                                           label = "Process Folder/File",
+                                                                           style = paste0(
+                                                                             "background-color:",
+                                                                             oxgraphs::ox_pallette()[2],
+                                                                             "; color: white"
+                                                                           )
+                                                                         ))),
+                 column(8,h4(verbatimTextOutput(ns("data_processed")), style = "margin-top:0em"))),
+        br(),
+        fluidRow(column(4, fluidRow(h4("3.", style = "margin-top:0.2em; margin-left:0.75em; margin-right:0.75em"),
+                                                                         actionButton(
+                                                                           ns("refresh"),
+                                                                           label = "Refresh",
+                                                                           style = paste0(
+                                                                             "background-color:",
+                                                                             oxgraphs::ox_pallette()[2],
+                                                                             "; color: white"
+                                                                           )
+                                                                         ))))
+      ) shinyWidgets::actionBttn()
+      shinyWidgets::circleButton()
+    )),
+    fluidRow(column(3, h4(
       strong("GEM Data Last Updated: "),
       br(),
       format(file.info("data/GEM_Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
@@ -290,25 +318,40 @@ homepage_server <- function(id) {
       volumes <- getVolumes()()
       shinyDirChoose(
         input,
-        "directory",
+        "aid_directory",
         roots = volumes,
         session = session,
         restrictions = system.file(package = "base"),
         allowDirCreate = FALSE
       )
-      # if (!(is.integer(input$directory))) {
-      #   source("data processing/DataProcessing_AEMO_input_directory.R",
-      #          local = TRUE)
-      # }
+      
+      shinyFileChoose(
+        input,
+        "aid_file",
+        roots = volumes,
+        session = session,
+        restrictions = system.file(package = "base")
+      )
       
       output$directorypath <- renderPrint({
-        if (is.integer(input$directory)) {
-          cat("No directory has been selected (shinyDirChoose)")
-        } else {
-          file.path(parseDirPath(volumes, input$directory), "/")
+        if (is.integer(input$aid_directory) & is.integer(input$aid_file)) {
+          cat("No folder/file has been selected")
+        } else if (!(is.integer(input$aid_directory))) {
+          file.path(parseDirPath(volumes, input$aid_directory), "/")
+        } else if (!(is.integer(input$aid_file))) {
+          file.path(parseFilePaths(volumes, input$aid_file))[4]
         }
       })
       
+    })
+    
+    observeEvent(input$process_folder_file, {
+      source("data processing/DataProcessing_AEMO_input_directory.R",
+                      local = TRUE)
+      output$data_processed <-
+        renderUI({
+          cat("Data process complete")
+        })
     })
     
     observeEvent(input$refresh, {
@@ -317,11 +360,15 @@ homepage_server <- function(id) {
     })
     
     observe({
-      output$AID_data_update_date <- renderUI({h5(strong("AID Data Last Updated: "),paste0(format(file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")))})
+      output$AID_data_update_date <-
+        renderUI({
+          h5(strong("AID Data Last Updated: "), paste0(format(
+            file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p"
+          )))
+        })
     })
     
     source("data/import_data.R", local = TRUE)
     return(data)
   })
 }
-
