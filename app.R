@@ -1,9 +1,4 @@
 
-
-
-
-
-
 rm(list = ls())
 
 list.of.packages <-
@@ -47,7 +42,7 @@ source("functions/functions.R")
 
 # 0.2 Import Processed AID Data -------------------------------------------
 
-#source("data/import_data.R")
+source("data/import_data.R")
 
 # 0.3 Import GEM Data -----------------------------------------------------
 
@@ -163,7 +158,6 @@ server <- function(input, output, session) {
 
     callModule(gc_version_server, "gc_version")
     callModule(gc_scenario_server, "gc_scenario")
-    #bs_themer()
 }
 
 # 5.0 Run App -------------------------------------------------------------

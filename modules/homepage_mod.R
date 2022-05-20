@@ -15,12 +15,45 @@ homepage_ui <- function(id) {
       The dashboard also includes several off-platform calculated series for further checking of forecasts as well as CAGR/Period average calculations that may be useful during report writing.
       We will continue to develop this dashboard, gradually generalising it so that it can be easily used across all projects and also by others."
     ),
-    fluidRow(column(3, h4(
-      strong("AEMO Data Last Updated: "),
-      br(),
-      uiOutput(ns("AID_data_update_date"))
-      #format(file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")
-    )),
+    fluidRow(column(6,
+    wellPanel(
+      style = paste0(
+        "border: 5px solid; border-color:",
+        oxgraphs::ox_pallette()[9],
+        "; margin-bottom: 0.5em"
+      ),
+      h4(strong("Updating AID Data"),
+      uiOutput(ns("AID_data_update_date"))),
+      fluidRow(
+        shinyDirButton(
+        ns("directory"),
+        "Select Folder",
+        "Please select a folder",
+        buttonType = 'md',
+        style = paste0(
+          "background-color:",
+          oxgraphs::ox_pallette()[2],
+          "; color: white; margin-left:1.25em"
+        )
+      ),
+      h4("or", style = "margin-top:0.2em; margin-left:0.5em; margin-right:0.5em"),
+      
+      shinyDirButton(
+        ns("files"),
+        "Select File",
+        "Please select a folder",
+        buttonType = 'md',
+        style = paste0(
+          "background-color:",
+          oxgraphs::ox_pallette()[2],
+          "; color: white"
+        )
+      )),
+      h4(verbatimTextOutput(ns("directorypath"))),
+      actionBttn(ns("refresh"),
+                 label = "Refresh")
+    ))),
+    fluidRow(
     column(3, h4(
       strong("GEM Data Last Updated: "),
       br(),
@@ -232,27 +265,6 @@ homepage_ui <- function(id) {
       ),
       h3(strong("Scenario Descriptions:")),
       tableOutput(ns("Table"))
-    ),
-    wellPanel(
-      style = paste0(
-        "border: 5px solid; border-color:",
-        oxgraphs::ox_pallette()[9],
-        "; margin-bottom: 0.5em"
-      ),
-      actionBttn(ns("refresh"),
-                 label = "Refresh"),
-      shinyDirButton(
-        ns("directory"),
-        "Folder select",
-        "Please select a folder",
-        style = paste0(
-          "background-color:",
-          oxgraphs::ox_pallette()[2],
-          "; color: white"
-        )
-      ),
-      verbatimTextOutput(ns("directorypath")),
-      #tableOutput(ns("Table"))
     )
   )
 }
@@ -275,11 +287,7 @@ homepage_server <- function(id) {
     })
     
     observe({
-      volumes <-
-        c(
-          Local = getVolumes()()[["Windows (C:)"]],
-          Home = fs::path_home()
-        )
+      volumes <- getVolumes()()
       shinyDirChoose(
         input,
         "directory",
@@ -288,10 +296,10 @@ homepage_server <- function(id) {
         restrictions = system.file(package = "base"),
         allowDirCreate = FALSE
       )
-      if (!(is.integer(input$directory))) {
-        source("data processing/DataProcessing_AEMO_input_directory.R",
-               local = TRUE)
-      }
+      # if (!(is.integer(input$directory))) {
+      #   source("data processing/DataProcessing_AEMO_input_directory.R",
+      #          local = TRUE)
+      # }
       
       output$directorypath <- renderPrint({
         if (is.integer(input$directory)) {
@@ -309,7 +317,7 @@ homepage_server <- function(id) {
     })
     
     observe({
-      output$AID_data_update_date <- renderUI({paste0(format(file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p"))})
+      output$AID_data_update_date <- renderUI({h5(strong("AID Data Last Updated: "),paste0(format(file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p")))})
     })
     
     source("data/import_data.R", local = TRUE)
@@ -317,19 +325,3 @@ homepage_server <- function(id) {
   })
 }
 
-
-
-# 3.0 Test Module ---------------------------------------------------------
-
-# gc_version_demo <- function() {
-#
-#   select <- data.frame(SCENARIO_VALUE = c("CENTRAL","EXPORT_SUPERPOWER","SUSTAINABLE_GROWTH","RAPID_DECARB"))
-#   ui <- navbarPage("Module Demo",
-#                    gc_version_ui("Version", "By Region"))
-#   server <- function(input, output, session) {
-#     callModule(gc_version_server,"Version")
-#     }
-#   shinyApp(ui, server)
-# }
-#
-# gc_version_demo()
