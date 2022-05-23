@@ -226,6 +226,7 @@ d_region_breakdown_server <- function(id, data) {
           )
         }
       }
+      if (length(input_line) >= 0) {
       fig <- fig %>% add_trace(
         y = d_region_breakdown_data[[input_line[1]]],
         color = I(ox_pallette()[9]),
@@ -233,6 +234,7 @@ d_region_breakdown_server <- function(id, data) {
         type = 'scatter',
         mode = 'lines'
       )
+      }
       if (input$title == "Title On") {
       fig <- fig %>%
         layout(title = list(

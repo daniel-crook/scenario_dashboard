@@ -248,6 +248,7 @@ d_total_increase_by_region_server <- function(id, data) {
           )
         }
       }
+      if (length(input_line) >= 0) {
       fig <- fig %>% add_trace(
         y = d_total_increase_by_region_data[[input_line[1]]],
         color = I(ox_pallette()[9]),
@@ -255,11 +256,12 @@ d_total_increase_by_region_server <- function(id, data) {
         type = 'scatter',
         mode = 'lines'
       )
+      }
       if (input$title == "Title On") {
         fig <- fig %>%
           layout(title = list(
             text = paste0(
-                str_after_first(input_bar[1], ","),
+                str_after_nth(input_bar[1], ",",2),
                 " - Population Breakdown"
             ),
             x = 0.05,
