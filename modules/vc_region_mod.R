@@ -29,6 +29,17 @@ vc_region_ui <- function(id) {
                      )
                    ),
                    column(
+                     5,
+                     radioGroupButtons(
+                       inputId = ns("title"),
+                       NULL,
+                       c("Title On", "Title Off"),
+                       selected = "Title On",
+                       justified = TRUE,
+                       status = "primary"
+                     )
+                   ),
+                   column(
                      4,
                      actionGroupButtons(
                        inputIds = c(ns("big4"), ns("small4"), ns("all")),
@@ -36,19 +47,7 @@ vc_region_ui <- function(id) {
                        status = "primary"
                      )
                    ),
-                   column(
-                     4,
-                     switchInput(
-                       inputId = ns("title"),
-                       label = "Title",
-                       value = TRUE,
-                       onLabel = "ON",
-                       offLabel = "OFF",
-                       onStatus = "primary",
-                       offStatus = "primary"
-                     )
-                   ),
-                   style = "margin-bottom:-2.0em"
+                   style = "margin-bottom:-1.0em"
                  )
                ),
                wellPanel(
@@ -362,7 +361,7 @@ vc_region_server <- function(id, data) {
             )
           }
         }
-        if (input$title == TRUE) {
+        if (input$title == "Title On") {
           fig <- fig %>%
             layout(title = list(
               text = paste0(

@@ -13,9 +13,10 @@ sc_region_ui <- function(id) {
                    oxgraphs::ox_pallette()[2],
                    "; margin-bottom: 0.5em"
                  ),
-                 fluidRow(
-                   column(3, h4("Display:", style = "margin-top: 0.15em")),
-                   column(
+                 fluidRow(column(
+                   3, h4("Display:", style = "margin-top: -0.5em")
+                 )),
+                 fluidRow(column(
                      5,
                      radioGroupButtons(
                        ns("display"),
@@ -27,14 +28,25 @@ sc_region_ui <- function(id) {
                      )
                    ),
                    column(
-                     4,
+                     5,
+                     radioGroupButtons(
+                       inputId = ns("title"),
+                       NULL,
+                       c("Title On", "Title Off"),
+                       selected = "Title On",
+                       justified = TRUE,
+                       status = "primary"
+                     )
+                   ),
+                   column(
+                     3,
                      actionGroupButtons(
                        inputIds = c(ns("big4"), ns("small4"), ns("all")),
                        labels = c("Big", "Small", "All"),
                        status = "primary"
                      )
                    ),
-                   style = "margin-bottom:-2.0em; margin-top:-0.75em"
+                   style = "margin-bottom:-1.0em"
                  )
                ),
                wellPanel(
@@ -123,6 +135,9 @@ sc_region_ui <- function(id) {
 
 sc_region_server <- function(id, data) {
   moduleServer(id, function(input, output, session) {
+
+# Filter Version based on Scenario Select ---------------------------------
+
     observe({
       rv_list <-
         data.frame(RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
@@ -142,7 +157,9 @@ sc_region_server <- function(id, data) {
         selected = as.list(rv_list$RELEASE_VERSION[1])
       )
     })
-    
+
+# Filter Attribute based on Version select --------------------------------
+
     observe({
       updateSelectInput(session,
                         "Attribute",
@@ -150,7 +167,9 @@ sc_region_server <- function(id, data) {
                         sort(unique(data$ATTRIBUTE[data$STATE == "NSW" &
                                                      data$RELEASE_VERSION == input$Version])))
     })
-    
+
+# Big States Button -------------------------------------------------------
+
     observeEvent(input$big4, {
       states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
       
@@ -176,7 +195,9 @@ sc_region_server <- function(id, data) {
         )
       )
     })
-    
+
+# Small States Button -----------------------------------------------------
+
     observeEvent(input$small4, {
       states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
       
@@ -202,7 +223,9 @@ sc_region_server <- function(id, data) {
         )
       )
     })
-    
+
+# All States Button -------------------------------------------------------
+
     observeEvent(input$all, {
       states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
       
@@ -228,8 +251,9 @@ sc_region_server <- function(id, data) {
         )
       )
     })
-    
-    ### --- update checkboxgroup options based on select inputs --- ###
+
+# Update checkgroup options based on select inputs ------------------------
+
     observe({
       if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
                                data$RELEASE_VERSION == input$Version &
@@ -262,6 +286,9 @@ sc_region_server <- function(id, data) {
       }
     })
     
+
+# Render Plot -------------------------------------------------------------
+
     observe({
       bar_dates <- seq(2020, 2050, 10)
       
@@ -293,19 +320,142 @@ sc_region_server <- function(id, data) {
       output$Plot <- renderPlotly({
         fig <-
           if (input$display != "Line chart") {
-            bar.plot(sc_region_data,
-                     input$Selections,
-                     "% of National",
-                     "%")
+            {
+              fig <- plot_ly(
+                sc_region_data,
+                x = ~ Dates,
+                y = sc_region_data[[input$Selections[1]]],
+                type = 'bar',
+                name = str_before_first(str_after_first(input$Selections[1], ", "), ", "),
+                color = I(ox_pallette()[1])
+              ) %>%
+                layout(
+                  yaxis = list(ticksuffix = "%", title = "% of National",
+                               showgrid = F,
+                               showline = T,
+                               linecolor = "#495057",
+                               ticks = "outside",
+                               tickcolor = "#495057"
+                  ),
+                  xaxis = list(
+                    title = "",
+                    zerolinecolor = "#495057",
+                    showgrid = F,
+                    showline = T,
+                    linecolor = "#495057",
+                    ticks = "outside",
+                    tickcolor = "#495057"),
+                  legend = list(
+                    orientation = "h",
+                    xanchor = "center",
+                    x = 0.5,
+                    y = -0.15
+                  ),
+                  barmode = 'group'
+                )
+              if (length(input$Selections) >= 2) {
+                for (i in 2:length(input$Selections)) {
+                  fig <- fig %>% add_trace(y = sc_region_data[[input$Selections[i]]],
+                                           color = I(ox_pallette()[i]),
+                                           name = str_before_first(str_after_first(input$Selections[i], ", "), ", "))
+                }
+              }
+              if (input$title == "Title On") {
+                fig <- fig %>%
+                  layout(title = list(
+                    text = paste0(
+                      str_before_first(input$Selections[1], ", "),
+                      ", ",
+                      str_after_nth(input$Selections[1], ", ", 2),
+                      " - By Region Comparison"
+                    ),
+                    x = 0.05,
+                    y = 1,
+                    font = list(
+                      family = "segoe ui",
+                      size = 24,
+                      color = "#495057"
+                    )
+                  )) }
+              return(fig)
+            }
           } else {
-            line.plot(sc_region_data,
-                      input$Selections,
-                      "% of National",
-                      "%")
+            {
+              fig <- plot_ly(
+                sc_region_data,
+                x = ~ Dates,
+                y = sc_region_data[[input$Selections[1]]],
+                name = str_before_first(str_after_first(input$Selections[1], ", "), ", "),
+                type = 'scatter',
+                mode = 'lines',
+                color = I(ox_pallette()[1])
+              ) %>%
+                layout(
+                  shapes = vline(data[(data$FORECAST_FLAG == "EA") &
+                                        (data$variable == input$Selections[1]), "Dates"]),
+                  yaxis = list(ticksuffix = "%", title = "% of National",
+                               showgrid = F,
+                               showline = T,
+                               linecolor = "#495057",
+                               ticks = "outside",
+                               tickcolor = "#495057"
+                  ),
+                  xaxis = list(
+                    title = "",
+                    zerolinecolor = "#495057",
+                    showgrid = F,
+                    showline = T,
+                    linecolor = "#495057",
+                    ticks = "outside",
+                    tickcolor = "#495057"),
+                  legend = list(
+                    orientation = "h",
+                    xanchor = "center",
+                    x = 0.5,
+                    y = -0.05
+                  )
+                ) %>%
+                add_annotations(
+                  x = data[(data$FORECAST_FLAG == "EA") &
+                             (data$variable == input$Selections[1]), "Dates"],
+                  y = 1,
+                  text = "              Forecast",
+                  yref = "paper",
+                  showarrow = FALSE
+                )
+              if (length(input$Selections) >= 2) {
+                for (i in 2:length(input$Selections)) {
+                  fig <- fig %>% add_trace(y = sc_region_data[[input$Selections[i]]],
+                                           color = I(ox_pallette()[i]),
+                                           name = str_before_first(str_after_first(input$Selections[i], ", "), ", "))
+                }
+              }
+              if (input$title == "Title On") {
+                fig <- fig %>%
+                  layout(title = list(
+                    text = paste0(
+                      str_before_first(input$Selections[1], ", "),
+                      ", ",
+                      str_after_nth(input$Selections[1], ", ", 2),
+                      " - By Region Comparison"
+                    ),
+                    x = 0.05,
+                    y = 1,
+                    font = list(
+                      family = "segoe ui",
+                      size = 24,
+                      color = "#495057"
+                    )
+                  )) }
+              return(fig)
+            }
           }
       })
     })
     
+
+# Render Table ------------------------------------------------------------
+
     observe({
       if (length(input$Selections) >= 2) {
         for (i in 2:length(input$Selections)) {
@@ -392,24 +542,20 @@ sc_region_server <- function(id, data) {
         }
         sc_region_p_avg_table <-
           sc_region_p_avg_table[, append("Period", input$Selections)]
+        
+        names(sc_region_p_avg_table) <-
+          gsub(paste0(str_before_first(input$Selections[1], ", "), ", "),
+               "",
+               names(sc_region_p_avg_table))
+        names(sc_region_p_avg_table) <-
+          gsub(paste0(", ", str_after_nth(input$Selections[1], ", ", 2)),
+               "",
+               names(sc_region_p_avg_table))
+        
+        return(sc_region_p_avg_table)
       },
       spacing = "s", striped = TRUE, hover = TRUE, align = "l")
     })
     
   })
 }
-
-# 3.0 Test Module ---------------------------------------------------------
-
-# sc_region_demo <- function() {
-#
-#   select <- data.frame(SCENARIO_VALUE = c("CENTRAL","EXPORT_SUPERPOWER","SUSTAINABLE_GROWTH","RAPID_DECARB"))
-#   ui <- navbarPage("Module Demo",
-#                    sc_region_ui("Version", "By Region"))
-#   server <- function(input, output, session) {
-#     callModule(sc_region_server,"Version")
-#     }
-#   shinyApp(ui, server)
-# }
-#
-# sc_region_demo()

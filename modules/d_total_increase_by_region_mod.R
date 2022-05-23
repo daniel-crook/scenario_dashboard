@@ -21,15 +21,13 @@ d_total_increase_by_region_ui <- function(id) {
                  ),
                  column(
                    5,
-                   switchInput(
+                   radioGroupButtons(
                      inputId = ns("title"),
-                     label = "Title",
-                     value = TRUE,
-                     size = 'large',
-                     onLabel = "ON",
-                     offLabel = "OFF",
-                     onStatus = "primary",
-                     offStatus = "primary"
+                     NULL,
+                     c("Title On", "Title Off"),
+                     selected = "Title On",
+                     justified = TRUE,
+                     status = "primary"
                    )
                  ),
                  style = "margin-bottom:-2.0em; margin-top:-0.75em")
@@ -210,13 +208,26 @@ d_total_increase_by_region_server <- function(id, data) {
         layout(
           shapes = vline(data[(data$FORECAST_FLAG == "EA") &
                                 (data$variable == input_series[1]), "Dates"]),
-          yaxis = list(title = "Persons (000s)"),
-          xaxis = list(title = "Year"),
+          yaxis = list(title = "Persons (000s)",
+                       showgrid = F,
+                       showline = T,
+                       linecolor = "#495057",
+                       ticks = "outside",
+                       tickcolor = "#495057"
+          ),
+          xaxis = list(
+            title = "",
+            zerolinecolor = "#495057",
+            showgrid = F,
+            showline = T,
+            linecolor = "#495057",
+            ticks = "outside",
+            tickcolor = "#495057"),
           legend = list(
             orientation = "h",
             xanchor = "center",
             x = 0.5,
-            y = -0.15
+            y = -0.05
           ),
           barmode = 'relative'
         ) %>% 
@@ -244,16 +255,12 @@ d_total_increase_by_region_server <- function(id, data) {
         type = 'scatter',
         mode = 'lines'
       )
-      if (input$title == TRUE) {
+      if (input$title == "Title On") {
         fig <- fig %>%
           layout(title = list(
             text = paste0(
-              '<b>',
-              paste0(
                 str_after_first(input_bar[1], ","),
                 " - Population Breakdown"
-              ),
-              '<b>'
             ),
             x = 0.05,
             y = 1,

@@ -14,9 +14,9 @@ sc_version_ui <- function(id) {
                    "; margin-bottom: 0.5em"
                  ),
                  fluidRow(column(
-                   3, h4("Display:", style = "margin-top: 0.15em")
-                 ),
-                 column(
+                   3, h4("Display:", style = "margin-top: -0.5em")
+                 )),
+                 fluidRow(column(
                    5,
                    radioGroupButtons(
                      ns("display"),
@@ -28,18 +28,17 @@ sc_version_ui <- function(id) {
                    )
                  ),
                  column(
-                   4,
-                   switchInput(
+                   5,
+                   radioGroupButtons(
                      inputId = ns("title"),
-                     label = "Title",
-                     value = TRUE,
-                     onLabel = "ON",
-                     offLabel = "OFF",
-                     onStatus = "primary",
-                     offStatus = "primary"
+                     NULL,
+                     c("Title On", "Title Off"),
+                     selected = "Title On",
+                     justified = TRUE,
+                     status = "primary"
                    )
                  ),
-                 style = "margin-bottom:-2.0em; margin-top:-0.75em")
+                 style = "margin-bottom:-2.0em")
                ),
                wellPanel(
                  style = paste0(
@@ -216,15 +215,131 @@ sc_version_server <- function(id, data) {
       output$Plot <- renderPlotly({
         fig <-
           if (input$display != "Line chart") {
-            bar.plot(sc_version_data,
-                     input$Selections,
-                     "% of National",
-                     "%")
+            {
+            fig <- plot_ly(
+              sc_version_data,
+              x = ~ Dates,
+              y = sc_version_data[[input$Selections[1]]],
+              type = 'bar',
+              name = str_after_last(input$Selections[1],", "),
+              color = I(ox_pallette()[1])
+            ) %>%
+              layout(
+                yaxis = list(ticksuffix = "%", title = "% of National",
+                             showgrid = F,
+                             showline = T,
+                             linecolor = "#495057",
+                             ticks = "outside",
+                             tickcolor = "#495057"
+                ),
+                xaxis = list(
+                  title = "",
+                  zerolinecolor = "#495057",
+                  showgrid = F,
+                  showline = T,
+                  linecolor = "#495057",
+                  ticks = "outside",
+                  tickcolor = "#495057"),
+                legend = list(
+                  orientation = "h",
+                  xanchor = "center",
+                  x = 0.5,
+                  y = -0.15
+                ),
+                barmode = 'group'
+              )
+            if (length(input$Selections) >= 2) {
+              for (i in 2:length(input$Selections)) {
+                fig <- fig %>% add_trace(y = sc_version_data[[input$Selections[i]]],
+                                         color = I(ox_pallette()[i]),
+                                         name = str_after_last(input$Selections[i],", "))
+              }
+            }
+            if (input$title == "Title On") {
+              fig <- fig %>%
+                layout(title = list(
+                  text = paste0(
+                    str_before_last(input$Selections[1], ","),
+                    " - By Version Comparison"
+                  ),
+                  x = 0.05,
+                  y = 1,
+                  font = list(
+                    family = "segoe ui",
+                    size = 24,
+                    color = "#495057"
+                  )
+                )) }
+            return(fig)
+            }
           } else {
-            line.plot(sc_version_data,
-                      input$Selections,
-                      "% of National",
-                      "%")
+            {
+            fig <- plot_ly(
+              sc_version_data,
+              x = ~ Dates,
+              y = sc_version_data[[input$Selections[1]]],
+              name = str_after_last(input$Selections[1],", "),
+              type = 'scatter',
+              mode = 'lines',
+              color = I(ox_pallette()[1])
+            ) %>%
+              layout(
+                shapes = vline(data[(data$FORECAST_FLAG == "EA") &
+                                      (data$variable == input$Selections[1]), "Dates"]),
+                yaxis = list(ticksuffix = "%", title = "% of National",
+                             showgrid = F,
+                             showline = T,
+                             linecolor = "#495057",
+                             ticks = "outside",
+                             tickcolor = "#495057"
+                ),
+                xaxis = list(
+                  title = "",
+                  zerolinecolor = "#495057",
+                  showgrid = F,
+                  showline = T,
+                  linecolor = "#495057",
+                  ticks = "outside",
+                  tickcolor = "#495057"),
+                legend = list(
+                  orientation = "h",
+                  xanchor = "center",
+                  x = 0.5,
+                  y = -0.05
+                )
+              ) %>%
+              add_annotations(
+                x = data[(data$FORECAST_FLAG == "EA") &
+                           (data$variable == input$Selections), "Dates"],
+                y = 1,
+                text = "              Forecast",
+                yref = "paper",
+                showarrow = FALSE
+              )
+            if (length(input$Selections) >= 2) {
+              for (i in 2:length(input$Selections)) {
+                fig <- fig %>% add_trace(y = sc_version_data[[input$Selections[i]]],
+                                         color = I(ox_pallette()[i]),
+                                         name = str_after_last(input$Selections[i],", "))
+              }
+            }
+            if (input$title == "Title On") {
+              fig <- fig %>%
+                layout(title = list(
+                  text = paste0(
+                    str_before_last(input$Selections[1], ","),
+                    " - By Version Comparison"
+                  ),
+                  x = 0.05,
+                  y = 1,
+                  font = list(
+                    family = "segoe ui",
+                    size = 24,
+                    color = "#495057"
+                  )
+                )) }
+            return(fig)
+            }
           }
       })
     })
@@ -316,6 +431,11 @@ sc_version_server <- function(id, data) {
         }
         sc_version_p_avg_table <-
           sc_version_p_avg_table[, append("Period", input$Selections)]
+        
+        names(sc_version_p_avg_table) <-
+          gsub(paste0(str_before_last(input$Selections[1],", "),", "),"",
+               names(sc_version_p_avg_table))
+        return(sc_version_p_avg_table)
       },
       spacing = "s", striped = TRUE, hover = TRUE, align = "l")
     })

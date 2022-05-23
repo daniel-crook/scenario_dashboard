@@ -71,12 +71,12 @@ vline <- function(x) {
 }
 
 ## -- function for creating line charts -- ##
-line.plot <- function(a, b, y_title, ticksuffix) {
+line.plot <- function(a, b, y_title, ticksuffix, name, name2) {
   fig <- plot_ly(
     a,
     x = ~ Dates,
     y = a[[b[1]]],
-    name = b[1],
+    name = name,
     type = 'scatter',
     mode = 'lines',
     color = I(ox_pallette()[1])
@@ -84,13 +84,26 @@ line.plot <- function(a, b, y_title, ticksuffix) {
     layout(
       shapes = vline(data[(data$FORECAST_FLAG == "EA") &
                             (data$variable == b[1]), "Dates"]),
-      yaxis = list(ticksuffix = ticksuffix, title = y_title),
-      xaxis = list(title = "Year"),
+      yaxis = list(ticksuffix = ticksuffix, title = y_title,
+                   showgrid = F,
+                   showline = T,
+                   linecolor = "#495057",
+                   ticks = "outside",
+                   tickcolor = "#495057"
+      ),
+      xaxis = list(
+        title = "",
+        zerolinecolor = "#495057",
+        showgrid = F,
+        showline = T,
+        linecolor = "#495057",
+        ticks = "outside",
+        tickcolor = "#495057"),
       legend = list(
         orientation = "h",
         xanchor = "center",
         x = 0.5,
-        y = -0.15
+        y = -0.05
       )
     ) %>%
     add_annotations(
@@ -105,7 +118,7 @@ line.plot <- function(a, b, y_title, ticksuffix) {
     for (i in 2:length(b)) {
       fig <- fig %>% add_trace(y = a[[b[i]]],
                                color = I(ox_pallette()[i]),
-                               name = b[i])
+                               name = name2)
     }
   }
   
@@ -113,18 +126,31 @@ line.plot <- function(a, b, y_title, ticksuffix) {
 }
 
 ## -- function for creating bar charts -- ##
-bar.plot <- function(a, b, y_title, ticksuffix) {
+bar.plot <- function(a, b, y_title, ticksuffix, name, name2) {
   fig <- plot_ly(
     a,
     x = ~ Dates,
     y = ~ a[[b[1]]],
     type = 'bar',
-    name = b[1],
+    name = name,
     color = I(ox_pallette()[1])
   ) %>%
     layout(
-      yaxis = list(ticksuffix = ticksuffix, title = y_title),
-      xaxis = list(title = "Year"),
+      yaxis = list(ticksuffix = ticksuffix, title = y_title,
+                   showgrid = F,
+                   showline = T,
+                   linecolor = "#495057",
+                   ticks = "outside",
+                   tickcolor = "#495057"
+      ),
+      xaxis = list(
+        title = "",
+        zerolinecolor = "#495057",
+        showgrid = F,
+        showline = T,
+        linecolor = "#495057",
+        ticks = "outside",
+        tickcolor = "#495057"),
       legend = list(
         orientation = "h",
         xanchor = "center",
@@ -137,7 +163,7 @@ bar.plot <- function(a, b, y_title, ticksuffix) {
     for (i in 2:length(b)) {
       fig <- fig %>% add_trace(y = a[[b[i]]],
                                color = I(ox_pallette()[i]),
-                               name = b[i])
+                               name = name2)
     }
   }
   return(fig)

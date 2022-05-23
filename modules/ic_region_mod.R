@@ -14,28 +14,40 @@ ic_region_ui <- function(id) {
                    oxgraphs::ox_pallette()[2],
                    "; margin-bottom: 0.5em"
                  ),
-                 fluidRow(
-                   column(2, h4("Display:", style = "margin-top: 0.15em")),
-                   column(
-                     5,
-                     radioGroupButtons(
-                       ns("display"),
-                       NULL,
-                       c("Line chart", "Bar chart"),
-                       selected = "Line chart",
-                       justified = TRUE,
-                       status = "primary"
-                     )
-                   ),
-                   column(
-                     5,
-                     actionGroupButtons(
-                       inputIds = c(ns("big4"), ns("small4"), ns("all")),
-                       labels = c("Big 4", "Small 4", "All States"),
-                       status = "primary"
-                     )
-                   ),
-                   style = "margin-bottom:-2.0em; margin-top:-0.75em"
+                 fluidRow(column(
+                   3, h4("Display:", style = "margin-top: -0.5em")
+                 )),
+                 fluidRow(column(
+                   5,
+                   radioGroupButtons(
+                     ns("display"),
+                     NULL,
+                     c("Line chart", "Bar chart"),
+                     selected = "Line chart",
+                     justified = TRUE,
+                     status = "primary"
+                   )
+                 ),
+                 column(
+                   5,
+                   radioGroupButtons(
+                     inputId = ns("title"),
+                     NULL,
+                     c("Title On", "Title Off"),
+                     selected = "Title On",
+                     justified = TRUE,
+                     status = "primary"
+                   )
+                 ),
+                 column(
+                   3,
+                   actionGroupButtons(
+                     inputIds = c(ns("big4"), ns("small4"), ns("all")),
+                     labels = c("Big", "Small", "All"),
+                     status = "primary"
+                   )
+                 ),
+                 style = "margin-bottom:-1.0em"
                  )
                ),
                wellPanel(
@@ -310,9 +322,135 @@ ic_region_server <- function(id, data) {
       
       fig <-
         if (input$display != "Line chart") {
-          bar.plot(ic_region_data, input$Selections, "% of Total GVA", "%")
+          {
+            fig <- plot_ly(
+              ic_region_data,
+              x = ~ Dates,
+              y = ic_region_data[[input$Selections[1]]],
+              type = 'bar',
+              name = str_before_first(str_after_first(input$Selections[1], ", "), ", "),
+              color = I(ox_pallette()[1])
+            ) %>%
+              layout(
+                yaxis = list(ticksuffix = "%", title = "% of Total GVA",
+                             showgrid = F,
+                             showline = T,
+                             linecolor = "#495057",
+                             ticks = "outside",
+                             tickcolor = "#495057"
+                ),
+                xaxis = list(
+                  title = "",
+                  zerolinecolor = "#495057",
+                  showgrid = F,
+                  showline = T,
+                  linecolor = "#495057",
+                  ticks = "outside",
+                  tickcolor = "#495057"),
+                legend = list(
+                  orientation = "h",
+                  xanchor = "center",
+                  x = 0.5,
+                  y = -0.15
+                ),
+                barmode = 'group'
+              )
+            if (length(input$Selections) >= 2) {
+              for (i in 2:length(input$Selections)) {
+                fig <- fig %>% add_trace(y = ic_region_data[[input$Selections[i]]],
+                                         color = I(ox_pallette()[i]),
+                                         name = str_before_first(str_after_first(input$Selections[i], ", "), ", "))
+              }
+            }
+            if (input$title == "Title On") {
+              fig <- fig %>%
+                layout(title = list(
+                  text = paste0(
+                    str_before_first(input$Selections[1], ", "),
+                    ", ",
+                    str_after_nth(input$Selections[1], ", ", 2),
+                    " - By Region Comparison"
+                  ),
+                  x = 0.05,
+                  y = 1,
+                  font = list(
+                    family = "segoe ui",
+                    size = 24,
+                    color = "#495057"
+                  )
+                )) }
+            return(fig)
+          }
         } else {
-          line.plot(ic_region_data, input$Selections, "% of Total GVA", "%")
+          {
+            fig <- plot_ly(
+              ic_region_data,
+              x = ~ Dates,
+              y = ic_region_data[[input$Selections[1]]],
+              name = str_before_first(str_after_first(input$Selections[1], ", "), ", "),
+              type = 'scatter',
+              mode = 'lines',
+              color = I(ox_pallette()[1])
+            ) %>%
+              layout(
+                shapes = vline(data[(data$FORECAST_FLAG == "EA") &
+                                      (data$variable == input$Selections[1]), "Dates"]),
+                yaxis = list(ticksuffix = "%", title = "% of Total GVA",
+                             showgrid = F,
+                             showline = T,
+                             linecolor = "#495057",
+                             ticks = "outside",
+                             tickcolor = "#495057"
+                ),
+                xaxis = list(
+                  title = "",
+                  zerolinecolor = "#495057",
+                  showgrid = F,
+                  showline = T,
+                  linecolor = "#495057",
+                  ticks = "outside",
+                  tickcolor = "#495057"),
+                legend = list(
+                  orientation = "h",
+                  xanchor = "center",
+                  x = 0.5,
+                  y = -0.05
+                )
+              ) %>%
+              add_annotations(
+                x = data[(data$FORECAST_FLAG == "EA") &
+                           (data$variable == input$Selections[1]), "Dates"],
+                y = 1,
+                text = "              Forecast",
+                yref = "paper",
+                showarrow = FALSE
+              )
+            if (length(input$Selections) >= 2) {
+              for (i in 2:length(input$Selections)) {
+                fig <- fig %>% add_trace(y = ic_region_data[[input$Selections[i]]],
+                                         color = I(ox_pallette()[i]),
+                                         name = str_before_first(str_after_first(input$Selections[i], ", "), ", "))
+              }
+            }
+            if (input$title == "Title On") {
+              fig <- fig %>%
+                layout(title = list(
+                  text = paste0(
+                    str_before_first(input$Selections[1], ", "),
+                    ", ",
+                    str_after_nth(input$Selections[1], ", ", 2),
+                    " - By Region Comparison"
+                  ),
+                  x = 0.05,
+                  y = 1,
+                  font = list(
+                    family = "segoe ui",
+                    size = 24,
+                    color = "#495057"
+                  )
+                )) }
+            return(fig)
+          }
         }
     })
   })
@@ -418,6 +556,17 @@ ic_region_server <- function(id, data) {
       }
       ic_region_p_avg_table <-
         ic_region_p_avg_table[, append("Period", input$Selections)]
+      
+      names(ic_region_p_avg_table) <-
+        gsub(paste0(str_before_first(input$Selections[1], ", "), ", "),
+             "",
+             names(ic_region_p_avg_table))
+      names(ic_region_p_avg_table) <-
+        gsub(paste0(", ", str_after_nth(input$Selections[1], ", ", 2)),
+             "",
+             names(ic_region_p_avg_table))
+      
+      return(ic_region_p_avg_table)
     },
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
   })

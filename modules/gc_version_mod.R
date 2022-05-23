@@ -14,20 +14,31 @@ gc_version_ui <- function(id) {
                    "; margin-bottom: 0.5em"
                  ),
                  fluidRow(column(
-                   2, h4("Display:", style = "margin-top: 0.15em")
-                 ),
-                 column(
-                   10,
+                   3, h4("Display:", style = "margin-top: -0.5em")
+                 )),
+                 fluidRow(column(
+                   5,
                    radioGroupButtons(
                      ns("display"),
                      NULL,
-                     c("Level Values", "% y/y"),
+                     c("Levels", "% y/y"),
                      selected = "% y/y",
                      justified = TRUE,
                      status = "primary"
                    )
                  ),
-                 style = "margin-bottom:-2.0em; margin-top:-0.75em")
+                 column(
+                   5,
+                   radioGroupButtons(
+                     inputId = ns("title"),
+                     NULL,
+                     c("Title On", "Title Off"),
+                     selected = "Title On",
+                     justified = TRUE,
+                     status = "primary"
+                   )
+                 ),
+                 style = "margin-bottom:-2.0em")
                ),
                wellPanel(
                  style = paste0(
@@ -162,28 +173,37 @@ gc_version_server <- function(input, output, session) {
         gc_version_data,
         x = ~ as.Date(Dates),
         y = gc_version_data[[gc_version_input[1]]],
-        name = substr(
-          gc_version_input[1],
-          str_locate(gc_version_input[1], ",") + 2,
-          nchar(gc_version_input[1])
-        ),
+        name = str_after_last(input$Selections[1],", "),
         type = 'scatter',
         mode = 'lines',
         color = I(ox_pallette()[1])
       ) %>%
         layout(
           shapes = vline(unique(gem_data$hist_end[gem_data$variable == gc_version_input[1]])),
-          yaxis = list(title = if (input$display == "Level Values") {
+          yaxis = list(title = if (input$display == "Levels") {
             unique(gem_data$Units[gem_data$variable == gc_version_input[1]])
           } else {
             "% y/y"
-          }),
-          xaxis = list(title = "Year"),
+          },
+          showgrid = F,
+          showline = T,
+          linecolor = "#495057",
+          ticks = "outside",
+          tickcolor = "#495057"
+          ),
+          xaxis = list(
+            title = "",
+            zerolinecolor = "#495057",
+            showgrid = F,
+            showline = T,
+            linecolor = "#495057",
+            ticks = "outside",
+            tickcolor = "#495057"),
           legend = list(
             orientation = "h",
             xanchor = "center",
             x = 0.5,
-            y = -0.2
+            y = -0.05
           )
         ) %>%
         add_annotations(
@@ -192,37 +212,33 @@ gc_version_server <- function(input, output, session) {
           text = "              Forecast",
           yref = "paper",
           showarrow = FALSE
-        ) %>%
-        layout(title = list(
-          text = paste0(
-            '<b>',
-            paste0(
-              str_before_nth(gc_version_input[1], ",", 2),
-              " - By Version Comparison"
-            ),
-            '<b>'
-          ),
-          x = 0.05,
-          y = 0.99,
-          font = list(
-            family = "segoe ui",
-            size = 18,
-            color = ox_pallette()[2]
-          )
-        ))
+        ) 
       if (length(gc_version_input) >= 2) {
         for (i in 2:length(gc_version_input)) {
           fig <- fig %>% add_trace(
             y = gc_version_data[[gc_version_input[i]]],
             color = I(ox_pallette()[i]),
-            name = substr(
-              gc_version_input[i],
-              str_locate(gc_version_input[i], ",") + 2,
-              nchar(gc_version_input[i])
-            )
+            name = str_after_last(input$Selections[i],", ")
           )
         }
       }
+      if (input$title == "Title On") {
+        fig <- fig %>%
+          layout(title = list(
+            text = paste0(
+              str_before_nth(gc_version_input[1], ",", 2),
+              " - By Version Comparison"
+            ),
+            x = 0.05,
+            y = 1,
+            font = list(
+              family = "segoe ui",
+              size = 24,
+              color = "#495057"
+            )
+          ))
+      }
+      
       return(fig)
     })
   })

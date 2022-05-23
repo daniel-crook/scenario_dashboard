@@ -14,10 +14,10 @@ ic_scenario_ui <- function(id) {
                    "; margin-bottom: 0.5em"
                  ),
                  fluidRow(column(
-                   2, h4("Display:", style = "margin-top: 0.15em")
-                 ),
-                 column(
-                   10,
+                   3, h4("Display:", style = "margin-top: -0.5em")
+                 )),
+                 fluidRow(column(
+                   5,
                    radioGroupButtons(
                      ns("display"),
                      NULL,
@@ -27,7 +27,18 @@ ic_scenario_ui <- function(id) {
                      status = "primary"
                    )
                  ),
-                 style = "margin-bottom:-2.0em; margin-top:-0.75em")
+                 column(
+                   5,
+                   radioGroupButtons(
+                     inputId = ns("title"),
+                     NULL,
+                     c("Title On", "Title Off"),
+                     selected = "Title On",
+                     justified = TRUE,
+                     status = "primary"
+                   )
+                 ),
+                 style = "margin-bottom:-2.0em")
                ),
                wellPanel(
                  style = paste0(
@@ -141,6 +152,9 @@ ic_scenario_server <- function(id, data) {
     )
   })
 
+
+# Render Plot -------------------------------------------------------------
+
   observe({
     output$Plot <- renderPlotly({
       bar_dates <- seq(2020, 2050, 10)
@@ -186,12 +200,137 @@ ic_scenario_server <- function(id, data) {
 
       fig <-
         if (input$display != "Line chart") {
-          bar.plot(ic_scenario_data, input$Selections, "% of Total GVA", "%")
+          {
+            fig <- plot_ly(
+              ic_scenario_data,
+              x = ~ Dates,
+              y = ic_scenario_data[[input$Selections[1]]],
+              type = 'bar',
+              name = str_after_nth(input$Selections[1], ", ", 2),
+              color = I(ox_pallette()[1])
+            ) %>%
+              layout(
+                yaxis = list(ticksuffix = "%", title = "% of Total GVA",
+                             showgrid = F,
+                             showline = T,
+                             linecolor = "#495057",
+                             ticks = "outside",
+                             tickcolor = "#495057"
+                ),
+                xaxis = list(
+                  title = "",
+                  zerolinecolor = "#495057",
+                  showgrid = F,
+                  showline = T,
+                  linecolor = "#495057",
+                  ticks = "outside",
+                  tickcolor = "#495057"),
+                legend = list(
+                  orientation = "h",
+                  xanchor = "center",
+                  x = 0.5,
+                  y = -0.15
+                ),
+                barmode = 'group'
+              )
+            if (length(input$Selections) >= 2) {
+              for (i in 2:length(input$Selections)) {
+                fig <- fig %>% add_trace(y = ic_scenario_data[[input$Selections[i]]],
+                                         color = I(ox_pallette()[i]),
+                                         name = str_after_last(input$Selections[i],", "))
+              }
+            }
+            if (input$title == "Title On") {
+              fig <- fig %>%
+                layout(title = list(
+                  text = paste0(
+                    str_before_nth(input$Selections[1], ",", 2),
+                    " - By Scenario Comparison"
+                  ),
+                  x = 0.05,
+                  y = 1,
+                  font = list(
+                    family = "segoe ui",
+                    size = 24,
+                    color = "#495057"
+                  )
+                )) }
+            return(fig)
+          }
         } else {
-          line.plot(ic_scenario_data, input$Selections, "% of Total GVA", "%")
+          {
+            fig <- plot_ly(
+              ic_scenario_data,
+              x = ~ Dates,
+              y = ic_scenario_data[[input$Selections[1]]],
+              name = str_after_nth(input$Selections[1], ", ", 2),
+              type = 'scatter',
+              mode = 'lines',
+              color = I(ox_pallette()[1])
+            ) %>%
+              layout(
+                shapes = vline(data[(data$FORECAST_FLAG == "EA") &
+                                      (data$variable == input$Selections[1]), "Dates"]),
+                yaxis = list(ticksuffix = "%", title = "% of Total GVA",
+                             showgrid = F,
+                             showline = T,
+                             linecolor = "#495057",
+                             ticks = "outside",
+                             tickcolor = "#495057"
+                ),
+                xaxis = list(
+                  title = "",
+                  zerolinecolor = "#495057",
+                  showgrid = F,
+                  showline = T,
+                  linecolor = "#495057",
+                  ticks = "outside",
+                  tickcolor = "#495057"),
+                legend = list(
+                  orientation = "h",
+                  xanchor = "center",
+                  x = 0.5,
+                  y = -0.05
+                )
+              ) %>%
+              add_annotations(
+                x = data[(data$FORECAST_FLAG == "EA") &
+                           (data$variable == input$Selections[1]), "Dates"],
+                y = 1,
+                text = "              Forecast",
+                yref = "paper",
+                showarrow = FALSE
+              )
+            if (length(input$Selections) >= 2) {
+              for (i in 2:length(input$Selections)) {
+                fig <- fig %>% add_trace(y = ic_scenario_data[[input$Selections[i]]],
+                                         color = I(ox_pallette()[i]),
+                                         name = str_after_nth(input$Selections[i], ", ", 2))
+              }
+            }
+            if (input$title == "Title On") {
+              fig <- fig %>%
+                layout(title = list(
+                  text = paste0(
+                    str_before_nth(input$Selections[1], ",", 2),
+                    " - By Scenario Comparison"
+                  ),
+                  x = 0.05,
+                  y = 1,
+                  font = list(
+                    family = "segoe ui",
+                    size = 24,
+                    color = "#495057"
+                  )
+                )) }
+            return(fig)
+          }
         }
     })
   })
+
+
+# Render Table ------------------------------------------------------------
 
   observe({
     if (length(input$Selections) >= 2) {
@@ -293,6 +432,12 @@ ic_scenario_server <- function(id, data) {
       }
       ic_scenario_p_avg_table <-
         ic_scenario_p_avg_table[, append("Period", input$Selections)]
+      
+      names(ic_scenario_p_avg_table) <-
+        gsub(paste0(str_before_nth(input$Selections[1], ", ", 2), ", "),
+             "",
+             names(ic_scenario_p_avg_table))
+      return(ic_scenario_p_avg_table)
     },
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
   })

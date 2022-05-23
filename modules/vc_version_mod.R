@@ -28,25 +28,24 @@ vc_version_ui <- function(id) {
                        status = "primary"
                      )
                    ),
-                   column(4,
+                   column(3,
                      radioGroupButtons(
                        ns("state_national"),
                        NULL,
-                       c("State", "National"),
+                       c("State", "Aus"),
                        justified = TRUE,
                        status = "primary"
                      )
                      ),
                    column(
-                     4,
-                     switchInput(
+                     5,
+                     radioGroupButtons(
                        inputId = ns("title"),
-                       label = "Title",
-                       value = TRUE,
-                       onLabel = "ON",
-                       offLabel = "OFF",
-                       onStatus = "primary",
-                       offStatus = "primary"
+                       NULL,
+                       c("Title On", "Title Off"),
+                       selected = "Title On",
+                       justified = TRUE,
+                       status = "primary"
                      )
                    ),
                    style = "margin-bottom:-2.0em"
@@ -282,7 +281,7 @@ vc_version_server <- function(id, data) {
             )
           }
         }
-        if (input$title == TRUE) {
+        if (input$title == "Title On") {
           fig <- fig %>%
             layout(title = list(
               text = paste0(
