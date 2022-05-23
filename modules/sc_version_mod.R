@@ -14,10 +14,10 @@ sc_version_ui <- function(id) {
                    "; margin-bottom: 0.5em"
                  ),
                  fluidRow(column(
-                   2, h4("Display:", style = "margin-top: 0.15em")
+                   3, h4("Display:", style = "margin-top: 0.15em")
                  ),
                  column(
-                   10,
+                   5,
                    radioGroupButtons(
                      ns("display"),
                      NULL,
@@ -25,6 +25,18 @@ sc_version_ui <- function(id) {
                      selected = "Line chart",
                      justified = TRUE,
                      status = "primary"
+                   )
+                 ),
+                 column(
+                   4,
+                   switchInput(
+                     inputId = ns("title"),
+                     label = "Title",
+                     value = TRUE,
+                     onLabel = "ON",
+                     offLabel = "OFF",
+                     onStatus = "primary",
+                     offStatus = "primary"
                    )
                  ),
                  style = "margin-bottom:-2.0em; margin-top:-0.75em")

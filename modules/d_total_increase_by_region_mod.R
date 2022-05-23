@@ -15,7 +15,7 @@ d_total_increase_by_region_ui <- function(id) {
                    "; margin-bottom: 0.5em"
                  ),
                  fluidRow(column(
-                   2, h4("Display:",
+                   3, h4("Display:",
                          style = "margin-top: 0.25em"
                    )
                  ),
@@ -256,11 +256,11 @@ d_total_increase_by_region_server <- function(id, data) {
               '<b>'
             ),
             x = 0.05,
-            y = 0.99,
+            y = 1,
             font = list(
               family = "segoe ui",
-              size = 18,
-              color = ox_pallette()[2]
+              size = 24,
+              color = "#495057"
             )
           )) }
       fig

@@ -26,7 +26,7 @@ homepage_ui <- function(id) {
         ),
         h4(strong("Updating AID Data"),
            uiOutput(ns(
-             "AID_data_update_date"
+             "aid_data_update_date"
            ))),
         fluidRow(column(4, fluidRow(h4("1.", style = "margin-top:0.2em; margin-left:0.75em"),
           
@@ -55,11 +55,11 @@ homepage_ui <- function(id) {
                 "; color: white"
               )
             ))),
-          column(8,h4(verbatimTextOutput(ns("directorypath")), style = "margin-top:0em"))
+          column(8,h4(verbatimTextOutput(ns("aid_directorypath")), style = "margin-top:0em"))
         ),
         fluidRow(column(4, fluidRow(h4("2.", style = "margin-top:0.2em; margin-left:0.75em; margin-right:0.75em"),
                                                                          actionButton(
-                                                                           ns("process_folder_file"),
+                                                                           ns("aid_process_folder_file"),
                                                                            label = "Process Folder/File",
                                                                            style = paste0(
                                                                              "background-color:",
@@ -67,11 +67,11 @@ homepage_ui <- function(id) {
                                                                              "; color: white"
                                                                            )
                                                                          ))),
-                 column(8,h4(verbatimTextOutput(ns("data_processed")), style = "margin-top:0em"))),
+                 column(8,h4(verbatimTextOutput(ns("aid_data_processed")), style = "margin-top:0em"))),
         br(),
         fluidRow(column(4, fluidRow(h4("3.", style = "margin-top:0.2em; margin-left:0.75em; margin-right:0.75em"),
                                                                          actionButton(
-                                                                           ns("refresh"),
+                                                                           ns("aid_refresh"),
                                                                            label = "Refresh",
                                                                            style = paste0(
                                                                              "background-color:",
@@ -332,7 +332,7 @@ homepage_server <- function(id) {
         restrictions = system.file(package = "base")
       )
       
-      output$directorypath <- renderPrint({
+      output$aid_directorypath <- renderPrint({
         if (is.integer(input$aid_directory) & is.integer(input$aid_file)) {
           cat("No folder/file has been selected")
         } else if (!(is.integer(input$aid_directory))) {
@@ -344,22 +344,24 @@ homepage_server <- function(id) {
       
     })
     
-    observeEvent(input$process_folder_file, {
+    observeEvent(input$aid_process_folder_file, {
       source("data processing/DataProcessing_AEMO_input_directory.R",
                       local = TRUE)
-      output$data_processed <-
-        renderUI({
-          cat("Data process complete")
+      output$aid_data_processed <-
+        renderPrint({
+          "Data process complete"
         })
     })
     
-    observeEvent(input$refresh, {
+    
+    
+    observeEvent(input$aid_refresh, {
       source("data/refresh_AID_data.R", local = TRUE)
       session$reload()
     })
     
     observe({
-      output$AID_data_update_date <-
+      output$aid_data_update_date <-
         renderUI({
           h5(strong("AID Data Last Updated: "), paste0(format(
             file.info("data/Dashboard_Data.rds")$mtime, format = "%d %b %Y %I:%M %p"

@@ -1,5 +1,4 @@
 
-
 ## -- function that removes the Australi name from the end of GEM data -- ##
 clean.names <- function(x) {
   x$variable <- gsub("_AUSTRALI", "", x$variable)
@@ -59,7 +58,7 @@ add.var.col.gem <- function(x) {
 }
 
 ### --- forecast line function --- ###
-vline <- function(x = 0, color = "black") {
+vline <- function(x) {
   list(
     type = "line",
     y0 = 0,
@@ -67,7 +66,7 @@ vline <- function(x = 0, color = "black") {
     yref = "paper",
     x0 = x,
     x1 = x,
-    line = list(color = color)
+    line = list(color = "#495057")
   )
 }
 

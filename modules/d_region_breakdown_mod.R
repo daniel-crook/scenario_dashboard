@@ -14,7 +14,7 @@ d_region_breakdown_ui <- function(id) {
                    "; margin-bottom: 0.5em"
                  ),
                  fluidRow(column(
-                   2, h4("Display:",
+                   3, h4("Display:",
                          style = "margin-top: 0.25em"
                          )
                  ),

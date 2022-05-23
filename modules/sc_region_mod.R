@@ -14,7 +14,7 @@ sc_region_ui <- function(id) {
                    "; margin-bottom: 0.5em"
                  ),
                  fluidRow(
-                   column(2, h4("Display:", style = "margin-top: 0.15em")),
+                   column(3, h4("Display:", style = "margin-top: 0.15em")),
                    column(
                      5,
                      radioGroupButtons(
@@ -27,10 +27,10 @@ sc_region_ui <- function(id) {
                      )
                    ),
                    column(
-                     5,
+                     4,
                      actionGroupButtons(
                        inputIds = c(ns("big4"), ns("small4"), ns("all")),
-                       labels = c("Big 4", "Small 4", "All States"),
+                       labels = c("Big", "Small", "All"),
                        status = "primary"
                      )
                    ),

@@ -190,12 +190,8 @@ gc_scenario_server <- function(input, output, session) {
         ) %>%
         layout(title = list(
           text = paste0(
-            '<b>',
-            paste0(
               str_before_first(gc_scenario_input[1], ","),
               " - By Scenario Comparison"
-            ),
-            '<b>'
           ),
           x = 0.05,
           y = 0.99,
@@ -281,6 +277,7 @@ gc_scenario_server <- function(input, output, session) {
 
       vc_version_table_data1 <-
         rbind(vc_version_table_data1, vc_version_table_data2)
+      
       names(vc_version_table_data1) <-
         gsub(paste0(input$Attribute,", "),"",
              names(vc_version_table_data1))

@@ -13,21 +13,23 @@ vc_scenario_ui <- function(id) {
                    oxgraphs::ox_pallette()[2],
                    "; margin-bottom: 0.5em"
                  ),
+                 fluidRow(column(
+                   4, h4("Display:", style = "margin-top: -0.5em")
+                 )),
                  fluidRow(
-                   column(2, h4("Display:", style = "margin-top: 0.15em")),
                    column(
-                     5,
+                     4,
                      radioGroupButtons(
                        ns("display"),
                        NULL,
-                       c("Level Values", "% y/y"),
+                       c("Levels", "% y/y"),
                        selected = "% y/y",
                        justified = TRUE,
                        status = "primary"
                      )
                    ),
                    column(
-                     5,
+                     4,
                      radioGroupButtons(
                        ns("state_national"),
                        NULL,
@@ -36,7 +38,19 @@ vc_scenario_ui <- function(id) {
                        status = "primary"
                      )
                    ),
-                   style = "margin-bottom:-2.0em; margin-top:-0.75em"
+                   column(
+                     4,
+                     switchInput(
+                       inputId = ns("title"),
+                       label = "Title",
+                       value = TRUE,
+                       onLabel = "ON",
+                       offLabel = "OFF",
+                       onStatus = "primary",
+                       offStatus = "primary"
+                     )
+                   ),
+                   style = "margin-bottom:-2.0em"
                  )
                ),
                wellPanel(
@@ -89,15 +103,15 @@ vc_scenario_ui <- function(id) {
                             ns("CAGR_start"),
                             label = NULL,
                             value = "2021"
-                          ), ),
+                          ),),
                    column(1,
-                          h4("-", style = "margin-top: 0.2em"), ),
+                          h4("-", style = "margin-top: 0.2em"),),
                    column(3,
                           textInput(
                             ns("CAGR_end"),
                             label = NULL,
                             value = "2053"
-                          ), ),
+                          ),),
                    style = "margin-bottom: -2em; margin-top: -1em"
                  )
                )
@@ -111,13 +125,17 @@ vc_scenario_ui <- function(id) {
 
 vc_scenario_server <- function(id, data) {
   moduleServer(id, function(input, output, session) {
+    # State vs National Filter ------------------------------------------------
+    
     observe({
       if (input$state_national == "State") {
         region <- sort(unique(data$STATE[data$STATE != "AUS"]))
-        attribute <- sort(unique(data$ATTRIBUTE[data$STATE != "AUS"]))
+        attribute <-
+          sort(unique(data$ATTRIBUTE[data$STATE != "AUS"]))
       } else {
         region <- sort(unique(data$STATE[data$STATE == "AUS"]))
-        attribute <- sort(unique(data$ATTRIBUTE[data$STATE == "AUS"]))
+        attribute <-
+          sort(unique(data$ATTRIBUTE[data$STATE == "AUS"]))
       }
       
       updateSelectInput(session,
@@ -134,7 +152,8 @@ vc_scenario_server <- function(id, data) {
       
     })
     
-    ## --- update checkboxgroup options based on select inputs --- ###
+    # Update Checkgroup options based on selected inputs ----------------------
+    
     observe({
       data_f <- filter(data, data$ATTRIBUTE == input$Attribute)
       
@@ -180,6 +199,7 @@ vc_scenario_server <- function(id, data) {
       )
     })
     
+    # Render Plot -------------------------------------------------------------
     
     observe({
       vc_scenario_data <- filter(data,
@@ -201,7 +221,7 @@ vc_scenario_server <- function(id, data) {
           vc_scenario_data,
           x = ~ Dates,
           y = vc_scenario_data[[input$Selections[1]]],
-          name = input$Selections[1],
+          name = str_after_nth(input$Selections[1], ", ", 2),
           type = 'scatter',
           mode = 'lines',
           color = I(ox_pallette()[1])
@@ -209,17 +229,32 @@ vc_scenario_server <- function(id, data) {
           layout(
             shapes = vline(data[(data$FORECAST_FLAG == "EA") &
                                   (data$variable == input$Selections[1]), "Dates"]),
-            yaxis = list(title = if (input$display == "% y/y") {
-              "% y/y"
-            } else {
-              "Number"
-            }),
-            xaxis = list(title = "Year"),
+            yaxis = list(
+              title = if (input$display == "% y/y") {
+                "% y/y"
+              } else {
+                "Number"
+              },
+              showgrid = F,
+              showline = T,
+              linecolor = "#495057",
+              ticks = "outside",
+              tickcolor = "#495057"
+            ),
+            xaxis = list(
+              title = "",
+              zerolinecolor = "#495057",
+              showgrid = F,
+              showline = T,
+              linecolor = "#495057",
+              ticks = "outside",
+              tickcolor = "#495057"
+            ),
             legend = list(
               orientation = "h",
               xanchor = "center",
               x = 0.5,
-              y = -0.15
+              y = -0.05
             )
           ) %>%
           add_annotations(
@@ -236,13 +271,31 @@ vc_scenario_server <- function(id, data) {
             fig <- fig %>% add_trace(
               y = vc_scenario_data[[input$Selections[i]]],
               color = I(ox_pallette()[i]),
-              name = input$Selections[i]
+              name =  str_after_nth(input$Selections[i], ", ", 2)
             )
           }
+        }
+        if (input$title == TRUE) {
+          fig <- fig %>%
+            layout(title = list(
+              text = paste0(
+                str_before_nth(input$Selections[1], ",", 2),
+                " - By Scenario Comparison"
+              ),
+              x = 0.05,
+              y = 1,
+              font = list(
+                family = "segoe ui",
+                size = 24,
+                color = "#495057"
+              )
+            ))
         }
         return(fig)
       })
     })
+    
+    # Render Tab;e ------------------------------------------------------------
     
     observe({
       if (length(input$Selections) >= 2) {
@@ -316,24 +369,15 @@ vc_scenario_server <- function(id, data) {
         
         vc_scenario_table_data <-
           rbind(vc_scenario_table_data, vc_scenario_table_data2)
+        
+        names(vc_scenario_table_data) <-
+          gsub(paste0(str_before_nth(input$Selections[1], ", ", 2), ", "),
+               "",
+               names(vc_scenario_table_data))
+        return(vc_scenario_table_data)
       },
       spacing = "s", striped = TRUE, hover = TRUE, align = "l")
     })
     
   })
 }
-
-# 3.0 Test Module ---------------------------------------------------------
-
-# vc_scenario_demo <- function() {
-#
-#   select <- data.frame(SCENARIO_VALUE = c("CENTRAL","EXPORT_SUPERPOWER","SUSTAINABLE_GROWTH","RAPID_DECARB"))
-#   ui <- navbarPage("Module Demo",
-#                    vc_scenario_ui("Version", "By Region"))
-#   server <- function(input, output, session) {
-#     callModule(vc_scenario_server,"Version")
-#     }
-#   shinyApp(ui, server)
-# }
-#
-# vc_scenario_demo()
