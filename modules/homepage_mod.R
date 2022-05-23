@@ -366,15 +366,15 @@ homepage_ui <- function(id) {
                  )
                )),
       ),
-      wellPanel(
-        style = paste0(
-          "border: 5px solid; border-color:",
-          oxgraphs::ox_pallette()[9],
-          "; margin-bottom: 0.5em"
-        ),
-        h3(strong("Scenario Descriptions:")),
-        tableOutput(ns("Table"))
-      )
+      # wellPanel(
+      #   style = paste0(
+      #     "border: 5px solid; border-color:",
+      #     oxgraphs::ox_pallette()[9],
+      #     "; margin-bottom: 0.5em"
+      #   ),
+      #   h3(strong("Scenario Descriptions:")),
+      #   tableOutput(ns("Table"))
+      # )
     )
     }
 

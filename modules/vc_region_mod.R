@@ -319,7 +319,7 @@ vc_region_server <- function(id, data) {
               title = if (input$display == "% y/y") {
                 "% y/y"
               } else {
-                "Number"
+                unique(data$UNIT[data$variable == input$Selections[1]])
               },
               showgrid = F,
               showline = T,
