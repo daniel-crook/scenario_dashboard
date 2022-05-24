@@ -1,7 +1,4 @@
 
-
-
-
 # 1.0 Module UI -----------------------------------------------------------
 
 sc_version_ui <- function(id) {
@@ -200,20 +197,43 @@ sc_version_server <- function(id, data) {
     
     # Render Plot -------------------------------------------------------------
     observe({
-      bar_dates <- seq(2020, 2050, 10)
+      vars <-  append(input$Selections, paste(input$Attribute,
+                                              input$State,
+                                              input$Scenario,
+                                              input$relative_to, sep = ", "))
       
-      if (length(input$relative_to) == 1 & input$display == "Diff-bar") {
+      if (length(vars) >= 2) {
+        for (i in 2:length(vars)) {
+          if (i == 2) {
+            common_dates <-
+              intersect(data$Dates[data$variable == vars[1]], data$Dates[data$variable == vars[i]])
+          } else {
+            common_dates <-
+              intersect(common_dates, data$Dates[data$variable == vars[i]])
+          }
+        }
+      } else {
+        common_dates <- data$Dates[data$variable == vars[1]]
+      }
+      
+      bar_dates <- c(data$Dates[data$FORECAST_FLAG == "EA" &
+                            data$variable == vars[1]], custom.max(common_dates))
+      
+      if (length(input$relative_to) == 1 &
+          input$display == "Diff-bar" &
+          !(paste(input$Attribute,
+                input$State,
+                input$Scenario,
+                input$relative_to, sep = ", ") %in% input$Selections[1])) {
         
-        relative_var <- paste0(input$Attribute,
+       relative_var <- data.frame(variable = paste(input$Attribute,
                                input$State,
                                input$Scenario,
-                               input$relative_to, sep = ", ")
-        
-        relative_var_sc_var <- unique(data$sc_variable[data$variable == relative_var]) 
+                               input$relative_to, sep = ", "))
         
         sc_version_data <- filter(data,
                                   sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]) |
-                                    sc_variable %in% relative_var_sc_var)
+                                  sc_variable %in% unique(data$sc_variable[data$variable %in% relative_var$variable]))
       } else {
         sc_version_data <- filter(data,
                                   sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
@@ -233,42 +253,58 @@ sc_version_server <- function(id, data) {
                   Dates,
                   variable,
                   value = round(VALUE / AUS_VALUE * 100, 2))
-      if (length(input$relative_to) == 1 & input$display == "Diff-bar") {
+      if (length(input$relative_to) == 1 & input$display == "Diff-bar"  &
+          !(paste(input$Attribute,
+                  input$State,
+                  input$Scenario,
+                  input$relative_to, sep = ", ") %in% input$Selections[1])) {
         sc_version_data <-
           trail_avg(sc_version_data, bar_dates[2] - bar_dates[1]) %>%
-          mutate(., value = round(value, 2)) %>%
-          filter(., Dates %in% bar_dates)
-        sc_version_data$Dates <- as.factor(sc_version_data$Dates)
+          mutate(., value = round(value, 2))
+          filter(., Dates == bar_dates[2])
+        sc_version_data$Dates <- as.factor(sc_version_data$Dates)}
+      
       sc_version_data <- spread(sc_version_data, variable, value)
+      
+      if (length(input$relative_to) == 1 & input$display == "Diff-bar"  &
+          !(paste(input$Attribute,
+                  input$State,
+                  input$Scenario,
+                  input$relative_to, sep = ", ") %in% input$Selections[1])) {
       for (i in 1:length(input$Selections)) {
-        sc_version_data[input$Selections[i]] <- sc_version_data[input$Selections[i]] - sc_version_data[sc_version_data$variable == relative_var]
+        sc_version_data[input$Selections[i]] <- sc_version_data[input$Selections[i]] - sc_version_data[relative_var$variable[1]]
       }
-      sc_version_data <- select(sc_version_data,-sc_version_data[relative_var[1]])
-      } else {sc_version_data <- spread(sc_version_data, variable, value)}
+      sc_version_data <- select(sc_version_data,-relative_var$variable[1])
+      }
       
       output$Plot <- renderPlotly({
         fig <-
-          if (length(input$relative_to) == 1 & input$display == "Diff-bar") {
+          if (length(input$relative_to) == 1 & input$display == "Diff-bar"  &
+              !(paste(input$Attribute,
+                      input$State,
+                      input$Scenario,
+                      input$relative_to, sep = ", ") %in% input$Selections[1])) {
             {
               fig <- plot_ly(
                 sc_version_data,
-                x = ~ Dates,
-                y = sc_version_data[[input$Selections[1]]],
+                y = ~ Dates,
+                x = sc_version_data[[input$Selections[1]]],
                 type = 'bar',
+                orientation = 'h',
                 name = str_after_last(input$Selections[1], ", "),
-                color = I(ox_pallette()[1])
+                color = I(ox_pallette()[1]),
+                hoverlabel = list(namelength = -1)
               ) %>%
                 layout(
-                  yaxis = list(
+                  xaxis = list(
                     ticksuffix = "%",
-                    title = "% of National",
                     showgrid = F,
                     showline = T,
                     linecolor = "#495057",
                     ticks = "outside",
                     tickcolor = "#495057"
                   ),
-                  xaxis = list(
+                  yaxis = list(
                     title = "",
                     zerolinecolor = "#495057",
                     showgrid = F,
@@ -281,16 +317,27 @@ sc_version_server <- function(id, data) {
                     orientation = "h",
                     xanchor = "center",
                     x = 0.5,
-                    y = -0.15
+                    y = -0.05
                   ),
+                  margin = list(l = 0, r = 0, b = 0, t = 50),
                   barmode = 'group'
+                ) %>% 
+                add_annotations(
+                  x = 0,
+                  y = 1.035,
+                  text = "% of National",
+                  xref = "paper",
+                  yref = "paper",
+                  xanchor = "left",
+                  showarrow = FALSE
                 )
               if (length(input$Selections) >= 2) {
                 for (i in 2:length(input$Selections)) {
                   fig <- fig %>% add_trace(
-                    y = sc_version_data[[input$Selections[i]]],
+                    x = sc_version_data[[input$Selections[i]]],
                     color = I(ox_pallette()[i]),
-                    name = str_after_last(input$Selections[i], ", ")
+                    name = str_after_last(input$Selections[i], ", "),
+                    hoverlabel = list(namelength = -1)
                   )
                 }
               }
@@ -301,8 +348,8 @@ sc_version_server <- function(id, data) {
                       str_before_last(input$Selections[1], ","),
                       " - By Version Comparison"
                     ),
-                    x = 0.05,
-                    y = 1,
+                    x = 0.035,
+                    y = 1.2,
                     font = list(
                       family = "segoe ui",
                       size = 24,
@@ -312,7 +359,7 @@ sc_version_server <- function(id, data) {
               }
               return(fig)
             }
-          } else {
+          } else if (input$display == "Line") {
             {
               fig <- plot_ly(
                 sc_version_data,
@@ -360,7 +407,7 @@ sc_version_server <- function(id, data) {
                 ) %>%
                 add_annotations(
                   x = data[(data$FORECAST_FLAG == "EA") &
-                             (data$variable == input$Selections), "Dates"],
+                             (data$variable == input$Selections[1]), "Dates"],
                   y = 1,
                   text = "              Forecast",
                   yref = "paper",
