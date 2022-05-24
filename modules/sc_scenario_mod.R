@@ -256,12 +256,13 @@ sc_scenario_server <- function(id, data) {
               name = str_after_nth(input$Selections[1], ", ", 2),
               type = 'scatter',
               mode = 'lines',
-              color = I(ox_pallette()[1])
+              color = I(ox_pallette()[1]),
+              hoverlabel = list(namelength = -1)
             ) %>%
               layout(
                 shapes = vline(data[(data$FORECAST_FLAG == "EA") &
                                       (data$variable == input$Selections[1]), "Dates"]),
-                yaxis = list(ticksuffix = "%", title = "% of National",
+                yaxis = list(ticksuffix = "%",
                              showgrid = F,
                              showline = T,
                              linecolor = "#495057",
@@ -281,7 +282,9 @@ sc_scenario_server <- function(id, data) {
                   xanchor = "center",
                   x = 0.5,
                   y = -0.05
-                )
+                ),
+                margin = list(l = 0, r = 0, b = 0, t = 50),
+                hovermode = "x unified"
               ) %>%
               add_annotations(
                 x = data[(data$FORECAST_FLAG == "EA") &
@@ -290,12 +293,22 @@ sc_scenario_server <- function(id, data) {
                 text = "              Forecast",
                 yref = "paper",
                 showarrow = FALSE
+              ) %>%
+              add_annotations(
+                x = min(sc_scenario_data$Dates[!is.na(sc_scenario_data[[input$Selections[1]]])]),
+                y = 1.035,
+                text = "% of National",
+                yref = "paper",
+                xanchor = "left",
+                showarrow = FALSE
               )
             if (length(input$Selections) >= 2) {
               for (i in 2:length(input$Selections)) {
                 fig <- fig %>% add_trace(y = sc_scenario_data[[input$Selections[i]]],
                                          color = I(ox_pallette()[i]),
-                                         name = str_after_nth(input$Selections[i], ", ", 2))
+                                         name = str_after_nth(input$Selections[i], ", ", 2),
+                                         hoverlabel = list(namelength = -1)
+                )
               }
             }
             if (input$title == "Title On") {
@@ -305,8 +318,8 @@ sc_scenario_server <- function(id, data) {
                     str_before_nth(input$Selections[1], ",", 2),
                     " - By Scenario Comparison"
                   ),
-                  x = 0.05,
-                  y = 1,
+                  x = 0.035,
+                  y = 1.2,
                   font = list(
                     family = "segoe ui",
                     size = 24,

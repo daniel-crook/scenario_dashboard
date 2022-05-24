@@ -171,20 +171,19 @@ gc_scenario_server <- function(input, output, session) {
         name = str_after_first(input$Selections[1],", "),
         type = 'scatter',
         mode = 'lines',
-        color = I(ox_pallette()[1])
+        color = I(ox_pallette()[1]),
+        hoverlabel = list(namelength = -1)
       ) %>%
         layout(
           shapes = vline(unique(gem_data$hist_end[gem_data$variable == gc_scenario_input[1]])),
-          yaxis = list(title = if (input$display == "Levels") {
-            unique(gem_data$Units[gem_data$variable == gc_scenario_input[1]])
-          } else {
-            "% y/y"
-          },
+          yaxis = list(
           showgrid = F,
           showline = T,
           linecolor = "#495057",
           ticks = "outside",
-          tickcolor = "#495057"
+          tickcolor = "#495057",
+          tickformat = ",",
+          ticksuffix = if(input$display == "% y/y"){"%"} else {NULL}
           ),
           xaxis = list(
             title = "",
@@ -199,7 +198,9 @@ gc_scenario_server <- function(input, output, session) {
             xanchor = "center",
             x = 0.5,
             y = -0.05
-          )
+          ),
+          margin = list(l = 0, r = 0, b = 0, t = 50),
+          hovermode = "x unified"
         ) %>%
         add_annotations(
           x = unique(gem_data$hist_end[gem_data$variable == gc_scenario_input[1]]),
@@ -207,13 +208,26 @@ gc_scenario_server <- function(input, output, session) {
           text = "              Forecast",
           yref = "paper",
           showarrow = FALSE
-        ) 
+        ) %>% 
+        add_annotations(
+          x = min(gc_scenario_data$Dates[!is.na(gc_scenario_data[[input$Selections[1]]])]),
+          y = 1.035,
+          text = if (input$display == "% y/y") {
+            "% y/y"
+          } else {
+            unique(gem_data$Units[gem_data$variable == gc_version_input[1]])
+          },
+          yref = "paper",
+          xanchor = "left",
+          showarrow = FALSE
+        )
       if (length(gc_scenario_input) >= 2) {
         for (i in 2:length(gc_scenario_input)) {
           fig <- fig %>% add_trace(
             y = gc_scenario_data[[gc_scenario_input[i]]],
             color = I(ox_pallette()[i]),
-            name = str_after_last(input$Selections[i],", ")
+            name = str_after_first(input$Selections[i],", "),
+            hoverlabel = list(namelength = -1)
           )
         }
       } 
@@ -224,8 +238,8 @@ gc_scenario_server <- function(input, output, session) {
               str_before_first(gc_scenario_input[1], ","),
               " - By Scenario Comparison"
             ),
-            x = 0.05,
-            y = 1,
+            x = 0.035,
+            y = 1.2,
             font = list(
               family = "segoe ui",
               size = 24,

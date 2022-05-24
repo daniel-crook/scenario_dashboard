@@ -1,4 +1,5 @@
 
+
 # 1.0 Module UI -----------------------------------------------------------
 
 sc_region_ui <- function(id) {
@@ -16,7 +17,8 @@ sc_region_ui <- function(id) {
                  fluidRow(column(
                    3, h4("Display:", style = "margin-top: -0.5em")
                  )),
-                 fluidRow(column(
+                 fluidRow(
+                   column(
                      5,
                      radioGroupButtons(
                        ns("display"),
@@ -113,15 +115,15 @@ sc_region_ui <- function(id) {
                             ns("Period_start"),
                             label = NULL,
                             value = "2021"
-                          ), ),
+                          ),),
                    column(1,
-                          h4("-", style = "margin-top: 0.2em"), ),
+                          h4("-", style = "margin-top: 0.2em"),),
                    column(3,
                           textInput(
                             ns("Period_end"),
                             label = NULL,
                             value = "2053"
-                          ), ),
+                          ),),
                    style = "margin-bottom: -2em; margin-top: -1em"
                  )
                )
@@ -135,9 +137,8 @@ sc_region_ui <- function(id) {
 
 sc_region_server <- function(id, data) {
   moduleServer(id, function(input, output, session) {
-
-# Filter Version based on Scenario Select ---------------------------------
-
+    # Filter Version based on Scenario Select ---------------------------------
+    
     observe({
       rv_list <-
         data.frame(RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario])) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
@@ -157,9 +158,9 @@ sc_region_server <- function(id, data) {
         selected = as.list(rv_list$RELEASE_VERSION[1])
       )
     })
-
-# Filter Attribute based on Version select --------------------------------
-
+    
+    # Filter Attribute based on Version select --------------------------------
+    
     observe({
       updateSelectInput(session,
                         "Attribute",
@@ -167,9 +168,9 @@ sc_region_server <- function(id, data) {
                         sort(unique(data$ATTRIBUTE[data$STATE == "NSW" &
                                                      data$RELEASE_VERSION == input$Version])))
     })
-
-# Big States Button -------------------------------------------------------
-
+    
+    # Big States Button -------------------------------------------------------
+    
     observeEvent(input$big4, {
       states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
       
@@ -195,9 +196,9 @@ sc_region_server <- function(id, data) {
         )
       )
     })
-
-# Small States Button -----------------------------------------------------
-
+    
+    # Small States Button -----------------------------------------------------
+    
     observeEvent(input$small4, {
       states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
       
@@ -223,9 +224,9 @@ sc_region_server <- function(id, data) {
         )
       )
     })
-
-# All States Button -------------------------------------------------------
-
+    
+    # All States Button -------------------------------------------------------
+    
     observeEvent(input$all, {
       states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
       
@@ -251,9 +252,9 @@ sc_region_server <- function(id, data) {
         )
       )
     })
-
-# Update checkgroup options based on select inputs ------------------------
-
+    
+    # Update checkgroup options based on select inputs ------------------------
+    
     observe({
       if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
                                data$RELEASE_VERSION == input$Version &
@@ -286,9 +287,9 @@ sc_region_server <- function(id, data) {
       }
     })
     
-
-# Render Plot -------------------------------------------------------------
-
+    
+    # Render Plot -------------------------------------------------------------
+    
     observe({
       bar_dates <- seq(2020, 2050, 10)
       
@@ -330,12 +331,14 @@ sc_region_server <- function(id, data) {
                 color = I(ox_pallette()[1])
               ) %>%
                 layout(
-                  yaxis = list(ticksuffix = "%", title = "% of National",
-                               showgrid = F,
-                               showline = T,
-                               linecolor = "#495057",
-                               ticks = "outside",
-                               tickcolor = "#495057"
+                  yaxis = list(
+                    ticksuffix = "%",
+                    title = "% of National",
+                    showgrid = F,
+                    showline = T,
+                    linecolor = "#495057",
+                    ticks = "outside",
+                    tickcolor = "#495057"
                   ),
                   xaxis = list(
                     title = "",
@@ -344,7 +347,8 @@ sc_region_server <- function(id, data) {
                     showline = T,
                     linecolor = "#495057",
                     ticks = "outside",
-                    tickcolor = "#495057"),
+                    tickcolor = "#495057"
+                  ),
                   legend = list(
                     orientation = "h",
                     xanchor = "center",
@@ -355,9 +359,11 @@ sc_region_server <- function(id, data) {
                 )
               if (length(input$Selections) >= 2) {
                 for (i in 2:length(input$Selections)) {
-                  fig <- fig %>% add_trace(y = sc_region_data[[input$Selections[i]]],
-                                           color = I(ox_pallette()[i]),
-                                           name = str_before_first(str_after_first(input$Selections[i], ", "), ", "))
+                  fig <- fig %>% add_trace(
+                    y = sc_region_data[[input$Selections[i]]],
+                    color = I(ox_pallette()[i]),
+                    name = str_before_first(str_after_first(input$Selections[i], ", "), ", ")
+                  )
                 }
               }
               if (input$title == "Title On") {
@@ -376,7 +382,8 @@ sc_region_server <- function(id, data) {
                       size = 24,
                       color = "#495057"
                     )
-                  )) }
+                  ))
+              }
               return(fig)
             }
           } else {
@@ -388,17 +395,19 @@ sc_region_server <- function(id, data) {
                 name = str_before_first(str_after_first(input$Selections[1], ", "), ", "),
                 type = 'scatter',
                 mode = 'lines',
-                color = I(ox_pallette()[1])
+                color = I(ox_pallette()[1]),
+                hoverlabel = list(namelength = -1)
               ) %>%
                 layout(
                   shapes = vline(data[(data$FORECAST_FLAG == "EA") &
                                         (data$variable == input$Selections[1]), "Dates"]),
-                  yaxis = list(ticksuffix = "%", title = "% of National",
-                               showgrid = F,
-                               showline = T,
-                               linecolor = "#495057",
-                               ticks = "outside",
-                               tickcolor = "#495057"
+                  yaxis = list(
+                    ticksuffix = "%",
+                    showgrid = F,
+                    showline = T,
+                    linecolor = "#495057",
+                    ticks = "outside",
+                    tickcolor = "#495057"
                   ),
                   xaxis = list(
                     title = "",
@@ -407,13 +416,21 @@ sc_region_server <- function(id, data) {
                     showline = T,
                     linecolor = "#495057",
                     ticks = "outside",
-                    tickcolor = "#495057"),
+                    tickcolor = "#495057"
+                  ),
                   legend = list(
                     orientation = "h",
                     xanchor = "center",
                     x = 0.5,
                     y = -0.05
-                  )
+                  ),
+                  margin = list(
+                    l = 0,
+                    r = 0,
+                    b = 0,
+                    t = 50
+                  ),
+                  hovermode = "x unified"
                 ) %>%
                 add_annotations(
                   x = data[(data$FORECAST_FLAG == "EA") &
@@ -422,12 +439,23 @@ sc_region_server <- function(id, data) {
                   text = "              Forecast",
                   yref = "paper",
                   showarrow = FALSE
+                ) %>%
+                add_annotations(
+                  x = min(sc_region_data$Dates[!is.na(sc_region_data[[input$Selections[1]]])]),
+                  y = 1.035,
+                  text = "% of National",
+                  yref = "paper",
+                  xanchor = "left",
+                  showarrow = FALSE
                 )
               if (length(input$Selections) >= 2) {
                 for (i in 2:length(input$Selections)) {
-                  fig <- fig %>% add_trace(y = sc_region_data[[input$Selections[i]]],
-                                           color = I(ox_pallette()[i]),
-                                           name = str_before_first(str_after_first(input$Selections[i], ", "), ", "))
+                  fig <- fig %>% add_trace(
+                    y = sc_region_data[[input$Selections[i]]],
+                    color = I(ox_pallette()[i]),
+                    name = str_before_first(str_after_first(input$Selections[i], ", "), ", "),
+                    hoverlabel = list(namelength = -1)
+                  )
                 }
               }
               if (input$title == "Title On") {
@@ -439,23 +467,24 @@ sc_region_server <- function(id, data) {
                       str_after_nth(input$Selections[1], ", ", 2),
                       " - By Region Comparison"
                     ),
-                    x = 0.05,
-                    y = 1,
+                    x = 0.035,
+                    y = 1.2,
                     font = list(
                       family = "segoe ui",
                       size = 24,
                       color = "#495057"
                     )
-                  )) }
+                  ))
+              }
               return(fig)
             }
           }
       })
     })
     
-
-# Render Table ------------------------------------------------------------
-
+    
+    # Render Table ------------------------------------------------------------
+    
     observe({
       if (length(input$Selections) >= 2) {
         for (i in 2:length(input$Selections)) {

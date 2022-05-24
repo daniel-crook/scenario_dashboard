@@ -310,22 +310,20 @@ vc_region_server <- function(id, data) {
           name = str_before_first(str_after_first(input$Selections[1], ", "), ", "),
           type = 'scatter',
           mode = 'lines',
-          color = I(ox_pallette()[1])
+          color = I(ox_pallette()[1]),
+          hoverlabel = list(namelength = -1)
         ) %>%
           layout(
             shapes = vline(data[(data$FORECAST_FLAG == "EA") &
                                   (data$variable == input$Selections[1]), "Dates"]),
             yaxis = list(
-              title = if (input$display == "% y/y") {
-                "% y/y"
-              } else {
-                unique(data$UNIT[data$variable == input$Selections[1]])
-              },
               showgrid = F,
               showline = T,
               linecolor = "#495057",
               ticks = "outside",
-              tickcolor = "#495057"
+              tickcolor = "#495057",
+              tickformat = ",",
+              ticksuffix = if(input$display == "% y/y"){"%"} else {NULL}
             ),
             xaxis = list(
               title = "",
@@ -341,7 +339,9 @@ vc_region_server <- function(id, data) {
               xanchor = "center",
               x = 0.5,
               y = -0.15
-            )
+            ),
+            margin = list(l = 0, r = 0, b = 0, t = 50),
+            hovermode = "x unified"
           ) %>%
           add_annotations(
             x = data[(data$FORECAST_FLAG == "EA") &
@@ -350,6 +350,18 @@ vc_region_server <- function(id, data) {
             text = "              Forecast",
             yref = "paper",
             showarrow = FALSE
+          ) %>% 
+          add_annotations(
+            x = min(vc_region_data$Dates[!is.na(vc_region_data[[input$Selections[1]]])]),
+            y = 1.035,
+            text = if (input$display == "% y/y") {
+              "% y/y"
+            } else {
+              unique(data$UNIT[data$variable == input$Selections[1]])
+            },
+            yref = "paper",
+            xanchor = "left",
+            showarrow = FALSE
           )
         
         if (length(input$Selections) >= 2) {
@@ -357,7 +369,8 @@ vc_region_server <- function(id, data) {
             fig <- fig %>% add_trace(
               y = vc_region_data[[input$Selections[i]]],
               color = I(ox_pallette()[i]),
-              name = str_before_first(str_after_first(input$Selections[i], ", "), ", ")
+              name = str_before_first(str_after_first(input$Selections[i], ", "), ", "),
+              hoverlabel = list(namelength = -1)
             )
           }
         }
@@ -370,8 +383,8 @@ vc_region_server <- function(id, data) {
                 str_after_nth(input$Selections[1], ", ", 2),
                 " - By Region Comparison"
               ),
-              x = 0.05,
-              y = 1,
+              x = 0.035,
+              y = 1.2,
               font = list(
                 family = "segoe ui",
                 size = 24,

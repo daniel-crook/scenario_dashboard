@@ -177,7 +177,7 @@ d_total_increase_by_region_server <- function(id, data) {
         transmute(.,
                   Dates = Dates,
                   variable,
-                  value = round(as.numeric(value), 2)) %>%
+                  value = round(as.numeric(value), 0)) %>%
         spread(., variable, value)
       
       input_series <-
@@ -203,17 +203,19 @@ d_total_increase_by_region_server <- function(id, data) {
           y = ~ d_total_increase_by_region_data[[input_bar[1]]],
           type = 'bar',
           name = str_after_first(str_before_nth(input_bar[1], ", ",2),", "),
-          color = I(ox_pallette()[1])
+          color = I(ox_pallette()[1]),
+          hoverlabel = list(namelength = -1)
         ) %>%
         layout(
           shapes = vline(data[(data$FORECAST_FLAG == "EA") &
                                 (data$variable == input_series[1]), "Dates"]),
-          yaxis = list(title = "Persons (000s)",
+          yaxis = list(title = "",
                        showgrid = F,
                        showline = T,
                        linecolor = "#495057",
                        ticks = "outside",
-                       tickcolor = "#495057"
+                       tickcolor = "#495057",
+                       tickformat = ","
           ),
           xaxis = list(
             title = "",
@@ -229,7 +231,9 @@ d_total_increase_by_region_server <- function(id, data) {
             x = 0.5,
             y = -0.05
           ),
-          barmode = 'relative'
+          barmode = 'relative',
+          margin = list(l = 0, r = 0, b = 0, t = 50),
+          hovermode = "x unified"
         ) %>% 
         add_annotations(
           x = data[(data$FORECAST_FLAG == "EA") &
@@ -238,13 +242,22 @@ d_total_increase_by_region_server <- function(id, data) {
           text = "              Forecast",
           yref = "paper",
           showarrow = FALSE
-        )
+        ) %>% 
+      add_annotations(
+        x = min(d_total_increase_by_region_data$Dates[!is.na(d_total_increase_by_region_data[[input$Selections[1]]])])-0.5,
+        y = 1.035,
+        text = "Persons (000s)",
+        yref = "paper",
+        xanchor = "left",
+        showarrow = FALSE
+      )
       if (length(input_bar) >= 2) {
         for (i in 2:length(input_bar)) {
           fig <- fig %>% add_bars(
             y = d_total_increase_by_region_data[[input_bar[i]]],
             color = I(ox_pallette()[i]),
-            name = str_after_first(str_before_nth(input_bar[i], ", ",2),", ")
+            name = str_after_first(str_before_nth(input_bar[i], ", ",2),", "),
+            hoverlabel = list(namelength = -1)
           )
         }
       }
@@ -254,7 +267,8 @@ d_total_increase_by_region_server <- function(id, data) {
         color = I(ox_pallette()[9]),
         name = str_after_first(str_before_nth(input_line[1], ", ",2),", "),
         type = 'scatter',
-        mode = 'lines'
+        mode = 'lines',
+        hoverlabel = list(namelength = -1)
       )
       }
       if (input$title == "Title On") {
@@ -264,8 +278,8 @@ d_total_increase_by_region_server <- function(id, data) {
                 str_after_nth(input_bar[1], ",",2),
                 " - Population Breakdown"
             ),
-            x = 0.05,
-            y = 1,
+            x = 0.055,
+            y = 1.2,
             font = list(
               family = "segoe ui",
               size = 24,
