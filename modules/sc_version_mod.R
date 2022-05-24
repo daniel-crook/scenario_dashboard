@@ -260,7 +260,7 @@ sc_version_server <- function(id, data) {
                   input$relative_to, sep = ", ") %in% input$Selections[1])) {
         sc_version_data <-
           trail_avg(sc_version_data, bar_dates[2] - bar_dates[1]) %>%
-          mutate(., value = round(value, 2))
+          mutate(., value = round(value, 2)) %>% 
           filter(., Dates == bar_dates[2])
         sc_version_data$Dates <- as.factor(sc_version_data$Dates)}
       
@@ -274,8 +274,12 @@ sc_version_server <- function(id, data) {
       for (i in 1:length(input$Selections)) {
         sc_version_data[input$Selections[i]] <- sc_version_data[input$Selections[i]] - sc_version_data[relative_var$variable[1]]
       }
-      sc_version_data <- select(sc_version_data,-relative_var$variable[1])
+      sc_version_data <- select(sc_version_data,-relative_var$variable[1]) %>% 
+        melt("Dates") %>% select(-Dates) %>% mutate(., variable = str_after_last(as.character(variable), ", "))
+      
       }
+      
+      #output$Table <- renderTable({sc_version_data})
       
       output$Plot <- renderPlotly({
         fig <-
@@ -287,17 +291,17 @@ sc_version_server <- function(id, data) {
             {
               fig <- plot_ly(
                 sc_version_data,
-                y = ~ Dates,
-                x = sc_version_data[[input$Selections[1]]],
+                y = ~ variable,
+                x = ~ value,
                 type = 'bar',
                 orientation = 'h',
-                name = str_after_last(input$Selections[1], ", "),
-                color = I(ox_pallette()[1]),
+                color = I(ox_pallette()[1:length(sc_version_data$variable)]),
                 hoverlabel = list(namelength = -1)
               ) %>%
                 layout(
                   xaxis = list(
                     ticksuffix = "%",
+                    title = "",
                     showgrid = F,
                     showline = T,
                     linecolor = "#495057",
@@ -320,27 +324,18 @@ sc_version_server <- function(id, data) {
                     y = -0.05
                   ),
                   margin = list(l = 0, r = 0, b = 0, t = 50),
+                  hovermode = "y unified",
                   barmode = 'group'
-                ) %>% 
+                ) %>%
                 add_annotations(
                   x = 0,
                   y = 1.035,
-                  text = "% of National",
+                  text = paste0("% of National, Period Average (",bar_dates[1]," - ",bar_dates[2],")"),
                   xref = "paper",
                   yref = "paper",
                   xanchor = "left",
                   showarrow = FALSE
                 )
-              if (length(input$Selections) >= 2) {
-                for (i in 2:length(input$Selections)) {
-                  fig <- fig %>% add_trace(
-                    x = sc_version_data[[input$Selections[i]]],
-                    color = I(ox_pallette()[i]),
-                    name = str_after_last(input$Selections[i], ", "),
-                    hoverlabel = list(namelength = -1)
-                  )
-                }
-              }
               if (input$title == "Title On") {
                 fig <- fig %>%
                   layout(title = list(
@@ -468,7 +463,7 @@ sc_version_server <- function(id, data) {
       } else {
         common_dates <- data$Dates[data$variable == input$Selections[1]]
       }
-      
+
       period_dates <-
         c(
           custom.min(common_dates),
@@ -480,7 +475,7 @@ sc_version_server <- function(id, data) {
           input$Period_start,
           input$Period_end
         )
-      
+
       period_names <-
         c("2000s",
           "2010s",
@@ -489,7 +484,7 @@ sc_version_server <- function(id, data) {
           "Long run",
           "",
           "Custom Period")
-      
+
       output$Table <- renderTable({
         sc_version_table_data <- filter(data,
                                         sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
@@ -507,7 +502,7 @@ sc_version_server <- function(id, data) {
                     Dates,
                     variable,
                     value = round(VALUE / AUS_VALUE * 100, 2))
-        
+
         for (i in c(2:6, length(period_dates))) {
           sc_version_table_data_1 <-
             sc_version_table_data %>%
@@ -527,10 +522,10 @@ sc_version_server <- function(id, data) {
               variable,
               value = round(value, 2)
             )
-          
+
           sc_version_table_data_1 <-
             spread(sc_version_table_data_1, variable, value)
-          
+
           if (i == 2) {
             sc_version_p_avg_table <- sc_version_table_data_1
           } else {
@@ -540,7 +535,7 @@ sc_version_server <- function(id, data) {
         }
         sc_version_p_avg_table <-
           sc_version_p_avg_table[, append("Period", input$Selections)]
-        
+
         names(sc_version_p_avg_table) <-
           gsub(paste0(str_before_last(input$Selections[1], ", "), ", "),
                "",
