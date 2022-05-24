@@ -1,5 +1,7 @@
 
 
+
+
 # 1.0 Module UI -----------------------------------------------------------
 
 sc_version_ui <- function(id) {
@@ -19,12 +21,12 @@ sc_version_ui <- function(id) {
                  )),
                  fluidRow(
                    column(
-                     5,
+                     7,
                      radioGroupButtons(
                        ns("display"),
                        NULL,
-                       c("Line chart", "Bar chart"),
-                       selected = "Line chart",
+                       c("Line", "Diff-bar"),
+                       selected = "Line",
                        justified = TRUE,
                        status = "primary"
                      )
@@ -78,7 +80,9 @@ sc_version_ui <- function(id) {
                      selectize = FALSE
                    )
                  ),
-                 style = "margin-bottom:-2em")
+                 style = "margin-bottom:-2em"
+                 ),
+                 uiOutput(ns("relative"))
                ),
                wellPanel(
                  style = paste0("border: 5px solid; border-color:",
@@ -129,6 +133,8 @@ sc_version_ui <- function(id) {
 
 sc_version_server <- function(id, data) {
   moduleServer(id, function(input, output, session) {
+    ns = NS(id)
+    
     # Update Attribute SelectInput based on Scenario --------------------------
     observe({
       attribute <- sort(unique(data$ATTRIBUTE[data$STATE != "AUS" &
@@ -166,6 +172,13 @@ sc_version_server <- function(id, data) {
           add.var.col(.) %>%
           add.sc.col(.)
         
+        if (length(input$relative_to) == 0) {
+          NULL
+        } else if (length(input$relative_to) == 1 & input$display == "Diff-bar") {
+          version_list <-
+            filter(version_list, RELEASE_VERSION != input$relative_to)
+        }
+        
         updatePrettyCheckboxGroup(
           session,
           "Selections",
@@ -189,8 +202,22 @@ sc_version_server <- function(id, data) {
     observe({
       bar_dates <- seq(2020, 2050, 10)
       
-      sc_version_data <- filter(data,
-                                sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
+      if (length(input$relative_to) == 1 & input$display == "Diff-bar") {
+        
+        relative_var <- paste0(input$Attribute,
+                               input$State,
+                               input$Scenario,
+                               input$relative_to, sep = ", ")
+        
+        relative_var_sc_var <- unique(data$sc_variable[data$variable == relative_var]) 
+        
+        sc_version_data <- filter(data,
+                                  sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]) |
+                                    sc_variable %in% relative_var_sc_var)
+      } else {
+        sc_version_data <- filter(data,
+                                  sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
+      }
       
       sc_version_data_a <-
         filter(sc_version_data, STATE %in% input$State)
@@ -206,18 +233,22 @@ sc_version_server <- function(id, data) {
                   Dates,
                   variable,
                   value = round(VALUE / AUS_VALUE * 100, 2))
-      if (input$display != "Line chart") {
+      if (length(input$relative_to) == 1 & input$display == "Diff-bar") {
         sc_version_data <-
           trail_avg(sc_version_data, bar_dates[2] - bar_dates[1]) %>%
           mutate(., value = round(value, 2)) %>%
           filter(., Dates %in% bar_dates)
         sc_version_data$Dates <- as.factor(sc_version_data$Dates)
-      }
       sc_version_data <- spread(sc_version_data, variable, value)
+      for (i in 1:length(input$Selections)) {
+        sc_version_data[input$Selections[i]] <- sc_version_data[input$Selections[i]] - sc_version_data[sc_version_data$variable == relative_var]
+      }
+      sc_version_data <- select(sc_version_data,-sc_version_data[relative_var[1]])
+      } else {sc_version_data <- spread(sc_version_data, variable, value)}
       
       output$Plot <- renderPlotly({
         fig <-
-          if (input$display != "Line chart") {
+          if (length(input$relative_to) == 1 & input$display == "Diff-bar") {
             {
               fig <- plot_ly(
                 sc_version_data,
@@ -471,21 +502,43 @@ sc_version_server <- function(id, data) {
       },
       spacing = "s", striped = TRUE, hover = TRUE, align = "l")
     })
+  
+    # Add Relative To UI dynamically ------------------------------------------
+    observe({
+      version_list <-
+        data.frame(
+          ATTRIBUTE = input$Attribute,
+          STATE = input$State,
+          SCENARIO_VALUE = input$Scenario,
+          RELEASE_VERSION = unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario &
+                                                          data$ATTRIBUTE == input$Attribute]),
+          Series_ID = unique(data$Series_ID[data$ATTRIBUTE == input$Attribute])
+        ) %>% separate(RELEASE_VERSION, c('Release_Date', 'Version'))
+      
+      version_list$Release_Date <-
+        parse_date_time(version_list$Release_Date, "my")
+      
+      version_list <-
+        arrange(version_list, desc(Release_Date), desc(Version)) %>%
+        mutate(., RELEASE_VERSION = paste(format(Release_Date, format = "%b%y"), Version, sep = " ")) %>%
+        select(-Release_Date, -Version)
+      
+      if (input$display == "Diff-bar") {
+        output$relative <- renderUI({
+          fluidRow(column(
+            12,
+          selectInput(
+            ns("relative_to"),
+            h4("Relative to:", style = "margin-bottom: 0.2em; margin-top: 1em"),
+            version_list$RELEASE_VERSION,
+            selectize = FALSE
+          )),
+          style = "margin-bottom:-2em")})
+          
+      } else {output$relative <- renderUI({NULL})}
+    })
     
-  })
+    
+      
+    })
 }
-
-# 3.0 Test Module ---------------------------------------------------------
-
-# sc_version_demo <- function() {
-#
-#   select <- data.frame(SCENARIO_VALUE = c("CENTRAL","EXPORT_SUPERPOWER","SUSTAINABLE_GROWTH","RAPID_DECARB"))
-#   ui <- navbarPage("Module Demo",
-#                    sc_version_ui("Version", "By Region"))
-#   server <- function(input, output, session) {
-#     callModule(sc_version_server,"Version")
-#     }
-#   shinyApp(ui, server)
-# }
-#
-# sc_version_demo()

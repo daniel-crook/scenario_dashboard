@@ -325,17 +325,3 @@ gc_version_server <- function(input, output, session) {
   })
 }
 
-# 3.0 Test Module ---------------------------------------------------------
-
-# gc_version_demo <- function() {
-#
-#   select <- data.frame(SCENARIO_VALUE = c("CENTRAL","EXPORT_SUPERPOWER","SUSTAINABLE_GROWTH","RAPID_DECARB"))
-#   ui <- navbarPage("Module Demo",
-#                    gc_version_ui("Version", "By Region"))
-#   server <- function(input, output, session) {
-#     callModule(gc_version_server,"Version")
-#     }
-#   shinyApp(ui, server)
-# }
-#
-# gc_version_demo()

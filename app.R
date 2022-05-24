@@ -16,7 +16,8 @@ list.of.packages <-
         "data.table",
         "kableExtra",
         "shinyFiles",
-        "shinyjs"
+        "shinyjs",
+        "git2r"
     )
 
 new.packages <- list.of.packages[!(list.of.packages %in%
@@ -50,7 +51,7 @@ source("data/import_data_gem.R")
 
 # 0.3 Import GEM Data -----------------------------------------------------
 
-source("data/import_scenario_table.R")
+#source("data/import_scenario_table.R")
 
 # 1.0 Static Elements -----------------------------------------------------
 
@@ -73,7 +74,7 @@ source)
 # 3.0 UI ------------------------------------------------------------------
 
 ui <-  tagList(
-    tags$head(tags$script(type = "text/javascript", src = "code.js")),
+    #tags$head(tags$script(type = "text/javascript", src = "code.js")),
     navbarPage(
         title = div(img(
             src = 'AEMO logo.png',
@@ -137,25 +138,24 @@ ui <-  tagList(
 # 4.0 Server --------------------------------------------------------------
 
 server <- function(input, output, session) {
-    
     data <- homepage_server("homepage")
     
     vc_version_server("vc_version", data)
     vc_scenario_server("vc_scenario", data)
     vc_region_server("vc_region", data)
-
+    
     sc_version_server("sc_version", data)
     sc_scenario_server("sc_scenario", data)
     sc_region_server("sc_region", data)
-
+    
     ic_version_server("ic_version", data)
     ic_scenario_server("ic_scenario", data)
     ic_region_server("ic_region", data)
     ic_variable_server("ic_variable", data)
-
+    
     d_region_breakdown_server("d_region_breakdown", data)
     d_total_increase_by_region_server("d_total_increase_by_region", data)
-
+    
     callModule(gc_version_server, "gc_version")
     callModule(gc_scenario_server, "gc_scenario")
 }
