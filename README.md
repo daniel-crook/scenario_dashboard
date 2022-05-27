@@ -76,7 +76,9 @@ This section goes through the various underlying files used to run the 'app.R' f
 
 **Modules**
 
-The modules folder contains
+The modules folder contains the R files sourced by the app.R file. These module files control the tabs that are independent of each other. For example, files with 'vc' in the prefix control the Variable Comparison page which is also separated by the tabs 'region', 'scenario', and 'version', as these tabs are independent of each other.
+
+Like any Shiny app, each modules have a UI and a Server component. The UI component allows for interactive features (such as buttons) and controls the overall aesthetics of the dashboard, while the Server component does the processing and calculations.
 
 **Data**
 
