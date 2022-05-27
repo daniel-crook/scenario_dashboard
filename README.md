@@ -22,21 +22,21 @@ If you do not have the Dashboard repository in your list of existing repositorie
 
 Next, set a location for the folder to be pulled to (destination). The image below shows an example of the folder being pulled into the Document folder in the local drive.
 
-![](www/ReadME/2.Choosing%20repo%20location.PNG){width="580"}
+![](www/ReadME/2.Choosing%20repo%20location.PNG)
 
 **Step 3. Ensuring the files are up to date**
 
 To ensure that you have the latest version of the Dashboard files, click on "*Fetch origin*" on the GitHub Desktop. This will update your local folder with the most current files in GitHub.
 
-![](www/ReadME/3.Fetch%20origin.PNG){width="580"}
+![](www/ReadME/3.Fetch%20origin.PNG)
 
 You can see which files have been updated by looking at the *Date Modified* column in your file explorer. The example below shows that a recent *app* file was updated alongside the *data* folder.
 
-![](www/ReadME/4.File%20explorer%20timestamp.PNG){width="580"}
+![](www/ReadME/4.File%20explorer%20timestamp.PNG)
 
 You can also see what has been updated in the code on your GitHub Desktop. On the left panel, click on the "Changes" tab. Then click on the R files to see what has been added and removed since the previous version.
 
-![](www/ReadME/5.Highlighted%20codes.PNG){width="580"}
+![](www/ReadME/5.Highlighted%20codes.PNG)
 
 ### Running and navigating the dashboard
 
