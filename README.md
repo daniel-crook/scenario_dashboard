@@ -16,27 +16,27 @@ The GitHub Desktop provides an easy method of pulling and updating the Dashboard
 
 To get the files in the GitHub onto your local drive, click on "*Clone a repository from the internet...*". Alternatively you can click the right hand side filter and choose the Dashboard repository and follow the prompts.
 
-<img src="www/ReadME/1.Clone%20repo.PNG" width="580"/>
+<img src="www/ReadME/Clone%20repo.PNG" width="580"/>
 
 If you do not have the Dashboard repository in your list of existing repositories, go to the *URL* tab and paste in the Dashboard link (<https://github.com/daniel-crook/scenario_dashboard>).
 
 Next, set a location for the folder to be pulled to (destination). The image below shows an example of the folder being pulled into the Document folder in the local drive.
 
-<img src="www/ReadME/2.Choosing%20repo%20location.PNG" width="580"/>
+<img src="www/ReadME/Choosing%20repo%20location.PNG" width="580"/>
 
 **Step 3. Ensuring the files are up to date**
 
 To ensure that you have the latest version of the Dashboard files, click on "*Fetch origin*" on the GitHub Desktop. This will update your local folder with the most current files in GitHub.
 
-<img src="www/ReadME/3.Fetch%20origin.PNG" width="580"/>
+<img src="www/ReadME/Fetch%20origin.PNG" width="580"/>
 
 You can see which files have been updated by looking at the *Date Modified* column in your file explorer. The example below shows that a recent *app* file was updated alongside the *data* folder.
 
-<img src="www/ReadME/4.File%20explorer%20timestamp.PNG" width="580"/>
+<img src="www/ReadME/File%20explorer%20timestamp.PNG" width="580"/>
 
 You can also see what has been updated in the code on your GitHub Desktop. On the left panel, click on the "Changes" tab. Then click on the R files to see what has been added and removed since the previous version.
 
-<img src="www/ReadME/5.Highlighted%20codes.PNG" width="580"/>
+<img src="www/ReadME/Highlighted%20codes.PNG" width="580"/>
 
 ### Running and navigating the dashboard
 
@@ -52,7 +52,7 @@ This app.R script is the master file used to source the different 'modules' used
 
 The dashboard will open in your default browsers. The homepage provides some additional information on the purpose for each tab. Make sure that the "Data Last Updated" time stamps look correct.
 
-![](C:/Users/gwang/AppData/Local/RStudio/tmp/paste-83180D86.png)
+<img src="www/ReadME/homepage.PNG" width="780"/>
 
 Click on one of the tabs on top (e.g. *Variable Comparison*). Each tab follows a similar structure.
 
@@ -64,7 +64,7 @@ Now you'll have a list of Variables that you can display as a chart and a CAGR t
 
 By default, the CAGR tables will have some set periods, but you can add a custom CAGR period in the Variable select section.
 
-<img src="www/ReadME/6.Annotated%20comparion%20page.PNG" width="780"/>
+<img src="www/ReadME/Annotated%20comparion%20page.PNG" width="780"/>
 
 ### Who do I talk to?
 
