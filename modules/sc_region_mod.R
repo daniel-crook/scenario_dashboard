@@ -1,5 +1,6 @@
 
 
+
 # 1.0 Module UI -----------------------------------------------------------
 
 sc_region_ui <- function(id) {
@@ -23,7 +24,7 @@ sc_region_ui <- function(id) {
                      radioGroupButtons(
                        ns("display"),
                        NULL,
-                       c("Line chart", "Bar chart"),
+                       c("Line chart", "Nested Pie"),
                        selected = "Line chart",
                        justified = TRUE,
                        status = "primary"
@@ -115,15 +116,15 @@ sc_region_ui <- function(id) {
                             ns("Period_start"),
                             label = NULL,
                             value = "2021"
-                          ),),
+                          ), ),
                    column(1,
-                          h4("-", style = "margin-top: 0.2em"),),
+                          h4("-", style = "margin-top: 0.2em"), ),
                    column(3,
                           textInput(
                             ns("Period_end"),
                             label = NULL,
                             value = "2053"
-                          ),),
+                          ), ),
                    style = "margin-bottom: -2em; margin-top: -1em"
                  )
                )
@@ -277,7 +278,7 @@ sc_region_server <- function(id, data) {
           "Selections",
           label = NULL,
           as.list(version_list$variable),
-          selected = as.list(version_list$variable[1:4]),
+          selected = as.list(version_list$variable[1:8]),
           prettyOptions = list(
             shape = "round",
             outline = TRUE,
@@ -287,12 +288,9 @@ sc_region_server <- function(id, data) {
       }
     })
     
-    
     # Render Plot -------------------------------------------------------------
     
     observe({
-      bar_dates <- seq(2020, 2050, 10)
-      
       sc_region_data <- filter(data,
                                sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
       sc_region_data_a <-
@@ -309,179 +307,176 @@ sc_region_server <- function(id, data) {
                   Dates,
                   variable,
                   value = round(VALUE / AUS_VALUE * 100, 2))
-      if (input$display != "Line chart") {
-        sc_region_data <-
-          trail_avg(sc_region_data, bar_dates[2] - bar_dates[1]) %>%
-          mutate(., value = round(value, 2)) %>%
-          filter(., Dates %in% bar_dates)
+      if (input$display == "Nested Pie") {
+        sc_region_data <- sc_region_data %>%
+          filter(., Dates %in% c(input$Period_start, input$Period_end))
         sc_region_data$Dates <- as.factor(sc_region_data$Dates)
       }
       sc_region_data <- spread(sc_region_data, variable, value)
       
+      if (input$display == "Nested Pie") {
+        sc_region_data <- melt(sc_region_data, "Dates") %>%
+          mutate(., variable = str_before_first(str_after_first(as.character(variable), ", "), ", ")) %>% 
+          mutate(., variable = factor(variable, levels = c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT"))) %>% 
+          arrange(variable)
+      } 
+      
+      output$Table <- renderTable({
+        sc_region_data
+      })
+      
       output$Plot <- renderPlotly({
-        fig <-
-          if (input$display != "Line chart") {
-            {
-              fig <- plot_ly(
-                sc_region_data,
-                x = ~ Dates,
-                y = sc_region_data[[input$Selections[1]]],
-                type = 'bar',
-                name = str_before_first(str_after_first(input$Selections[1], ", "), ", "),
-                color = I(ox_pallette()[1])
-              ) %>%
-                layout(
-                  yaxis = list(
-                    ticksuffix = "%",
-                    title = "% of National",
-                    showgrid = F,
-                    showline = T,
-                    linecolor = "#495057",
-                    ticks = "outside",
-                    tickcolor = "#495057"
-                  ),
-                  xaxis = list(
-                    title = "",
-                    zerolinecolor = "#495057",
-                    showgrid = F,
-                    showline = T,
-                    linecolor = "#495057",
-                    ticks = "outside",
-                    tickcolor = "#495057"
-                  ),
-                  legend = list(
-                    orientation = "h",
-                    xanchor = "center",
-                    x = 0.5,
-                    y = -0.15
-                  ),
-                  barmode = 'group'
+        if (input$display == "Nested Pie") {
+          fig <- plot_ly(
+            sc_region_data,
+            labels = unique(sc_region_data$variable),
+            values = sc_region_data$value[sc_region_data$Dates == input$Period_end],
+            type = 'pie',
+            hole = 0.7,
+            name = input$Period_end,
+            marker = list(colors = I(ox_pallette()[1:length(input$Selections)])),
+            insidetextorientation = 'horizontal',
+            insidetextfont = list(color = 'white')
+          )
+          fig <- fig %>% add_pie(
+            sc_region_data,
+            labels = unique(sc_region_data$variable),
+            values = sc_region_data$value[sc_region_data$Dates == input$Period_start],
+            type = 'pie',
+            hole = 0.6,
+            domain = list(x = c(0.15, 0.85),y = c(0.15, 0.85)),
+            name = input$Period_start,
+            marker = list(colors = I(ox_pallette()[1:length(input$Selections)])),
+            insidetextorientation = 'horizontal',
+            textposition = 'inside',
+            insidetextfont = list(color = 'white')
+          ) %>%
+            layout(legend = list(
+              orientation = "h",
+              xanchor = "center",
+              x = 0.5,
+              y = -0.05
+            ),
+            margin = list(
+              l = 0,
+              r = 0,
+              b = 0,
+              t = 50
+            ))
+          if (input$title == "Title On") {
+            fig <- fig %>%
+              layout(title = list(
+                text = paste0(
+                  str_before_first(input$Selections[1], ", "),
+                  ", ",
+                  str_after_nth(input$Selections[1], ", ", 2),
+                  " - By Region Comparison"
+                ),
+                x = 0.035,
+                y = 1.2,
+                font = list(
+                  family = "segoe ui",
+                  size = 24,
+                  color = "#495057"
                 )
-              if (length(input$Selections) >= 2) {
-                for (i in 2:length(input$Selections)) {
-                  fig <- fig %>% add_trace(
-                    y = sc_region_data[[input$Selections[i]]],
-                    color = I(ox_pallette()[i]),
-                    name = str_before_first(str_after_first(input$Selections[i], ", "), ", ")
-                  )
-                }
-              }
-              if (input$title == "Title On") {
-                fig <- fig %>%
-                  layout(title = list(
-                    text = paste0(
-                      str_before_first(input$Selections[1], ", "),
-                      ", ",
-                      str_after_nth(input$Selections[1], ", ", 2),
-                      " - By Region Comparison"
-                    ),
-                    x = 0.05,
-                    y = 1,
-                    font = list(
-                      family = "segoe ui",
-                      size = 24,
-                      color = "#495057"
-                    )
-                  ))
-              }
-              return(fig)
-            }
-          } else {
-            {
-              fig <- plot_ly(
-                sc_region_data,
-                x = ~ Dates,
-                y = sc_region_data[[input$Selections[1]]],
-                name = str_before_first(str_after_first(input$Selections[1], ", "), ", "),
-                type = 'scatter',
-                mode = 'lines',
-                color = I(ox_pallette()[1]),
-                hoverlabel = list(namelength = -1)
-              ) %>%
-                layout(
-                  shapes = vline(data[(data$FORECAST_FLAG == "EA") &
-                                        (data$variable == input$Selections[1]), "Dates"]),
-                  yaxis = list(
-                    ticksuffix = "%",
-                    showgrid = F,
-                    showline = T,
-                    linecolor = "#495057",
-                    ticks = "outside",
-                    tickcolor = "#495057"
-                  ),
-                  xaxis = list(
-                    title = "",
-                    zerolinecolor = "#495057",
-                    showgrid = F,
-                    showline = T,
-                    linecolor = "#495057",
-                    ticks = "outside",
-                    tickcolor = "#495057"
-                  ),
-                  legend = list(
-                    orientation = "h",
-                    xanchor = "center",
-                    x = 0.5,
-                    y = -0.05
-                  ),
-                  margin = list(
-                    l = 0,
-                    r = 0,
-                    b = 0,
-                    t = 50
-                  ),
-                  hovermode = "x unified"
-                ) %>%
-                add_annotations(
-                  x = data[(data$FORECAST_FLAG == "EA") &
-                             (data$variable == input$Selections[1]), "Dates"],
-                  y = 1,
-                  text = "              Forecast",
-                  yref = "paper",
-                  showarrow = FALSE
-                ) %>%
-                add_annotations(
-                  x = min(sc_region_data$Dates[!is.na(sc_region_data[[input$Selections[1]]])]),
-                  y = 1.035,
-                  text = "% of National",
-                  yref = "paper",
-                  xanchor = "left",
-                  showarrow = FALSE
-                )
-              if (length(input$Selections) >= 2) {
-                for (i in 2:length(input$Selections)) {
-                  fig <- fig %>% add_trace(
-                    y = sc_region_data[[input$Selections[i]]],
-                    color = I(ox_pallette()[i]),
-                    name = str_before_first(str_after_first(input$Selections[i], ", "), ", "),
-                    hoverlabel = list(namelength = -1)
-                  )
-                }
-              }
-              if (input$title == "Title On") {
-                fig <- fig %>%
-                  layout(title = list(
-                    text = paste0(
-                      str_before_first(input$Selections[1], ", "),
-                      ", ",
-                      str_after_nth(input$Selections[1], ", ", 2),
-                      " - By Region Comparison"
-                    ),
-                    x = 0.035,
-                    y = 1.2,
-                    font = list(
-                      family = "segoe ui",
-                      size = 24,
-                      color = "#495057"
-                    )
-                  ))
-              }
-              return(fig)
-            }
+              ))
           }
+          return(fig)
+        } else if (input$display == "Line chart") {
+          {
+            fig <- plot_ly(
+              sc_region_data,
+              x = ~ Dates,
+              y = sc_region_data[[input$Selections[1]]],
+              name = str_before_first(str_after_first(input$Selections[1], ", "), ", "),
+              type = 'scatter',
+              mode = 'lines',
+              color = I(ox_pallette()[1]),
+              hoverlabel = list(namelength = -1)
+            ) %>%
+              layout(
+                shapes = vline(data[(data$FORECAST_FLAG == "EA") &
+                                      (data$variable == input$Selections[1]), "Dates"]),
+                yaxis = list(
+                  ticksuffix = "%",
+                  showgrid = F,
+                  showline = T,
+                  linecolor = "#495057",
+                  ticks = "outside",
+                  tickcolor = "#495057"
+                ),
+                xaxis = list(
+                  title = "",
+                  zerolinecolor = "#495057",
+                  showgrid = F,
+                  showline = T,
+                  linecolor = "#495057",
+                  ticks = "outside",
+                  tickcolor = "#495057"
+                ),
+                legend = list(
+                  orientation = "h",
+                  xanchor = "center",
+                  x = 0.5,
+                  y = -0.05
+                ),
+                margin = list(
+                  l = 0,
+                  r = 0,
+                  b = 0,
+                  t = 50
+                ),
+                hovermode = "x unified"
+              ) %>%
+              add_annotations(
+                x = data[(data$FORECAST_FLAG == "EA") &
+                           (data$variable == input$Selections[1]), "Dates"],
+                y = 1,
+                text = "              Forecast",
+                yref = "paper",
+                showarrow = FALSE
+              ) %>%
+              add_annotations(
+                x = min(sc_region_data$Dates[!is.na(sc_region_data[[input$Selections[1]]])]),
+                y = 1.035,
+                text = "% of National",
+                yref = "paper",
+                xanchor = "left",
+                showarrow = FALSE
+              )
+            if (length(input$Selections) >= 2) {
+              for (i in 2:length(input$Selections)) {
+                fig <- fig %>% add_trace(
+                  y = sc_region_data[[input$Selections[i]]],
+                  color = I(ox_pallette()[i]),
+                  name = str_before_first(str_after_first(input$Selections[i], ", "), ", "),
+                  hoverlabel = list(namelength = -1)
+                )
+              }
+            }
+            if (input$title == "Title On") {
+              fig <- fig %>%
+                layout(title = list(
+                  text = paste0(
+                    str_before_first(input$Selections[1], ", "),
+                    ", ",
+                    str_after_nth(input$Selections[1], ", ", 2),
+                    " - By Region Comparison"
+                  ),
+                  x = 0.035,
+                  y = 1.2,
+                  font = list(
+                    family = "segoe ui",
+                    size = 24,
+                    color = "#495057"
+                  )
+                ))
+            }
+            return(fig)
+          }
+        }
       })
     })
-    
     
     # Render Table ------------------------------------------------------------
     
