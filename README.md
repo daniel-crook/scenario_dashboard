@@ -72,6 +72,24 @@ By default, the CAGR tables will have some set periods, but you can add a custom
 
 ### More details
 
+This section goes through the various underlying files used to run the 'app.R' file.
+
+**Modules**
+
+The modules folder contains
+
+**Data**
+
+The data folder contains...
+
+**Data Processing**
+
+The data processing folder contains...
+
+**Functions**
+
+The functions folder contains...
+
 ### Contact
 
 The dashboard was developed by Daniel Crook. Any questions or issues relating to the dashboard can be sent to [dcrook\@bisoxfordeconomics.com.au](mailto:dcrook@bisoxfordeconomics.com.au).
