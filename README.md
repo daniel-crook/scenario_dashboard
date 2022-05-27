@@ -92,4 +92,4 @@ The functions folder contains...
 
 ### Contact
 
-The dashboard was developed by Daniel Crook. Any questions or issues relating to the dashboard can be sent to [dcrook\@bisoxfordeconomics.com.au](mailto:dcrook@bisoxfordeconomics.com.au).
+The dashboard was developed by Daniel Crook. Please contact [dcrook\@bisoxfordeconomics.com.au](mailto:dcrook@bisoxfordeconomics.com.au) if there are any questions or problems relating to the dashboard.
