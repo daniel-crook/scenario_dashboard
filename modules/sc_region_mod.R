@@ -1,6 +1,7 @@
 
 
 
+
 # 1.0 Module UI -----------------------------------------------------------
 
 sc_region_ui <- function(id) {
@@ -116,15 +117,15 @@ sc_region_ui <- function(id) {
                             ns("Period_start"),
                             label = NULL,
                             value = "2021"
-                          ), ),
+                          ),),
                    column(1,
-                          h4("-", style = "margin-top: 0.2em"), ),
+                          h4("-", style = "margin-top: 0.2em"),),
                    column(3,
                           textInput(
                             ns("Period_end"),
                             label = NULL,
                             value = "2053"
-                          ), ),
+                          ),),
                    style = "margin-bottom: -2em; margin-top: -1em"
                  )
                )
@@ -316,10 +317,14 @@ sc_region_server <- function(id, data) {
       
       if (input$display == "Nested Pie") {
         sc_region_data <- melt(sc_region_data, "Dates") %>%
-          mutate(., variable = str_before_first(str_after_first(as.character(variable), ", "), ", ")) %>% 
-          mutate(., variable = factor(variable, levels = c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT"))) %>% 
-          arrange(variable)
-      } 
+          mutate(variable = str_before_first(str_after_first(as.character(variable), ", "), ", ")) %>%
+          mutate(variable = factor(
+            variable,
+            levels = c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+          )) %>%
+          arrange(variable) %>%
+          mutate(value = round(value, 1))
+      }
       
       output$Table <- renderTable({
         sc_region_data
@@ -343,26 +348,56 @@ sc_region_server <- function(id, data) {
             labels = unique(sc_region_data$variable),
             values = sc_region_data$value[sc_region_data$Dates == input$Period_start],
             type = 'pie',
-            hole = 0.6,
-            domain = list(x = c(0.15, 0.85),y = c(0.15, 0.85)),
+            hole = 0.55,
+            domain = list(x = c(0.15, 0.85), y = c(0.15, 0.85)),
             name = input$Period_start,
             marker = list(colors = I(ox_pallette()[1:length(input$Selections)])),
             insidetextorientation = 'horizontal',
             textposition = 'inside',
             insidetextfont = list(color = 'white')
           ) %>%
-            layout(legend = list(
-              orientation = "h",
-              xanchor = "center",
-              x = 0.5,
-              y = -0.05
-            ),
-            margin = list(
-              l = 0,
-              r = 0,
-              b = 0,
-              t = 50
-            ))
+            layout(
+              legend = list(
+                orientation = "h",
+                xanchor = "center",
+                x = 0.5,
+                y = -0.05
+              ),
+              margin = list(
+                l = 0,
+                r = 0,
+                b = 0,
+                t = 50
+              )
+            ) %>% add_annotations(
+              x = 0.6125,
+              y = 0.5,
+              xref = "paper",
+              yref = "paper",
+              text = input$Period_start,
+              showarrow = T,
+              ax = 175,
+              ay = -20,
+              arrowcolor = "black",
+              font = list(color = "black", family = "segoe ui",
+                          size = 16,
+                          color = "black")
+              
+            ) %>% add_annotations(
+              x = 0.675,
+              y = 0.575,
+              xref = "paper",
+              yref = "paper",
+              text = input$Period_end,
+              showarrow = T,
+              ax = 110,
+              ay = -13,
+              arrowcolor = "black",
+              font = list(color = "black", family = "segoe ui",
+                          size = 16,
+                          color = "black")
+              
+            )
           if (input$title == "Title On") {
             fig <- fig %>%
               layout(title = list(
