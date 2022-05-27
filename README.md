@@ -16,13 +16,13 @@ The GitHub Desktop provides an easy method of pulling and updating the Dashboard
 
 To get the files in the GitHub onto your local drive, click on "*Clone a repository from the internet...*". Alternatively you can click the right hand side filter and choose the Dashboard repository and follow the prompts.
 
-<img src="www/ReadME/1.Clone%20repo.PNG" width = "580"/>
+<img src="www/ReadME/1.Clone%20repo.PNG" width="580"/>
 
 If you do not have the Dashboard repository in your list of existing repositories, go to the *URL* tab and paste in the Dashboard link (<https://github.com/daniel-crook/scenario_dashboard>).
 
 Next, set a location for the folder to be pulled to (destination). The image below shows an example of the folder being pulled into the Document folder in the local drive.
 
-![](www/ReadME/2.Choosing%20repo%20location.PNG)
+<img src="www/ReadME/2.Choosing%20repo%20location.PNG" width="580"/>
 
 **Step 3. Ensuring the files are up to date**
 
