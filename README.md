@@ -16,35 +16,35 @@ The GitHub Desktop provides an easy method of pulling and updating the Dashboard
 
 To get the files in the GitHub onto your local drive, click on "*Clone a repository from the internet...*". Alternatively you can click the right hand side filter and choose the Dashboard repository and follow the prompts.
 
-![](C:/Users/gwang/OneDrive%20-%20Oxford%20Economics/Pictures/Clone%20repo.PNG){width="580"}
+![](www/ReadME/1.Clone%20repo.PNG){width="580"}
 
 If you do not have the Dashboard repository in your list of existing repositories, go to the *URL* tab and paste in the Dashboard link (<https://github.com/daniel-crook/scenario_dashboard>).
 
 Next, set a location for the folder to be pulled to (destination). The image below shows an example of the folder being pulled into the Document folder in the local drive.
 
-![](C:/Users/gwang/OneDrive%20-%20Oxford%20Economics/Pictures/Choosing%20repo%20location.PNG){width="580"}
+![](www/ReadME/2.Choosing%20repo%20location.PNG){width="580"}
 
 **Step 3. Ensuring the files are up to date**
 
 To ensure that you have the latest version of the Dashboard files, click on "*Fetch origin*" on the GitHub Desktop. This will update your local folder with the most current files in GitHub.
 
-![](C:/Users/gwang/OneDrive%20-%20Oxford%20Economics/Pictures/Fetch%20origin.PNG){width="580"}
+![](www/ReadME/3.Fetch%20origin.PNG){width="580"}
 
 You can see which files have been updated by looking at the *Date Modified* column in your file explorer. The example below shows that a recent *app* file was updated alongside the *data* folder.
 
-![](C:/Users/gwang/OneDrive%20-%20Oxford%20Economics/Pictures/File%20explorer%20timestamp.PNG){width="580"}
+![](www/ReadME/4.File%20explorer%20timestamp.PNG){width="580"}
 
 You can also see what has been updated in the code on your GitHub Desktop. On the left panel, click on the "Changes" tab. Then click on the R files to see what has been added and removed since the previous version.
 
-![](C:/Users/gwang/OneDrive%20-%20Oxford%20Economics/Pictures/Highlighted%20codes.PNG)
+![](www/ReadME/5.Highlighted%20codes.PNG){width="580"}
 
 ### Running and navigating the dashboard
 
 **Step 1. Opening the Dashboard**
 
-Open the "*scenario_dashboard*" folder in your local drive. Click and run the R file named "*app*". Click anywhere on the script, then hold down "ctrl" + "shift" + "enter" on your keyboard to run the script.
+You will require RStudio to access the dashboard. (Enter instructions to download RStudio. Or an existing BISOE guide?)
 
-(NEED R STUDIO)
+Open the "*scenario_dashboard*" folder in your local drive. Click and run the R file named "*app*". Click anywhere on the script, then hold down "ctrl" + "shift" + "enter" on your keyboard to run the script.
 
 This app.R script is the master file used to source the different 'modules' used to generate the dashboard. More details the dependencies are in the "More details" section.
 
@@ -76,6 +76,3 @@ By default, the CAGR tables will have some set periods, but you can add a custom
 # Testing with README BRANCH
 
 Testing with README BRANCH \>\>\>\>\>\>\> Stashed changes
-
-
-
