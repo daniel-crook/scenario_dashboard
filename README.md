@@ -64,7 +64,7 @@ Now you'll have a list of Variables that you can display as a chart and a CAGR t
 
 By default, the CAGR tables will have some set periods, but you can add a custom CAGR period in the Variable select section.
 
-<img src="www/ReadME/6.Annotated%20comparion%20page.PNG" width="580"/>
+<img src="www/ReadME/6.Annotated%20comparion%20page.PNG" width="780"/>
 
 ### Who do I talk to?
 
