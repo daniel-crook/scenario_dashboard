@@ -449,7 +449,7 @@ ic_scenario_server <- function(id, data) {
                   fig <- fig %>%
                     layout(title = list(
                       text = paste0(
-                        str_before_nth(input$Selections[1], ",", 2),
+                        str_before_nth(input$Selections[1], ", ", 2),
                         " - By Scenario Comparison"
                       ),
                       x = 0.035,
