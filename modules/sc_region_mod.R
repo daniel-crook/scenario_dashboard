@@ -168,7 +168,7 @@ sc_region_server <- function(id, data) {
       
       version_list <-
         data.frame(
-          ATTRIBUTE = input$Attribute,
+          ATTRIBUTE = if(input$display == "Cont. to GDP bar") {"Gross State Product"} else {input$Attribute},
           STATE = states,
           SCENARIO_VALUE = input$Scenario,
           RELEASE_VERSION = input$Version
@@ -196,7 +196,7 @@ sc_region_server <- function(id, data) {
       
       version_list <-
         data.frame(
-          ATTRIBUTE = input$Attribute,
+          ATTRIBUTE = if(input$display == "Cont. to GDP bar") {"Gross State Product"} else {input$Attribute},
           STATE = states,
           SCENARIO_VALUE = input$Scenario,
           RELEASE_VERSION = input$Version
@@ -224,7 +224,7 @@ sc_region_server <- function(id, data) {
       
       version_list <-
         data.frame(
-          ATTRIBUTE = input$Attribute,
+          ATTRIBUTE = if(input$display == "Cont. to GDP bar") {"Gross State Product"} else {input$Attribute},
           STATE = states,
           SCENARIO_VALUE = input$Scenario,
           RELEASE_VERSION = input$Version

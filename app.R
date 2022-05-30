@@ -112,7 +112,7 @@ ui <-  tagList(
                 ic_version_ui("ic_version"),
                 ic_scenario_ui("ic_scenario"),
                 ic_region_ui("ic_region"),
-                ic_variable_ui("ic_variable")
+                ic_industry_ui("ic_industry")
             )
         ),
         tabPanel(
@@ -151,7 +151,7 @@ server <- function(input, output, session) {
     ic_version_server("ic_version", data)
     ic_scenario_server("ic_scenario", data)
     ic_region_server("ic_region", data)
-    ic_variable_server("ic_variable", data)
+    ic_industry_server("ic_industry", data)
     
     d_region_breakdown_server("d_region_breakdown", data)
     d_total_increase_by_region_server("d_total_increase_by_region", data)
