@@ -1,5 +1,6 @@
 
 
+
 # 1.0 Module UI -----------------------------------------------------------
 
 homepage_ui <- function(id) {
@@ -26,7 +27,7 @@ homepage_ui <- function(id) {
       wellPanel(
         style = paste0(
           "border: 5px solid; border-color:",
-          oxgraphs::ox_pallette()[9],
+          oxgraphs::ox_pallette()[2],
           "; margin-bottom: 0.5em"
         ),
         h4(strong("Steps to update AID data"),
@@ -107,36 +108,28 @@ homepage_ui <- function(id) {
         fluidRow(column(
           6, wellPanel(
             style = paste0(
-              "border: 5px solid; background-color:",
-              oxgraphs::ox_pallette()[1],
-              "; border-color:",
-              oxgraphs::ox_pallette()[1],
+              "border: 5px solid; border-color:",
+              oxgraphs::ox_pallette()[2],
               "; margin-bottom: 0.5em"
             ),
             fluidRow(column(10, h4(
               strong("Variable Comparison"),
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[1],
-                "; color: white"
-              )
+              style = paste0("border-color:",
+                             oxgraphs::ox_pallette()[2],
+                             "; color: black")
             )),
             column(2,
                    h1(
                      icon("fas fa-chart-line"),
                      style = paste0(
-                       "background-color:",
-                       oxgraphs::ox_pallette()[1],
-                       "; color: white; margin-top: 0.1em"
+                       "border-color:",
+                       oxgraphs::ox_pallette()[2],
+                       "; color: black; margin-top: 0.1em"
                      )
                    ))),
             h5(
               "General comparison of level & growth forecasts of variables across scenarios: by version, scenario or region.",
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[1],
-                "; color: white"
-              )
+              style = paste0("color: black")
             )
           )
         ),
@@ -144,108 +137,66 @@ homepage_ui <- function(id) {
           6,
           wellPanel(
             style = paste0(
-              "border: 5px solid; background-color:",
-              oxgraphs::ox_pallette()[2],
-              "; border-color:",
+              "border: 5px solid; border-color:",
               oxgraphs::ox_pallette()[2],
               "; margin-bottom: 0.5em"
             ),
             fluidRow(column(10, h4(
               strong("State Composition"),
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[2],
-                "; color: white"
-              )
+              style = paste0("color: black")
             )),
             column(2,
                    h1(
                      icon("fas fa-map-marked-alt"),
-                     style = paste0(
-                       "background-color:",
-                       oxgraphs::ox_pallette()[2],
-                       "; color: white; margin-top: 0.1em"
-                     )
+                     style = paste0("color: black; margin-top: 0.1em")
                    ))),
             h5(
               "Compare how the scenarios affect the state compositions for a particular variable: by version, scenario or region.",
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[2],
-                "; color: white"
-              )
+              style = paste0("color: black")
             )
           )
         )),
         fluidRow(column(
           6, wellPanel(
             style = paste0(
-              "border: 5px solid; background-color:",
-              oxgraphs::ox_pallette()[3],
-              "; border-color:",
-              oxgraphs::ox_pallette()[3],
+              "border: 5px solid; border-color:",
+              oxgraphs::ox_pallette()[2],
               "; margin-bottom: 0.5em"
             ),
             fluidRow(column(10, h4(
               strong("Industry Comparison"),
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[3],
-                "; color: white"
-              )
+              style = paste0("color: black")
             )),
             column(2,
                    h1(
                      icon("fas fa-industry"),
-                     style = paste0(
-                       "background-color:",
-                       oxgraphs::ox_pallette()[3],
-                       "; color: white; margin-top: 0.1em"
-                     )
+                     style = paste0("color: black; margin-top: 0.1em")
                    ))),
             h5(
               "Compare how the scenarios affect an industries GVA share for a region: by version, scenario or region.",
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[3],
-                "; color: white"
-              )
+              style = paste0("color: black")
             )
           )
         ),
         column(
           6, wellPanel(
             style = paste0(
-              "border: 5px solid; background-color:",
-              oxgraphs::ox_pallette()[4],
-              "; border-color:",
-              oxgraphs::ox_pallette()[4],
+              "border: 5px solid; border-color:",
+              oxgraphs::ox_pallette()[2],
               "; margin-bottom: 0.5em"
             ),
             fluidRow(column(10, h4(
               strong("Demographics"),
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[4],
-                "; color: white"
-              )
+              style = paste0("color: black")
             )),
             column(2,
                    h1(
                      icon("fas fa-user"),
-                     style = paste0(
-                       "background-color:",
-                       oxgraphs::ox_pallette()[4],
-                       "; color: white; margin-top: 0.1em"
-                     )
+                     style = paste0("color: black; margin-top: 0.1em")
                    ))),
             h5(
               "Compare the demographic outlook across scenarios, with a further breakdown on population growth.",
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[4],
-                "; color: white"
-              )
+              style = paste0("color: black")
             )
           )
         )),
@@ -256,7 +207,7 @@ homepage_ui <- function(id) {
       wellPanel(
         style = paste0(
           "border: 5px solid; border-color:",
-          oxgraphs::ox_pallette()[9],
+          oxgraphs::ox_pallette()[1],
           "; margin-bottom: 0.5em"
         ),
         h4(strong("Steps to update GEM data"),
@@ -327,7 +278,7 @@ homepage_ui <- function(id) {
               "; color: white"
             )
           )
-        )),column(
+        )), column(
           8, h4(verbatimTextOutput(
             ns("gem_data_refreshed"), placeholder = TRUE
           ), style = "margin-top:0em")
@@ -336,35 +287,24 @@ homepage_ui <- function(id) {
         fluidRow(column(
           6, wellPanel(
             style = paste0(
-              "border: 5px solid; background-color:",
-              oxgraphs::ox_pallette()[5],
-              "; border-color:",
-              oxgraphs::ox_pallette()[5],
+              "border: 5px solid; border-color:",
+              oxgraphs::ox_pallette()[1],
               "; margin-bottom: 0.5em"
             ),
             fluidRow(column(10, h4(
               strong("GEM Checks"),
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[5],
-                "; color: white"
+              style = paste0("color: black"
               )
             )),
             column(2,
                    h1(
                      icon("fas fa-globe-asia"),
-                     style = paste0(
-                       "background-color:",
-                       oxgraphs::ox_pallette()[5],
-                       "; color: white; margin-top: 0.1em"
+                     style = paste0("color: black; margin-top: 0.1em"
                      )
                    ))),
             h5(
               "General variable of GEM variables across scenarios as well as energy specific charts: by version, scenario or region.",
-              style = paste0(
-                "background-color:",
-                oxgraphs::ox_pallette()[5],
-                "; color: white"
+              style = paste0("color: black"
               )
             )
           )
