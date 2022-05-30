@@ -317,12 +317,13 @@ sc_region_server <- function(id, data) {
       
       if (input$display == "Nested Pie") {
        
-        sc_region_data <- mutate(sc_region_data, "Attached Dwellings, Unselected, Central, May22 V3" = round(100 - rowSums(sc_region_data[input$Selections]),1)) %>% 
-          melt("Dates") %>%
+        sc_region_data <- mutate(sc_region_data, "Attached Dwellings,  , Central, May22 V3" = round(100 - rowSums(sc_region_data[input$Selections]),1))
+          #if(sc_region_data[["Attached Dwellings, Unselected, Central, May22 V3",1]] == 0.0) {sc_region_data <- select(sc_region_data, -"Attached Dwellings, Unselected, Central, May22 V3")}
+          sc_region_data <- melt(sc_region_data, "Dates") %>%
           mutate(variable = str_before_first(str_after_first(as.character(variable), ", "), ", ")) %>%
           mutate(variable = factor(
             variable,
-            levels = c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT","Unselected")
+            levels = c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT"," ")
           )) %>%
           arrange(variable) %>%
           mutate(value = round(value, 1))
