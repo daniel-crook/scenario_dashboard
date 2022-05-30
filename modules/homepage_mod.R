@@ -1,6 +1,4 @@
 
-
-
 # 1.0 Module UI -----------------------------------------------------------
 
 homepage_ui <- function(id) {
@@ -18,10 +16,26 @@ homepage_ui <- function(id) {
     #   ))
     # ),
     h5(
-      "The dashboard has been designed to be used during scenario development, allowing for several comparisons between databases to be conducted (by version, by scenario or by region).
-      The dashboard also includes several off-platform calculated series for further checking of forecasts as well as CAGR/Period average calculations that may be useful during report writing.
-      We will continue to develop this dashboard, gradually generalising it so that it can be easily used across all projects and also by others."
+      "The Dashboard has been designed to be used for:",
+    
+    fluidRow(column(
+      3,
+      HTML(
+        "<ul>Several comparisons between databases to be conducted: <ul>
+                <li>By version</li>
+                <li>By scenario</li>
+                <li>By region</li>
+</ul>"
+      )
     ),
+column(
+  3,
+  HTML(
+    "<ul>Calculate several off-platform series to further check of forecasts:<ul>
+                <li>Compound Annual Growth Rates
+                <li>Period average calculations"
+  )
+))),
     fluidRow(column(
       6,
       wellPanel(
@@ -104,7 +118,7 @@ homepage_ui <- function(id) {
             ns("aid_data_refreshed"), placeholder = TRUE
           ), style = "margin-top:0em")
         )),
-        h4(strong("AID data is used in:")),
+        h4(strong("AID data is used in:"), style = "margin-top: -0.5em"),
         fluidRow(column(
           6, wellPanel(
             style = paste0(
@@ -283,7 +297,7 @@ homepage_ui <- function(id) {
             ns("gem_data_refreshed"), placeholder = TRUE
           ), style = "margin-top:0em")
         )),
-        h4(strong("GEM data is used in:")),
+        h4(strong("GEM data is used in:"), style = "margin-top: -0.5em"),
         fluidRow(column(
           6, wellPanel(
             style = paste0(
@@ -293,19 +307,16 @@ homepage_ui <- function(id) {
             ),
             fluidRow(column(10, h4(
               strong("GEM Checks"),
-              style = paste0("color: black"
-              )
+              style = paste0("color: black")
             )),
             column(2,
                    h1(
                      icon("fas fa-globe-asia"),
-                     style = paste0("color: black; margin-top: 0.1em"
-                     )
+                     style = paste0("color: black; margin-top: 0.1em")
                    ))),
             h5(
               "General variable of GEM variables across scenarios as well as energy specific charts: by version, scenario or region.",
-              style = paste0("color: black"
-              )
+              style = paste0("color: black")
             )
           )
         ))
