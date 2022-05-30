@@ -199,10 +199,10 @@ ic_scenario_server <- function(id, data) {
     # Render Plot -------------------------------------------------------------
     
     observe({
-      if (length(input$Selections) >= 2 &
-          length(input$display) == 1 &
-          length(input$State) == 1) {
         output$Plot <- renderPlotly({
+          validate(need({length(input$Selections) >= 1 &
+                          length(input$display) == 1 &
+                          length(input$State) == 1}, ""))
           # aggregate gva categories
           aggregate_vars <-
             c("SVCSGVALCC",
@@ -212,14 +212,12 @@ ic_scenario_server <- function(id, data) {
               "GVACLCC",
               "GVAA_BLCC")
           
-          if (input$display == "Line" &
-              length(input$Selections) >= 2) {
+          if (input$display == "Line") {
             ic_scenario_data <- filter(data,
                                        ic_variable %in% unique(data$ic_variable[data$variable %in% input$Selections]))
             ic_scenario_data_a <- filter(ic_scenario_data,
                                          variable %in% input$Selections)
-          } else if (input$display == "Final Year Bar" &
-                     length(input$Selections) >= 2) {
+          } else if (input$display == "Final Year Bar") {
             ic_scenario_data <- filter(
               data,
               ic_fy_variable %in% input$Selections &
@@ -231,6 +229,8 @@ ic_scenario_server <- function(id, data) {
           ic_scenario_data_b <-
             filter(ic_scenario_data,
                    Series_ID %in% aggregate_vars)
+          
+          validate(need(NROW(ic_scenario_data_b) >= 1, ""))
           
           ic_scenario_data_b <-
             aggregate(
@@ -251,8 +251,7 @@ ic_scenario_server <- function(id, data) {
                       variable,
                       value = round(VALUE / GVATOT * 100, 2))
           
-          if (input$display == "Final Year Bar" &
-              length(input$Selections) >= 2) {
+          if (input$display == "Final Year Bar") {
             {
               #Find max common date
               date_vars <-
@@ -288,8 +287,7 @@ ic_scenario_server <- function(id, data) {
           scenario_names <- colnames(ic_scenario_data)[-1]
           
           fig <-
-            if (input$display == "Final Year Bar" &
-                length(input$Selections) >= 2) {
+            if (input$display == "Final Year Bar") {
               {
                 fig <- plot_ly(
                   ic_scenario_data,
@@ -373,8 +371,8 @@ ic_scenario_server <- function(id, data) {
                 }
                 return(fig)
               }
-            } else if (input$display == "Line" &
-                       length(input$Attribute) == 1) {
+            } else if (input$display == "Line") {
+              validate(need(length(input$Attribute) == 1, ""))
               {
                 fig <- plot_ly(
                   ic_scenario_data,
@@ -467,127 +465,128 @@ ic_scenario_server <- function(id, data) {
               }
             }
         })
-      }
     })
     
     # # Render Table ------------------------------------------------------------
     
-    # observe({
-    #   if (length(input$Selections) >= 2 & length(input$Attribute) == 1 & input$display == "Line") {
-    #     if (length(input$Selections) >= 2) {
-    #       for (i in 2:length(input$Selections)) {
-    #         if (i == 2) {
-    #           common_dates <-
-    #             intersect(data$Dates[data$variable == input$Selections[1]], data$Dates[data$variable == input$Selections[i]])
-    #         } else {
-    #           common_dates <-
-    #             intersect(common_dates, data$Dates[data$variable == input$Selections[i]])
-    #         }
-    #       }
-    #     } else {
-    #       common_dates <- data$Dates[data$variable == input$Selections[1]]
-    #     }
-    #
-    #     period_dates <-
-    #       c(
-    #         custom.min(common_dates),
-    #         "2010",
-    #         "2021",
-    #         "2025",
-    #         "2030",
-    #         custom.max(common_dates),
-    #         input$Period_start,
-    #         input$Period_end
-    #       )
-    #
-    #     period_names <-
-    #       c("2000s",
-    #         "2010s",
-    #         "Short run",
-    #         "Medium run",
-    #         "Long run",
-    #         "",
-    #         "Custom Period")
-    #
-    #     output$Table <- renderTable({
-    #       ic_scenario_table_data <- filter(data,
-    #                                        ic_variable %in% unique(data$ic_variable[data$variable %in% input$Selections]))
-    #
-    #       ic_scenario_table_data_a <- filter(ic_scenario_table_data,
-    #                                          variable %in% input$Selections)
-    #       ic_scenario_table_data_b <-
-    #         filter(
-    #           ic_scenario_table_data,
-    #           Series_ID %in% c("GVAA_BLCC", "INDPRODLCC", "GVAFLCC", "SVCSGVALCC")
-    #         )
-    #       ic_scenario_table_data_b <-
-    #         aggregate(
-    #           x = ic_scenario_table_data_b$value,
-    #           by = list(
-    #             ic_scenario_table_data_b$Dates,
-    #             ic_scenario_table_data_b$ic_variable
-    #           ),
-    #           FUN = sum
-    #         ) %>%
-    #         transmute(
-    #           .,
-    #           Dates = Group.1,
-    #           ic_variable = Group.2,
-    #           GVATOT = x
-    #         )
-    #       ic_scenario_table_data <- merge(
-    #         ic_scenario_table_data_a,
-    #         ic_scenario_table_data_b,
-    #         by = c("Dates", "ic_variable")
-    #       ) %>%
-    #         transmute(.,
-    #                   Dates,
-    #                   variable,
-    #                   value = round(VALUE / GVATOT * 100, 2))
-    #
-    #       for (i in c(2:6, length(period_dates))) {
-    #         ic_scenario_table_data_1 <-
-    #           ic_scenario_table_data %>%
-    #           trail_avg(., p = {
-    #             as.numeric(period_dates[i]) - as.numeric(period_dates[i - 1])
-    #           }) %>%
-    #           filter(., Dates == period_dates[i]) %>%
-    #           transmute(
-    #             Period = paste0(
-    #               period_names[i - 1],
-    #               " (",
-    #               period_dates[i - 1],
-    #               " - ",
-    #               period_dates[i],
-    #               ")"
-    #             ),
-    #             variable,
-    #             value = round(value, 2)
-    #           )
-    #
-    #         ic_scenario_table_data_1 <-
-    #           spread(ic_scenario_table_data_1, variable, value)
-    #
-    #         if (i == 2) {
-    #           ic_scenario_p_avg_table <- ic_scenario_table_data_1
-    #         } else {
-    #           ic_scenario_p_avg_table <-
-    #             rbind(ic_scenario_p_avg_table,
-    #                   ic_scenario_table_data_1)
-    #         }
-    #       }
-    #       ic_scenario_p_avg_table <-
-    #         ic_scenario_p_avg_table[, append("Period", input$Selections)]
-    #
-    #       names(ic_scenario_p_avg_table) <-
-    #         gsub(paste0(str_before_nth(input$Selections[1], ", ", 2), ", "),
-    #              "",
-    #              names(ic_scenario_p_avg_table))
-    #       return(ic_scenario_p_avg_table)
-    #     },
-    #     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
-    #   }
-    #   })
+    observe({
+      if (length(input$Selections) >= 2 & length(input$Attribute) == 1 & input$display == "Line") {
+        if (length(input$Selections) >= 2) {
+          for (i in 2:length(input$Selections)) {
+            if (i == 2) {
+              common_dates <-
+                intersect(data$Dates[data$variable == input$Selections[1]], data$Dates[data$variable == input$Selections[i]])
+            } else {
+              common_dates <-
+                intersect(common_dates, data$Dates[data$variable == input$Selections[i]])
+            }
+          }
+        } else {
+          common_dates <- data$Dates[data$variable == input$Selections[1]]
+        }
+
+        period_dates <-
+          c(
+            custom.min(common_dates),
+            "2010",
+            "2021",
+            "2025",
+            "2030",
+            custom.max(common_dates),
+            input$Period_start,
+            input$Period_end
+          )
+
+        period_names <-
+          c("2000s",
+            "2010s",
+            "Short run",
+            "Medium run",
+            "Long run",
+            "",
+            "Custom Period")
+
+        output$Table <- renderTable({
+          ic_scenario_table_data <- filter(data,
+                                           ic_variable %in% unique(data$ic_variable[data$variable %in% input$Selections]))
+
+          ic_scenario_table_data_a <- filter(ic_scenario_table_data,
+                                             variable %in% input$Selections)
+          ic_scenario_table_data_b <-
+            filter(
+              ic_scenario_table_data,
+              Series_ID %in% c("GVAA_BLCC", "INDPRODLCC", "GVAFLCC", "SVCSGVALCC")
+            )
+          validate(need(NROW(ic_scenario_table_data_b) >= 1, ""))
+          ic_scenario_table_data_b <-
+            aggregate(
+              x = ic_scenario_table_data_b$value,
+              by = list(
+                ic_scenario_table_data_b$Dates,
+                ic_scenario_table_data_b$ic_variable
+              ),
+              FUN = sum
+            ) %>%
+            transmute(
+              .,
+              Dates = Group.1,
+              ic_variable = Group.2,
+              GVATOT = x
+            )
+          ic_scenario_table_data <- merge(
+            ic_scenario_table_data_a,
+            ic_scenario_table_data_b,
+            by = c("Dates", "ic_variable")
+          ) %>%
+            transmute(.,
+                      Dates,
+                      variable,
+                      value = round(VALUE / GVATOT * 100, 2))
+
+          for (i in c(2:6, length(period_dates))) {
+            ic_scenario_table_data_1 <-
+              ic_scenario_table_data %>%
+              trail_avg(., p = {
+                as.numeric(period_dates[i]) - as.numeric(period_dates[i - 1])
+              }) %>%
+              filter(., Dates == period_dates[i]) %>%
+              transmute(
+                Period = paste0(
+                  period_names[i - 1],
+                  " (",
+                  period_dates[i - 1],
+                  " - ",
+                  period_dates[i],
+                  ")"
+                ),
+                variable,
+                value = round(value, 2)
+              )
+
+            ic_scenario_table_data_1 <-
+              spread(ic_scenario_table_data_1, variable, value)
+
+            if (i == 2) {
+              ic_scenario_p_avg_table <- ic_scenario_table_data_1
+            } else {
+              ic_scenario_p_avg_table <-
+                rbind(ic_scenario_p_avg_table,
+                      ic_scenario_table_data_1)
+            }
+          }
+          ic_scenario_p_avg_table <-
+            ic_scenario_p_avg_table[, append("Period", input$Selections)]
+
+          names(ic_scenario_p_avg_table) <-
+            gsub(paste0(str_before_nth(input$Selections[1], ", ", 2), ", "),
+                 "",
+                 names(ic_scenario_p_avg_table))
+          return(ic_scenario_p_avg_table)
+        },
+        spacing = "s", striped = TRUE, hover = TRUE, align = "l")
+      }
+      })
+    
     
     # Add Relative To UI dynamically ------------------------------------------
     

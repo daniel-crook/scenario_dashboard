@@ -21,18 +21,18 @@ sc_region_ui <- function(id) {
                  )),
                  fluidRow(
                    column(
-                     5,
+                     9,
                      radioGroupButtons(
                        ns("display"),
                        NULL,
-                       c("Line chart", "Nested Pie"),
-                       selected = "Line chart",
+                       c("Line", "Nested Pie","Cont. to GDP bar"),
+                       selected = "Line",
                        justified = TRUE,
                        status = "primary"
                      )
                    ),
                    column(
-                     5,
+                     6,
                      radioGroupButtons(
                        inputId = ns("title"),
                        NULL,
@@ -43,14 +43,14 @@ sc_region_ui <- function(id) {
                      )
                    ),
                    column(
-                     3,
+                     6,
                      actionGroupButtons(
                        inputIds = c(ns("big4"), ns("small4"), ns("all")),
                        labels = c("Big", "Small", "All"),
                        status = "primary"
                      )
                    ),
-                   style = "margin-bottom:-1.0em"
+                   style = "margin-bottom:-2.0em"
                  )
                ),
                wellPanel(
@@ -316,19 +316,17 @@ sc_region_server <- function(id, data) {
       sc_region_data <- spread(sc_region_data, variable, value)
       
       if (input$display == "Nested Pie") {
-        sc_region_data <- melt(sc_region_data, "Dates") %>%
+       
+        sc_region_data <- mutate(sc_region_data, "Attached Dwellings, Unselected, Central, May22 V3" = round(100 - rowSums(sc_region_data[input$Selections]),1)) %>% 
+          melt("Dates") %>%
           mutate(variable = str_before_first(str_after_first(as.character(variable), ", "), ", ")) %>%
           mutate(variable = factor(
             variable,
-            levels = c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+            levels = c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT","Unselected")
           )) %>%
           arrange(variable) %>%
           mutate(value = round(value, 1))
       }
-      
-      output$Table <- renderTable({
-        sc_region_data
-      })
       
       output$Plot <- renderPlotly({
         if (input$display == "Nested Pie") {
@@ -339,7 +337,8 @@ sc_region_server <- function(id, data) {
             type = 'pie',
             hole = 0.7,
             name = input$Period_end,
-            marker = list(colors = I(ox_pallette()[1:length(input$Selections)])),
+            marker = list(colors = c(I(ox_pallette()[1:length(input$Selections)]),"white")),
+            hovertemplate = '%{label}, %{percent}',
             insidetextorientation = 'horizontal',
             insidetextfont = list(color = 'white')
           )
@@ -351,7 +350,8 @@ sc_region_server <- function(id, data) {
             hole = 0.55,
             domain = list(x = c(0.15, 0.85), y = c(0.15, 0.85)),
             name = input$Period_start,
-            marker = list(colors = I(ox_pallette()[1:length(input$Selections)])),
+            marker = list(colors = c(I(ox_pallette()[1:length(input$Selections)]),"white")),
+            hovertemplate = '%{label}, %{percent}',
             insidetextorientation = 'horizontal',
             textposition = 'inside',
             insidetextfont = list(color = 'white')
@@ -382,7 +382,7 @@ sc_region_server <- function(id, data) {
               font = list(color = "black", family = "segoe ui",
                           size = 16,
                           color = "black")
-              
+
             ) %>% add_annotations(
               x = 0.675,
               y = 0.575,
@@ -396,7 +396,7 @@ sc_region_server <- function(id, data) {
               font = list(color = "black", family = "segoe ui",
                           size = 16,
                           color = "black")
-              
+
             )
           if (input$title == "Title On") {
             fig <- fig %>%
@@ -417,7 +417,7 @@ sc_region_server <- function(id, data) {
               ))
           }
           return(fig)
-        } else if (input$display == "Line chart") {
+        } else if (input$display == "Line") {
           {
             fig <- plot_ly(
               sc_region_data,
@@ -529,7 +529,7 @@ sc_region_server <- function(id, data) {
       } else {
         common_dates <- data$Dates[data$variable == input$Selections[1]]
       }
-      
+
       period_dates <-
         c(
           custom.min(common_dates),
@@ -541,7 +541,7 @@ sc_region_server <- function(id, data) {
           input$Period_start,
           input$Period_end
         )
-      
+
       period_names <-
         c("2000s",
           "2010s",
@@ -550,7 +550,7 @@ sc_region_server <- function(id, data) {
           "Long run",
           "",
           "Custom Period")
-      
+
       output$Table <- renderTable({
         sc_region_table_data <- filter(data,
                                        sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
@@ -568,7 +568,7 @@ sc_region_server <- function(id, data) {
                     Dates,
                     variable,
                     value = round(VALUE / AUS_VALUE * 100, 2))
-        
+
         for (i in c(2:6, length(period_dates))) {
           sc_region_table_data_1 <-
             sc_region_table_data %>%
@@ -588,10 +588,10 @@ sc_region_server <- function(id, data) {
               variable,
               value = round(value, 2)
             )
-          
+
           sc_region_table_data_1 <-
             spread(sc_region_table_data_1, variable, value)
-          
+
           if (i == 2) {
             sc_region_p_avg_table <- sc_region_table_data_1
           } else {
@@ -601,7 +601,7 @@ sc_region_server <- function(id, data) {
         }
         sc_region_p_avg_table <-
           sc_region_p_avg_table[, append("Period", input$Selections)]
-        
+
         names(sc_region_p_avg_table) <-
           gsub(paste0(str_before_first(input$Selections[1], ", "), ", "),
                "",
@@ -610,7 +610,7 @@ sc_region_server <- function(id, data) {
           gsub(paste0(", ", str_after_nth(input$Selections[1], ", ", 2)),
                "",
                names(sc_region_p_avg_table))
-        
+
         return(sc_region_p_avg_table)
       },
       spacing = "s", striped = TRUE, hover = TRUE, align = "l")
