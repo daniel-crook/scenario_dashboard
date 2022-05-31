@@ -31,7 +31,7 @@ homepage_ui <- function(id) {
 column(
   3,
   HTML(
-    "<ul>Calculate several off-platform series to further check of forecasts:<ul>
+    "<ul>Calculate several off-platform series to further check forecasts:<ul>
                 <li>Compound Annual Growth Rates
                 <li>Period average calculations"
   )
@@ -69,7 +69,7 @@ column(
               ns("aid_file"),
               "Select File",
               "Please select a file",
-              multiple = F,
+              multiple = T,
               buttonType = 'md',
               style = paste0(
                 "background-color:",
@@ -249,7 +249,7 @@ column(
               ns("gem_file"),
               "Select File",
               "Please select a file",
-              multiple = F,
+              multiple = T,
               buttonType = 'md',
               style = paste0(
                 "background-color:",
@@ -344,7 +344,7 @@ column(
 # 2.0 Module Server -------------------------------------------------------
 
 homepage_server <- function(id) {
-  moduleServer(id, function(input, output, session, data) {
+  moduleServer(id, function(input, output, session, data, gem_data) {
     # Scenario Description Table ----------------------------------------------
     observe({
       output$Table <- function() {
@@ -435,6 +435,17 @@ homepage_server <- function(id) {
         })
     })
     
+    # Process GEM db ----------------------------------------------------------
+    
+    observeEvent(input$gem_process_folder_file, {
+      source("data processing/DataProcessing_GEM.R",
+             local = TRUE)
+      output$gem_data_processed <-
+        renderPrint({
+          "Data process complete"
+        })
+    })
+    
     # Refresh AID Button ------------------------------------------------------
     
     observeEvent(input$aid_refresh, {
@@ -443,6 +454,17 @@ homepage_server <- function(id) {
           "Refreshing Dashboard..."
         })
       source("data/refresh_AID_data.R", local = TRUE)
+      session$reload()
+    })
+    
+    # Refresh GEM Button ------------------------------------------------------
+    
+    observeEvent(input$gem_refresh, {
+      output$gem_data_refreshed <-
+        renderPrint({
+          "Refreshing Dashboard..."
+        })
+      source("data/refresh_GEM_data.R", local = TRUE)
       session$reload()
     })
     
@@ -469,8 +491,12 @@ homepage_server <- function(id) {
         })
     })
     
-    # Source Data -------------------------------------------------------------
+   # Source AID Data ---------------------------------------------------------
     source("data/import_data.R", local = TRUE)
     return(data)
+    
+    # Source GEM Data ---------------------------------------------------------
+    source("data/import_data_gem.R", local = TRUE)
+    return(gem_data)
   })
 }

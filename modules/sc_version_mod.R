@@ -197,7 +197,8 @@ sc_version_server <- function(id, data) {
     
     # Render Plot -------------------------------------------------------------
     observe({
-      vars <-  append(input$Selections, paste(input$Attribute,
+      if (str_before_last(input$Selections[1], ", ") == paste(input$Attribute, input$State, input$Scenario, sep = ", ")) {
+        vars <-  append(input$Selections, paste(input$Attribute,
                                               input$State,
                                               input$Scenario,
                                               input$relative_to, sep = ", "))
@@ -221,10 +222,10 @@ sc_version_server <- function(id, data) {
       
       if (length(input$relative_to) == 1 &
           input$display == "Diff-bar" &
-          !(paste(input$Attribute,
+          (paste(input$Attribute,
                 input$State,
                 input$Scenario,
-                input$relative_to, sep = ", ") %in% input$Selections[1])) {
+                input$relative_to, sep = ", ") != input$Selections[1])) {
         
        relative_var <- data.frame(variable = paste(input$Attribute,
                                input$State,
@@ -254,10 +255,9 @@ sc_version_server <- function(id, data) {
                   variable,
                   value = round(VALUE / AUS_VALUE * 100, 2))
       if (length(input$relative_to) == 1 & input$display == "Diff-bar"  &
-          !(paste(input$Attribute,
+          str_before_last(input$Selections[1],", ") == paste(input$Attribute,
                   input$State,
-                  input$Scenario,
-                  input$relative_to, sep = ", ") %in% input$Selections[1])) {
+                  input$Scenario, sep = ", ")) {
         sc_version_data <-
           trail_avg(sc_version_data, bar_dates[2] - bar_dates[1]) %>%
           mutate(., value = round(value, 2)) %>% 
@@ -266,36 +266,39 @@ sc_version_server <- function(id, data) {
       
       sc_version_data <- spread(sc_version_data, variable, value)
       
-      if (length(input$relative_to) == 1 & input$display == "Diff-bar"  &
-          !(paste(input$Attribute,
-                  input$State,
-                  input$Scenario,
-                  input$relative_to, sep = ", ") %in% input$Selections[1])) {
+      if (length(input$relative_to) == 1 & input$display == "Diff-bar" &
+          (paste(input$Attribute,
+                 input$State,
+                 input$Scenario,
+                 input$relative_to, sep = ", ") != input$Selections[1])) {
       for (i in 1:length(input$Selections)) {
         sc_version_data[input$Selections[i]] <- sc_version_data[input$Selections[i]] - sc_version_data[relative_var$variable[1]]
       }
       sc_version_data <- select(sc_version_data,-relative_var$variable[1]) %>% 
-        melt("Dates") %>% select(-Dates) %>% mutate(., variable = str_after_last(as.character(variable), ", "))
-      
+        melt("Dates") %>% select(-Dates) %>% mutate(., variable = str_after_last(as.character(variable),", ")) %>% 
+        spread(., variable,value)
       }
       
       #output$Table <- renderTable({sc_version_data})
       
       output$Plot <- renderPlotly({
+        
         fig <-
           if (length(input$relative_to) == 1 & input$display == "Diff-bar"  &
-              !(paste(input$Attribute,
+              paste(input$Attribute,
                       input$State,
                       input$Scenario,
-                      input$relative_to, sep = ", ") %in% input$Selections[1])) {
+                      input$relative_to, sep = ", ") != input$Selections[1] &
+              length(input$Selections) >= 1) {
             {
               fig <- plot_ly(
                 sc_version_data,
-                y = ~ variable,
-                x = ~ value,
+                x = sc_version_data[[str_after_last(input$Selections[1],", ")]],
+                y = str_after_last(input$Selections[1],", "),
                 type = 'bar',
                 orientation = 'h',
-                color = I(ox_pallette()[1:length(sc_version_data$variable)]),
+                color = I(ox_pallette()[1]),
+                name = str_after_last(input$Selections[1], ", "),
                 hoverlabel = list(namelength = -1)
               ) %>%
                 layout(
@@ -324,8 +327,7 @@ sc_version_server <- function(id, data) {
                     y = -0.05
                   ),
                   margin = list(l = 0, r = 0, b = 0, t = 50),
-                  hovermode = "y unified",
-                  barmode = 'group'
+                  hovermode = "x unified"
                 ) %>%
                 add_annotations(
                   x = 0,
@@ -336,6 +338,14 @@ sc_version_server <- function(id, data) {
                   xanchor = "left",
                   showarrow = FALSE
                 )
+              if (length(input$Selections) >= 2) {
+                for (i in 2:length(input$Selections)) {
+                  fig <- fig %>% add_trace(x = sc_version_data[[str_after_last(input$Selections[i],", ")]],
+                                           y = str_after_last(input$Selections[i],", "),
+                                           color = I(ox_pallette()[i]),
+                                           name = str_after_last(input$Selections[i],", "))
+                }
+              }
               if (input$title == "Title On") {
                 fig <- fig %>%
                   layout(title = list(
@@ -409,7 +419,7 @@ sc_version_server <- function(id, data) {
                   showarrow = FALSE
                 ) %>%
                 add_annotations(
-                  x = min(sc_version_data$Dates[!is.na(sc_version_data[[input$Selections[1]]])]),
+                  x = min(sc_version_data$Dates),
                   y = 1.035,
                   text = "% of National",
                   yref = "paper",
@@ -446,10 +456,12 @@ sc_version_server <- function(id, data) {
             }
           }
       })
+      }
     })
     
     # Render Table ------------------------------------------------------------
     observe({
+      if (str_before_last(input$Selections[1], ", ") == paste(input$Attribute, input$State, input$Scenario, sep = ", ")) {
       if (length(input$Selections) >= 2) {
         for (i in 2:length(input$Selections)) {
           if (i == 2) {
@@ -483,7 +495,8 @@ sc_version_server <- function(id, data) {
           "Medium run",
           "Long run",
           "",
-          "Custom Period")
+          "Custom Period"
+          )
 
       output$Table <- renderTable({
         sc_version_table_data <- filter(data,
@@ -543,6 +556,7 @@ sc_version_server <- function(id, data) {
         return(sc_version_p_avg_table)
       },
       spacing = "s", striped = TRUE, hover = TRUE, align = "l")
+      }
     })
   
     # Add Relative To UI dynamically ------------------------------------------
