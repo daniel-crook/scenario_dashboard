@@ -82,7 +82,7 @@ Like any Shiny app, each modules have a UI and a Server component. The UI compon
 
 **Data**
 
-The data folder contains...
+The data folder contains R scripts used to import data that have been processed and converted to RDS files.
 
 **Data Processing**
 
