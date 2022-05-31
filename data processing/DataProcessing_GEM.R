@@ -2,6 +2,8 @@
 
 # Get File path from input -------------------------------------------------
 
+volumes <- getVolumes()()
+
 if (!(is.integer(input$gem_directory))) {
   GEM_db_folder <-
     file.path(parseDirPath(volumes, input$gem_directory), "/")

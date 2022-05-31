@@ -25,7 +25,7 @@ for (i in 1:length(gem_rds_filename)) {
       mutate(SCENARIO_RELEASE = gem_rds_filename[i])
     hist_end <- d[[2]]
   } else {
-    print(gem_rds_filename[i])
+    message(gem_rds_filename[i])
     gem_db_s <-
       readRDS(paste0(gem_rds_folder, gem_rds_filename[i], ".rds"))
     if (inherits(gem_db_s, "list")) {
@@ -42,5 +42,5 @@ gem_data_list <-
 saveRDS(gem_data_list, "data/GEM_Dashboard_Data.rds")
 
 message("")
-message("AID Data has been updated")
+message("GEM Data has been updated")
 

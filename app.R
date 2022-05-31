@@ -123,8 +123,8 @@ ui <-  tagList(
             h5(icon("fas fa-globe-asia"), strong("GEM Checks")),
             tabsetPanel(
                 type = "pills",
-                gc_version_ui("gc_version"),
-                gc_scenario_ui("gc_scenario"),
+                # gc_version_ui("gc_version"),
+                # gc_scenario_ui("gc_scenario"),
                 tabPanel("AC - % of GDP")
             )
         )
@@ -135,6 +135,7 @@ ui <-  tagList(
 
 server <- function(input, output, session) {
     data <- homepage_server("homepage")
+    gem_data <- homepage_server("homepage")
     
     vc_version_server("vc_version", data)
     vc_scenario_server("vc_scenario", data)
@@ -152,8 +153,8 @@ server <- function(input, output, session) {
     d_region_breakdown_server("d_region_breakdown", data)
     d_total_increase_by_region_server("d_total_increase_by_region", data)
     
-    callModule(gc_version_server, "gc_version")
-    callModule(gc_scenario_server, "gc_scenario")
+    # gc_version_server("gc_version", gem_data)
+    # gc_scenario_server("gc_scenario", gem_data)
 }
 
 # 5.0 Run App -------------------------------------------------------------
