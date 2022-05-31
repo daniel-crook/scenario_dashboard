@@ -48,6 +48,16 @@ add.ic.col <- function(x) {
                              sep = ", "))
 }
 
+## -- function that adds a concat variable column for the industry comp tab -- ##
+add.ic.fy.col <- function(x) {
+  mutate(x, ic_fy_variable = paste(
+    STATE,
+    SCENARIO_VALUE,
+    RELEASE_VERSION,
+    sep = ", "
+  ))
+}
+
 ## -- function that adds a concat variable column for the gem checks tab -- ##
 add.var.col.gem <- function(x) {
   mutate(x,
