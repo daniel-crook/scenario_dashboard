@@ -4,6 +4,7 @@
 homepage_ui <- function(id) {
   ns = NS(id)
   tabPanel(
+    
     "Homepage",
     titlePanel(h1(
       strong("Welcome to the Scenario Dashboard")
@@ -345,6 +346,7 @@ column(
 
 homepage_server <- function(id) {
   moduleServer(id, function(input, output, session, data, gem_data) {
+    
     # Scenario Description Table ----------------------------------------------
     observe({
       output$Table <- function() {

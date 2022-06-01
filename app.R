@@ -17,7 +17,8 @@ list.of.packages <-
         "kableExtra",
         "shinyFiles",
         "shinyjs",
-        "git2r"
+        "git2r",
+        "waiter"
     )
 
 new.packages <- list.of.packages[!(list.of.packages %in%
@@ -71,7 +72,10 @@ source)
 
 ui <-  tagList(
     #tags$head(tags$script(type = "text/javascript", src = "code.js")),
+    useWaiter(), 
+    waiterPreloader(html = spin_folding_cube()),
     navbarPage(
+        
         title = div(img(
             src = 'AEMO logo.png',
             style = "margin-top: 0px",
@@ -134,6 +138,9 @@ ui <-  tagList(
 # 4.0 Server --------------------------------------------------------------
 
 server <- function(input, output, session) {
+    
+    
+    
     data <- homepage_server("homepage")
     gem_data <- homepage_server("homepage")
     
