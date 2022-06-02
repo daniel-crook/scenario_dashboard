@@ -42,13 +42,17 @@ You can also see what has been updated in the code on your GitHub Desktop. On th
 
 **Step 1. Opening the Dashboard**
 
-You will require R and R Studio to access the dashboard. Download the following and once downloaded, open the .exe files and follow the defauly installation prompts.
+You will require R and R Studio to access the dashboard. Download the following and once downloaded, open the .exe files and follow the default installation prompts.
 
 -   Install R: [https://cran.r-project.org/bin/windows/base](https://cran.r-project.org/bin/windows/base/)
 
 -   Install R Studio: <https://cran.r-project.org/bin/windows/base/>
 
 Open the "*scenario_dashboard*" folder in your local drive. Click and run the R file named "*app*". This should open up R Studio. Click anywhere on the script, then hold down "ctrl" + "shift" + "enter" on your keyboard to run the script.
+
+Note, if there is an error with your packages, it may be that the OE MDL and oxgraphs packages (our in-house packages) have not been installed. A guide on installing OE MDL can be found [here](https://github.com/stefanangrick/oemdlRtools), while oxgraphs can be installed by running the following code in R Studio:
+
+    devtools::install_github("slangcake/oxgraphs", build=FALSE)
 
 This app.R script is the master file used to source the different 'modules' that are used to generate the dashboard. More details the dependencies are in the "More details" section.
 
