@@ -60,13 +60,26 @@ This app.R script is the master file used to source the different 'modules' that
 
 The dashboard will open in your default browsers. The homepage provides some additional information on the purpose for each tab and allow you to select your databases.
 
-Select your databases depending on what dashboard you want to access. Make sure that the data helper file time stamps look correct once you have finished selecting your databases.
+The dashboard will have pre-loaded databases called "helper files". The time stamp at the bottom of the page shows when the existing data was last updated. However, you can also select an updated database from your C drive by following the steps as shown below. You will need to make sure the name follows our Dashboard naming convention, "Scenario - AID - mmmyy - V\_" (example below).
+
+If the file name is incorrectly formatted, your dashboard will turn dim and you will see an error in your R Studio console. If this is successful, there will be a text next to the process folder/file icon saying "Data process complete".
+
+| Central           | \_  | AID | \_  | Jun22 | \_  | V4  |
+|-------------------|-----|-----|-----|-------|-----|-----|
+| ExportSuperPower  | \_  | AID | \_  | Jun22 | \_  | V4  |
+| SlowGrowth        | \_  | AID | \_  | Jun22 | \_  | V4  |
+| RapidDecarb       | \_  | AID | \_  | Jun22 | \_  | V4  |
+| SustainableGrowth | \_  | AID | \_  | Jun22 | \_  | V4  |
 
 <img src="www/ReadME/homepage.PNG" width="780"/>
 
 <img src="www/ReadME/sort_files.PNG" width="780"/>
 
-Once your databases have been selected, click on one of the tabs on top (e.g. *Variable Comparison*). Each tab follows a similar structure.
+<img src="www/ReadME/wrongname.PNG" width="780"/>
+
+<img src="www/ReadME/successprocess.PNG" width="780"/>
+
+Once your databases have been successfully processed, press refresh. This will reload your dashboard (your dashboard will turn grey with a loading icon). Once this is completed you can navigate the dashboard freely by clicking on one of the tabs on top (e.g. *Variable Comparison*). Each tab follows a similar structure.
 
 1.  On the left pane, you can select how you want to view the data. For example, in the Variable Comparison tab, you can view graphs and tables by version, by scenario, or by region.
 2.  Then click on what you would like displayed. For example, levels versus year-on-year percentage change, and whether you want state level data or national level data. This will affect the drop-down options in the next section.
