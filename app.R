@@ -18,7 +18,8 @@ list.of.packages <-
         "shinyFiles",
         "shinyjs",
         "git2r",
-        "waiter"
+        "waiter",
+        "shinyFeedback"
     )
 
 new.packages <- list.of.packages[!(list.of.packages %in%
@@ -127,7 +128,7 @@ ui <-  tagList(
             h5(icon("fas fa-globe-asia"), strong("GEM Checks")),
             tabsetPanel(
                 type = "pills",
-                # gc_version_ui("gc_version"),
+                gc_version_ui("gc_version"),
                 # gc_scenario_ui("gc_scenario"),
                 tabPanel("AC - % of GDP")
             )
@@ -139,10 +140,7 @@ ui <-  tagList(
 
 server <- function(input, output, session) {
     
-    
-    
-    data <- homepage_server("homepage")
-    gem_data <- homepage_server("homepage")
+    homepage_server("homepage")
     
     vc_version_server("vc_version", data)
     vc_scenario_server("vc_scenario", data)
@@ -160,7 +158,7 @@ server <- function(input, output, session) {
     d_region_breakdown_server("d_region_breakdown", data)
     d_total_increase_by_region_server("d_total_increase_by_region", data)
     
-    # gc_version_server("gc_version", gem_data)
+    gc_version_server("gc_version", gem_data)
     # gc_scenario_server("gc_scenario", gem_data)
 }
 

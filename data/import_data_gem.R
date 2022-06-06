@@ -1,15 +1,12 @@
 
-setwd("C:/Users/dcrook/Documents/scenario_dashboard/")
-
 gem_data_list <- readRDS("data/GEM_Dashboard_Data.rds")
 
 list.of.indicators <-
-  openxlsx::read.xlsx("data processing/List_Of_Indicators_GEM.xlsx") %>%
+  readxl::read_xlsx("data processing/Input Files/List_Of_Indicators_GEM.xlsx") %>%
   dplyr::rename(Sector = Division)
 
 gem_data <-
-  gem_data_list[[1]] %>% clean.names() %>%
-  filter(variable %in% list.of.indicators$Mnemonic)
+  gem_data_list[[1]]
 
 gem_data <-
   transmute(
@@ -17,8 +14,8 @@ gem_data <-
     Dates,
     variable,
     value,
-    Scenario = str_before_nth(SCENARIO_RELEASE, "_", str_count(SCENARIO_RELEASE, "_") -
-                                1),
+    Scenario = str_before_first(str_before_nth(SCENARIO_RELEASE, "_", str_count(SCENARIO_RELEASE, "_") -
+                                1),"_GEM"),
     Release = str_after_nth(SCENARIO_RELEASE, "_", str_count(SCENARIO_RELEASE, "_") -
                               1)
   )

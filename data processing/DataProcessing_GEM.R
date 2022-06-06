@@ -46,8 +46,7 @@ gem_rds_filename <-
   list.files(path = gem_rds_folder) %>% str_replace_all(".rds", "")
 
 list.of.indicators <-
-  openxlsx::read.xlsx("data processing/List_Of_Indicators_GEM.xlsx") %>%
-  dplyr::rename(Sector = Division)
+  readxl::read_xlsx("data processing/Input Files/List_Of_Indicators_GEM.xlsx") 
 
 for (i in gem_db_filename) {
   start_time <- Sys.time()

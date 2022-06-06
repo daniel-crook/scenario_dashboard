@@ -481,7 +481,7 @@ homepage_server <- function(id) {
         })
     })
     
-    # AID data last updated output --------------------------------------------
+    # GEM data last updated output --------------------------------------------
     
     observe({
       output$gem_data_update_date <-
