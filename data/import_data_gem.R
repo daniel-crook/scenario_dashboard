@@ -1,8 +1,6 @@
 
 gem_data_list <- readRDS("data/GEM_Dashboard_Data.rds")
 
-if(exists(gem_data)) {rm(gem_data)}
-
 list.of.indicators <-
   readxl::read_xlsx("data processing/Input Files/List_Of_Indicators_GEM.xlsx") %>%
   dplyr::rename(Sector = Division)
@@ -60,3 +58,4 @@ for (i in 1:length(categories)) {
 }
 
 names(var_list) <- categories
+return(gem_data)

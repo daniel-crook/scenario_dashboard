@@ -495,10 +495,8 @@ homepage_server <- function(id) {
     
    # Source AID Data ---------------------------------------------------------
     source("data/import_data.R")
-    return(data)
     
     # Source GEM Data ---------------------------------------------------------
-    source("data/import_data_gem.R"E)
-    return(gem_data)
+    source("data/import_data_gem.R")
   })
 }

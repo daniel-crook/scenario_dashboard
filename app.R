@@ -49,7 +49,7 @@ source("data/import_data.R")
 
 # 0.3 Import GEM Data -----------------------------------------------------
 
-#source("data/import_data_gem.R")
+source("data/import_data_gem.R")
 
 # 1.0 Static Elements -----------------------------------------------------
 
