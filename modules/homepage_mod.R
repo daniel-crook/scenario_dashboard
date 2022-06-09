@@ -70,7 +70,7 @@ column(
               ns("aid_file"),
               "Select File",
               "Please select a file",
-              multiple = T,
+              multiple = F,
               buttonType = 'md',
               style = paste0(
                 "background-color:",
@@ -250,7 +250,7 @@ column(
               ns("gem_file"),
               "Select File",
               "Please select a file",
-              multiple = T,
+              multiple = F,
               buttonType = 'md',
               style = paste0(
                 "background-color:",
@@ -494,11 +494,11 @@ homepage_server <- function(id) {
     })
     
    # Source AID Data ---------------------------------------------------------
-    source("data/import_data.R", local = TRUE)
+    source("data/import_data.R")
     return(data)
     
     # Source GEM Data ---------------------------------------------------------
-    source("data/import_data_gem.R", local = TRUE)
+    source("data/import_data_gem.R"E)
     return(gem_data)
   })
 }

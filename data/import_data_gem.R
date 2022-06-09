@@ -1,6 +1,8 @@
 
 gem_data_list <- readRDS("data/GEM_Dashboard_Data.rds")
 
+if(exists(gem_data)) {rm(gem_data)}
+
 list.of.indicators <-
   readxl::read_xlsx("data processing/Input Files/List_Of_Indicators_GEM.xlsx") %>%
   dplyr::rename(Sector = Division)
@@ -44,6 +46,7 @@ list.of.indicators <-
          Units,
          Aggregation,
          Category)
+
 gem_data <-
   left_join(gem_data, list.of.indicators, by =  "Mnemonic") %>%
   add.var.col.gem()

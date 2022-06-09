@@ -1,5 +1,4 @@
 
-
 # Get File path from input -------------------------------------------------
 
 volumes <- getVolumes()()
@@ -15,14 +14,13 @@ if (!(is.integer(input$gem_directory))) {
   file <- str_after_last(full_db_path, "/")
 }
 
-gem_db_folder <- "C:/AID/GCS/Mar 2022/"
+file <- file %>% str_replace_all(".db", "")
 
-gem_db_filename <-
-  list.files(path = gem_db_folder) %>% str_replace_all(".db", "")
+message("Processing Dbs....")
 
 # Name Check --------------------------------------------------------------
 {
-  # correct_names <- keep(gem_db_filename, grepl("_GEM_",gem_db_filename))
+  # correct_names <- keep(file, grepl("_GEM_",file))
   #
   # correct_names <- keep(correct_names, grepl("_V",correct_names))
   #
@@ -37,18 +35,20 @@ gem_db_filename <-
   #   if(is.na(date)) {correct_names <- correct_names[correct_names != i]}
   # }
   #
-  # incorrect_names <- gem_db_filename[!(gem_db_filename %in% correct_names)]
+  # incorrect_names <- file[!(file %in% correct_names)]
 }
-#setwd("C:/Users/dcrook/Documents/scenario_dashboard/")
+
 gem_rds_folder <- "data processing/GEM RDS Files/"
 
 gem_rds_filename <-
   list.files(path = gem_rds_folder) %>% str_replace_all(".rds", "")
 
+#setwd("C:/Users/dcrook/Documents/scenario_dashboard/")
+
 list.of.indicators <-
   readxl::read_xlsx("data processing/Input Files/List_Of_Indicators_GEM.xlsx") 
 
-for (i in gem_db_filename) {
+for (i in file) {
   start_time <- Sys.time()
   print(i)
   
@@ -59,10 +59,10 @@ for (i in gem_db_filename) {
   } else {
     # a quick work around for the "space" bug in the read_oedb function
     old_wd <- getwd()
-    setwd(gem_db_folder)
+    setwd(GEM_db_folder)
     db <- oxoedb(
       paste0(i, ".db"),
-      sect = unique(list.of.indicators$Sector)
+      sect = unique(list.of.indicators$Division)
     )
     setwd(old_wd)
     

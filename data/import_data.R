@@ -42,4 +42,4 @@ data <- readRDS("data/Dashboard_Data.rds") %>%
   add.var.col(.) %>%
   add.sc.col(.) %>%
   add.ic.col(.) %>% 
-  add.ic.fy.col(.)
+  add.ic.fy.col(.) 
