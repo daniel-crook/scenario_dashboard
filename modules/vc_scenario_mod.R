@@ -307,7 +307,7 @@ vc_scenario_server <- function(id, data) {
       })
     })
     
-    # Render Tab;e ------------------------------------------------------------
+    # Render Table ------------------------------------------------------------
     
     observe({
       if (length(input$Selections) >= 2) {

@@ -129,7 +129,7 @@ vc_version_ui <- function(id) {
                )
              ),
              mainPanel(
-               plotlyOutput(ns("Plot"), height = '600px', width = '900px'),
+               plotlyOutput(ns("Plot"), height = '600px'),
                        tableOutput(ns("Table")))
            ))
 }
@@ -246,10 +246,7 @@ vc_version_server <- function(id, data) {
               ticks = "outside",
               tickcolor = "#495057",
               tickformat = ",",
-              ticksuffix = if(input$display == "% y/y"){"%"} else {NULL},
-              tickfont = list(size = 18,
-                              family = "segoe ui",
-                              color = "#495057")
+              ticksuffix = if(input$display == "% y/y"){"%"} else {NULL}
             ),
             xaxis = list(
               title = "",
@@ -259,20 +256,12 @@ vc_version_server <- function(id, data) {
               linecolor = "#495057",
               ticks = "outside",
               tickcolor = "#495057",
-              range,
-              tickfont = list(size = 18,
-                              family = "segoe ui",
-                              color = "#495057")),
+              range),
             legend = list(
               orientation = "h",
               xanchor = "center",
               x = 0.5,
-              y = -0.075,
-              font = list(
-                family = "segoe ui",
-                size = 18,
-                color = "#495057"
-              )
+              y = -0.05
             ),
             margin = list(l = 0, r = 0, b = 0, t = 50),
             hovermode = "x unified"
@@ -280,15 +269,10 @@ vc_version_server <- function(id, data) {
           add_annotations(
             x = data[(data$FORECAST_FLAG == "EA") &
                        (data$variable == input$Selections[1]), "Dates"],
-            y = 1.01,
+            y = 1,
             text = "               Forecast",
             yref = "paper",
-            showarrow = FALSE,
-            font = list(
-              family = "segoe ui",
-              size = 18,
-              color = "#495057"
-            )
+            showarrow = FALSE
           ) %>% 
           add_annotations(
             x = min(vc_version_data$Dates[!is.na(vc_version_data[[input$Selections[1]]])]),
@@ -300,12 +284,7 @@ vc_version_server <- function(id, data) {
               },
             yref = "paper",
             xanchor = "left",
-            showarrow = FALSE,
-            font = list(
-              family = "segoe ui",
-              size = 18,
-              color = "#495057"
-            )
+            showarrow = FALSE
           )
           if (length(input$Selections) >= 2) {
           for (i in 2:length(input$Selections)) {
