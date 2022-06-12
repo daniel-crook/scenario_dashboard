@@ -17,7 +17,6 @@ list.of.packages <-
         "kableExtra",
         "shinyFiles",
         "shinyjs",
-        "git2r",
         "waiter",
         "shinyFeedback"
     )
@@ -72,15 +71,14 @@ source)
 # 3.0 UI ------------------------------------------------------------------
 
 ui <-  tagList(
-    #tags$head(tags$script(type = "text/javascript", src = "code.js")),
+    tags$head(tags$script(type = "text/javascript", src = "code.js")),
     useWaiter(),
     waiterPreloader(html = spin_folding_cube()),
     navbarPage(
-        
         title = div(img(
-            src = 'AEMO logo.png',
+            src = 'company_logo.png',
             style = "margin-top: 0px",
-            height = 75
+            height = "75px"
         )),
         id = "navbar",
         windowTitle = "Scenario Dashboard",
@@ -169,3 +167,4 @@ shinyApp(
     server = server,
     options = list(launch.browser = TRUE)
 )
+
