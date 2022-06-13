@@ -120,6 +120,7 @@ br(),
             ns("aid_data_refreshed"), placeholder = TRUE
           ), style = "margin-top:0em")
         )),
+        br(),
         h4(strong("AID data is used in:"), style = "margin-top: -0.5em"),
         fluidRow(column(
           6, wellPanel(
@@ -299,6 +300,7 @@ br(),
             ns("gem_data_refreshed"), placeholder = TRUE
           ), style = "margin-top:0em")
         )),
+        br(),
         h4(strong("GEM data is used in:"), style = "margin-top: -0.5em"),
         fluidRow(column(
           6, wellPanel(
@@ -340,35 +342,35 @@ br(),
         format = "%d %b %Y %I:%M %p"
       )
     ))),
-  fluidRow(column(2, 
-                  shinyFilesButton(
-                    ns("company_logo"),
-                    "Select Company Logo",
-                    "Please select a Company logo image file",
-                    multiple = F,
-                    buttonType = 'md',
-                    style = paste0(
-                      "background-color:",
-                      oxgraphs::ox_pallette()[3],
-                      "; color: white"
-                    )
-                  )),
-           column(
-             5, h4(verbatimTextOutput(ns(
-               "company_logopath"
-             ), placeholder = TRUE), style = "margin-top:0em")
-           ),
-           column(3,
-                  actionButton(
-                    ns("ch_logo_and_refresh"),
-                    label = "Change Logo & Refresh",
-                    style = paste0(
-                      "background-color:",
-                      oxgraphs::ox_pallette()[3],
-                      "; color: white"
-                    )
-                  ))
-           )
+  # fluidRow(column(2, 
+  #                 shinyFilesButton(
+  #                   ns("company_logo"),
+  #                   "Select Company Logo",
+  #                   "Please select a Company logo image file",
+  #                   multiple = F,
+  #                   buttonType = 'md',
+  #                   style = paste0(
+  #                     "background-color:",
+  #                     oxgraphs::ox_pallette()[3],
+  #                     "; color: white"
+  #                   )
+  #                 )),
+  #          column(
+  #            5, h4(verbatimTextOutput(ns(
+  #              "company_logopath"
+  #            ), placeholder = TRUE), style = "margin-top:0em")
+  #          ),
+  #          column(3,
+  #                 actionButton(
+  #                   ns("ch_logo_and_refresh"),
+  #                   label = "Change Logo & Refresh",
+  #                   style = paste0(
+  #                     "background-color:",
+  #                     oxgraphs::ox_pallette()[3],
+  #                     "; color: white"
+  #                   )
+  #                 ))
+  #          )
   )
 }
 
@@ -525,38 +527,38 @@ homepage_server <- function(id) {
         })
     })
     
-    # Company Logo Button -----------------------------------------------------
-    observe({
-      shinyFileChoose(
-        input,
-        "company_logo",
-        roots = volumes,
-        session = session,
-        filetypes=c('png','jpeg'),
-        restrictions = system.file(package = "base")
-      )
-      
-      output$company_logopath <- renderPrint({
-        if (is.integer(input$company_logo)) {
-          cat("Please select a folder/file")
-        } else if (!(is.integer(input$company_log))) {
-          file.path(parseFilePaths(volumes, input$company_logo))[4]
-        }
-      })
-    })
-    
-    # Change Logo & Refresh ---------------------------------------------------
-
-    observeEvent(input$ch_logo_and_refresh, {
-      company_logo_path <-
-        file.path(parseFilePaths(volumes, input$company_logo))[4]
-      
-      file.copy(from = company_logo_path,
-                to = "www/company_logo.png",
-                overwrite = T)
-      
-      session$reload()
-    })
+    # # Company Logo Button -----------------------------------------------------
+    # observe({
+    #   shinyFileChoose(
+    #     input,
+    #     "company_logo",
+    #     roots = volumes,
+    #     session = session,
+    #     filetypes=c('png','jpeg'),
+    #     restrictions = system.file(package = "base")
+    #   )
+    #   
+    #   output$company_logopath <- renderPrint({
+    #     if (is.integer(input$company_logo)) {
+    #       cat("Please select a folder/file")
+    #     } else if (!(is.integer(input$company_log))) {
+    #       file.path(parseFilePaths(volumes, input$company_logo))[4]
+    #     }
+    #   })
+    # })
+    # 
+    # # Change Logo & Refresh ---------------------------------------------------
+    # 
+    # observeEvent(input$ch_logo_and_refresh, {
+    #   company_logo_path <-
+    #     file.path(parseFilePaths(volumes, input$company_logo))[4]
+    #   
+    #   file.copy(from = company_logo_path,
+    #             to = "www/company_logo.png",
+    #             overwrite = T)
+    #   
+    #   session$reload()
+    # })
     
    # Source AID Data ---------------------------------------------------------
     source("data/import_data.R")

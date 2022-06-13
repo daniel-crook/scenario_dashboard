@@ -84,8 +84,9 @@ ui <-  tagList(
         windowTitle = "Scenario Dashboard",
         position = "static-top",
         theme = my_theme,
-        tabPanel(h5(icon("fas fa-home"), strong("Home")),
+        tabPanel(title = h4(strong(icon("fas fa-home"), "Home")),
                  homepage_ui("homepage")),
+        navbarMenu(title = h4(strong("Austalia In Detail")),
         tabPanel(
             h5(icon("fas fa-chart-line"), strong("Variable Comparison")),
             tabsetPanel(
@@ -121,7 +122,8 @@ ui <-  tagList(
                 d_region_breakdown_ui("d_region_breakdown"),
                 d_total_increase_by_region_ui("d_total_increase_by_region")
             )
-        ),
+        )),
+        navbarMenu(title = h4(strong("Global Economic Model")),
         tabPanel(
             h5(icon("fas fa-globe-asia"), strong("GEM Checks")),
             tabsetPanel(
@@ -130,6 +132,11 @@ ui <-  tagList(
                 # gc_scenario_ui("gc_scenario"),
                 tabPanel("AC - % of GDP")
             )
+        )),
+        
+        tabPanel(
+          h4(strong(icon("fas fa-cog"), "Settings")),
+          settings_ui("settings")
         )
     )
 )
@@ -158,6 +165,8 @@ server <- function(input, output, session) {
     
     gc_version_server("gc_version", gem_data)
     # gc_scenario_server("gc_scenario", gem_data)
+    
+    settings_server("settings")
 }
 
 # 5.0 Run App -------------------------------------------------------------
