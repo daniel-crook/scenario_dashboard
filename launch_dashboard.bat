@@ -1,1 +1,1 @@
-"C:\Program Files\R\R-4.1.1\bin\R.exe" -e "shiny::runApp('C:\Users\dcrook\Documents\scenario_dashboard', launch.browser = TRUE)"
+"C:/Program Files/R/R-4.1.1/bin/Rscript.exe" -e "library(shiny); shiny::runApp('C:/Users/dcrook/Documents/scenario_dashboard', launch.browser = TRUE)"
