@@ -17,7 +17,8 @@ list.of.packages <-
         "kableExtra",
         "shinyFiles",
         "shinyjs",
-        "git2r"
+        "waiter",
+        "shinyFeedback"
     )
 
 new.packages <- list.of.packages[!(list.of.packages %in%
@@ -49,10 +50,6 @@ source("data/import_data.R")
 
 source("data/import_data_gem.R")
 
-# 0.3 Import GEM Data -----------------------------------------------------
-
-#source("data/import_scenario_table.R")
-
 # 1.0 Static Elements -----------------------------------------------------
 
 my_theme <- bs_theme(
@@ -74,19 +71,22 @@ source)
 # 3.0 UI ------------------------------------------------------------------
 
 ui <-  tagList(
-    #tags$head(tags$script(type = "text/javascript", src = "code.js")),
+    tags$head(tags$script(type = "text/javascript", src = "code.js")),
+    useWaiter(),
+    waiterPreloader(html = spin_folding_cube()),
     navbarPage(
         title = div(img(
-            src = 'AEMO logo.png',
+            src = 'company_logo.png',
             style = "margin-top: 0px",
-            height = 75
+            height = "75px"
         )),
         id = "navbar",
         windowTitle = "Scenario Dashboard",
         position = "static-top",
         theme = my_theme,
-        tabPanel(h5(icon("fas fa-home"), strong("Home")),
+        tabPanel(title = h4(strong(icon("fas fa-home"), "Home")),
                  homepage_ui("homepage")),
+        navbarMenu(title = h4(strong("Austalia In Detail")),
         tabPanel(
             h5(icon("fas fa-chart-line"), strong("Variable Comparison")),
             tabsetPanel(
@@ -112,7 +112,7 @@ ui <-  tagList(
                 ic_version_ui("ic_version"),
                 ic_scenario_ui("ic_scenario"),
                 ic_region_ui("ic_region"),
-                ic_variable_ui("ic_variable")
+                ic_industry_ui("ic_industry")
             )
         ),
         tabPanel(
@@ -122,15 +122,21 @@ ui <-  tagList(
                 d_region_breakdown_ui("d_region_breakdown"),
                 d_total_increase_by_region_ui("d_total_increase_by_region")
             )
-        ),
+        )),
+        navbarMenu(title = h4(strong("Global Economic Model")),
         tabPanel(
             h5(icon("fas fa-globe-asia"), strong("GEM Checks")),
             tabsetPanel(
                 type = "pills",
                 gc_version_ui("gc_version"),
-                gc_scenario_ui("gc_scenario"),
+                # gc_scenario_ui("gc_scenario"),
                 tabPanel("AC - % of GDP")
             )
+        )),
+        
+        tabPanel(
+          h4(strong(icon("fas fa-cog"), "Settings")),
+          settings_ui("settings")
         )
     )
 )
@@ -138,7 +144,8 @@ ui <-  tagList(
 # 4.0 Server --------------------------------------------------------------
 
 server <- function(input, output, session) {
-    data <- homepage_server("homepage")
+    
+    homepage_server("homepage")
     
     vc_version_server("vc_version", data)
     vc_scenario_server("vc_scenario", data)
@@ -151,13 +158,15 @@ server <- function(input, output, session) {
     ic_version_server("ic_version", data)
     ic_scenario_server("ic_scenario", data)
     ic_region_server("ic_region", data)
-    ic_variable_server("ic_variable", data)
+    ic_industry_server("ic_industry", data)
     
     d_region_breakdown_server("d_region_breakdown", data)
     d_total_increase_by_region_server("d_total_increase_by_region", data)
     
-    callModule(gc_version_server, "gc_version")
-    callModule(gc_scenario_server, "gc_scenario")
+    gc_version_server("gc_version", gem_data)
+    # gc_scenario_server("gc_scenario", gem_data)
+    
+    settings_server("settings")
 }
 
 # 5.0 Run App -------------------------------------------------------------
@@ -167,3 +176,4 @@ shinyApp(
     server = server,
     options = list(launch.browser = TRUE)
 )
+

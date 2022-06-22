@@ -4,6 +4,7 @@
 homepage_ui <- function(id) {
   ns = NS(id)
   tabPanel(
+    
     "Homepage",
     titlePanel(h1(
       strong("Welcome to the Scenario Dashboard")
@@ -16,19 +17,36 @@ homepage_ui <- function(id) {
     #   ))
     # ),
     h5(
-      "The dashboard has been designed to be used during scenario development, allowing for several comparisons between databases to be conducted (by version, by scenario or by region).
-      The dashboard also includes several off-platform calculated series for further checking of forecasts as well as CAGR/Period average calculations that may be useful during report writing.
-      We will continue to develop this dashboard, gradually generalising it so that it can be easily used across all projects and also by others."
+      "The Dashboard has been designed to be used for:",
+    
+    fluidRow(column(
+      4,
+      HTML(
+        "<ul>Several comparisons between databases to be conducted: <ul>
+                <li>By version</li>
+                <li>By scenario</li>
+                <li>By region</li>
+</ul>"
+      )
     ),
+column(
+  4,
+  HTML(
+    "<ul>Calculate several off-platform series to further check forecasts:<ul>
+                <li>Compound Annual Growth Rates
+                <li>Period average calculations"
+  )
+))),
+br(),
     fluidRow(column(
       6,
       wellPanel(
         style = paste0(
           "border: 5px solid; border-color:",
-          oxgraphs::ox_pallette()[9],
+          oxgraphs::ox_pallette()[2],
           "; margin-bottom: 0.5em"
         ),
-        h4(strong("Updating AID Data"),
+        h4(strong("Steps to update AID data"),
            uiOutput(ns(
              "aid_data_update_date"
            )), style = "margin-top: -0.5em"),
@@ -96,7 +114,109 @@ homepage_ui <- function(id) {
               "; color: white"
             )
           )
-        )))
+        )),
+        column(
+          8, h4(verbatimTextOutput(
+            ns("aid_data_refreshed"), placeholder = TRUE
+          ), style = "margin-top:0em")
+        )),
+        br(),
+        h4(strong("AID data is used in:"), style = "margin-top: -0.5em"),
+        fluidRow(column(
+          6, wellPanel(
+            style = paste0(
+              "border: 5px solid; border-color:",
+              oxgraphs::ox_pallette()[2],
+              "; margin-bottom: 0.5em"
+            ),
+            fluidRow(column(10, h4(
+              strong("Variable Comparison"),
+              style = paste0("border-color:",
+                             oxgraphs::ox_pallette()[2],
+                             "; color: black")
+            )),
+            column(2,
+                   h1(
+                     icon("fas fa-chart-line"),
+                     style = paste0(
+                       "border-color:",
+                       oxgraphs::ox_pallette()[2],
+                       "; color: black; margin-top: 0.1em"
+                     )
+                   ))),
+            h5(
+              "General comparison of level & growth forecasts of variables across scenarios: by version, scenario or region.",
+              style = paste0("color: black")
+            )
+          )
+        ),
+        column(
+          6,
+          wellPanel(
+            style = paste0(
+              "border: 5px solid; border-color:",
+              oxgraphs::ox_pallette()[2],
+              "; margin-bottom: 0.5em"
+            ),
+            fluidRow(column(10, h4(
+              strong("State Composition"),
+              style = paste0("color: black")
+            )),
+            column(2,
+                   h1(
+                     icon("fas fa-map-marked-alt"),
+                     style = paste0("color: black; margin-top: 0.1em")
+                   ))),
+            h5(
+              "Compare how the scenarios affect the state compositions for a particular variable: by version, scenario or region.",
+              style = paste0("color: black")
+            )
+          )
+        )),
+        fluidRow(column(
+          6, wellPanel(
+            style = paste0(
+              "border: 5px solid; border-color:",
+              oxgraphs::ox_pallette()[2],
+              "; margin-bottom: 0.5em"
+            ),
+            fluidRow(column(10, h4(
+              strong("Industry Comparison"),
+              style = paste0("color: black")
+            )),
+            column(2,
+                   h1(
+                     icon("fas fa-industry"),
+                     style = paste0("color: black; margin-top: 0.1em")
+                   ))),
+            h5(
+              "Compare how the scenarios affect an industries GVA share for a region: by version, scenario or region.",
+              style = paste0("color: black")
+            )
+          )
+        ),
+        column(
+          6, wellPanel(
+            style = paste0(
+              "border: 5px solid; border-color:",
+              oxgraphs::ox_pallette()[2],
+              "; margin-bottom: 0.5em"
+            ),
+            fluidRow(column(10, h4(
+              strong("Demographics"),
+              style = paste0("color: black")
+            )),
+            column(2,
+                   h1(
+                     icon("fas fa-user"),
+                     style = paste0("color: black; margin-top: 0.1em")
+                   ))),
+            h5(
+              "Compare the demographic outlook across scenarios, with a further breakdown on population growth.",
+              style = paste0("color: black")
+            )
+          )
+        )),
       )
     ),
     column(
@@ -104,10 +224,10 @@ homepage_ui <- function(id) {
       wellPanel(
         style = paste0(
           "border: 5px solid; border-color:",
-          oxgraphs::ox_pallette()[9],
+          oxgraphs::ox_pallette()[1],
           "; margin-bottom: 0.5em"
         ),
-        h4(strong("Updating GEM Data"),
+        h4(strong("Steps to update GEM data"),
            uiOutput(ns(
              "gem_data_update_date"
            )), style = "margin-top: -0.5em"),
@@ -175,7 +295,35 @@ homepage_ui <- function(id) {
               "; color: white"
             )
           )
-        )))
+        )), column(
+          8, h4(verbatimTextOutput(
+            ns("gem_data_refreshed"), placeholder = TRUE
+          ), style = "margin-top:0em")
+        )),
+        br(),
+        h4(strong("GEM data is used in:"), style = "margin-top: -0.5em"),
+        fluidRow(column(
+          6, wellPanel(
+            style = paste0(
+              "border: 5px solid; border-color:",
+              oxgraphs::ox_pallette()[1],
+              "; margin-bottom: 0.5em"
+            ),
+            fluidRow(column(10, h4(
+              strong("GEM Checks"),
+              style = paste0("color: black")
+            )),
+            column(2,
+                   h1(
+                     icon("fas fa-globe-asia"),
+                     style = paste0("color: black; margin-top: 0.1em")
+                   ))),
+            h5(
+              "General variable of GEM variables across scenarios as well as energy specific charts: by version, scenario or region.",
+              style = paste0("color: black")
+            )
+          )
+        ))
       )
     )),
     fluidRow(column(3, h4(
@@ -194,199 +342,43 @@ homepage_ui <- function(id) {
         format = "%d %b %Y %I:%M %p"
       )
     ))),
-    fluidRow(
-      column(3,
-             wellPanel(
-               style = paste0(
-                 "border: 5px solid; background-color:",
-                 oxgraphs::ox_pallette()[1],
-                 "; border-color:",
-                 oxgraphs::ox_pallette()[1],
-                 "; margin-bottom: 0.5em"
-               ),
-               fluidRow(column(10, h4(
-                 strong("Variable Comparison"),
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[1],
-                   "; color: white"
-                 )
-               )),
-               column(2,
-                      h1(
-                        icon("fas fa-chart-line"),
-                        style = paste0(
-                          "background-color:",
-                          oxgraphs::ox_pallette()[1],
-                          "; color: white; margin-top: 0.1em"
-                        )
-                      ))),
-               h5(
-                 "General comparison of AID variables across scenarios: by version, scenario or region.",
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[1],
-                   "; color: white"
-                 )
-               )
-             )),
-      column(3,
-             wellPanel(
-               style = paste0(
-                 "border: 5px solid; background-color:",
-                 oxgraphs::ox_pallette()[2],
-                 "; border-color:",
-                 oxgraphs::ox_pallette()[2],
-                 "; margin-bottom: 0.5em"
-               ),
-               fluidRow(column(10, h4(
-                 strong("State Composition"),
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[2],
-                   "; color: white"
-                 )
-               )),
-               column(2,
-                      h1(
-                        icon("fas fa-map-marked-alt"),
-                        style = paste0(
-                          "background-color:",
-                          oxgraphs::ox_pallette()[2],
-                          "; color: white; margin-top: 0.1em"
-                        )
-                      ))),
-               h5(
-                 "Compare how the scenarios affect the state compositions for a particular variable: by version, scenario or region.",
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[2],
-                   "; color: white"
-                 )
-               )
-             )),
-      column(3,
-             wellPanel(
-               style = paste0(
-                 "border: 5px solid; background-color:",
-                 oxgraphs::ox_pallette()[3],
-                 "; border-color:",
-                 oxgraphs::ox_pallette()[3],
-                 "; margin-bottom: 0.5em"
-               ),
-               fluidRow(column(10, h4(
-                 strong("Industry Comparison"),
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[3],
-                   "; color: white"
-                 )
-               )),
-               column(2,
-                      h1(
-                        icon("fas fa-industry"),
-                        style = paste0(
-                          "background-color:",
-                          oxgraphs::ox_pallette()[3],
-                          "; color: white; margin-top: 0.1em"
-                        )
-                      ))),
-               h5(
-                 "Compare how the scenarios affect an industries GVA share for a region: by version, scenario or region.",
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[3],
-                   "; color: white"
-                 )
-               )
-             )),
-      column(3,
-             wellPanel(
-               style = paste0(
-                 "border: 5px solid; background-color:",
-                 oxgraphs::ox_pallette()[4],
-                 "; border-color:",
-                 oxgraphs::ox_pallette()[4],
-                 "; margin-bottom: 0.5em"
-               ),
-               fluidRow(column(10, h4(
-                 strong("Demographics"),
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[4],
-                   "; color: white"
-                 )
-               )),
-               column(2,
-                      h1(
-                        icon("fas fa-user"),
-                        style = paste0(
-                          "background-color:",
-                          oxgraphs::ox_pallette()[4],
-                          "; color: white; margin-top: 0.1em"
-                        )
-                      ))),
-               h5(
-                 "Compare the demographic outlook across scenarios, with a further breakdown on population growth.",
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[4],
-                   "; color: white"
-                 )
-               )
-             )),
-      column(3,
-             wellPanel(
-               style = paste0(
-                 "border: 5px solid; background-color:",
-                 oxgraphs::ox_pallette()[5],
-                 "; border-color:",
-                 oxgraphs::ox_pallette()[5],
-                 "; margin-bottom: 0.5em"
-               ),
-               fluidRow(column(10, h4(
-                 strong("GEM Checks"),
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[5],
-                   "; color: white"
-                 )
-               )),
-               column(2,
-                      h1(
-                        icon("fas fa-globe-asia"),
-                        style = paste0(
-                          "background-color:",
-                          oxgraphs::ox_pallette()[5],
-                          "; color: white; margin-top: 0.1em"
-                        )
-                      ))),
-               h5(
-                 "General variable of GEM variables across scenarios as well as energy specific charts: by version, scenario or region.",
-                 style = paste0(
-                   "background-color:",
-                   oxgraphs::ox_pallette()[5],
-                   "; color: white"
-                 )
-               )
-             )),
-    ),
-    # wellPanel(
-    #   style = paste0(
-    #     "border: 5px solid; border-color:",
-    #     oxgraphs::ox_pallette()[9],
-    #     "; margin-bottom: 0.5em"
-    #   ),
-    #   h3(strong("Scenario Descriptions:")),
-    #   tableOutput(ns("Table"))
-    # )
+  # fluidRow(column(2, 
+  #                 shinyFilesButton(
+  #                   ns("company_logo"),
+  #                   "Select Company Logo",
+  #                   "Please select a Company logo image file",
+  #                   multiple = F,
+  #                   buttonType = 'md',
+  #                   style = paste0(
+  #                     "background-color:",
+  #                     oxgraphs::ox_pallette()[3],
+  #                     "; color: white"
+  #                   )
+  #                 )),
+  #          column(
+  #            5, h4(verbatimTextOutput(ns(
+  #              "company_logopath"
+  #            ), placeholder = TRUE), style = "margin-top:0em")
+  #          ),
+  #          column(3,
+  #                 actionButton(
+  #                   ns("ch_logo_and_refresh"),
+  #                   label = "Change Logo & Refresh",
+  #                   style = paste0(
+  #                     "background-color:",
+  #                     oxgraphs::ox_pallette()[3],
+  #                     "; color: white"
+  #                   )
+  #                 ))
+  #          )
   )
 }
 
 # 2.0 Module Server -------------------------------------------------------
 
 homepage_server <- function(id) {
-  moduleServer(id, function(input, output, session, data) {
+  moduleServer(id, function(input, output, session, data, gem_data) {
+    
     # Scenario Description Table ----------------------------------------------
     observe({
       output$Table <- function() {
@@ -402,8 +394,9 @@ homepage_server <- function(id) {
     
     # Shiny AID Directory/File Select -----------------------------------------
     
+    volumes <- getVolumes()()
+    
     observe({
-      volumes <- getVolumes()()
       shinyDirChoose(
         input,
         "aid_directory",
@@ -436,12 +429,12 @@ homepage_server <- function(id) {
     # Shiny GEM Directory/File Select -----------------------------------------
     
     observe({
-      volumes <- getVolumes()()
       shinyDirChoose(
         input,
         "gem_directory",
         roots = volumes,
         session = session,
+        filetypes=c('db'),
         restrictions = system.file(package = "base"),
         allowDirCreate = FALSE
       )
@@ -451,6 +444,7 @@ homepage_server <- function(id) {
         "gem_file",
         roots = volumes,
         session = session,
+        filetypes=c('db'),
         restrictions = system.file(package = "base")
       )
       
@@ -477,10 +471,36 @@ homepage_server <- function(id) {
         })
     })
     
+    # Process GEM db ----------------------------------------------------------
+    
+    observeEvent(input$gem_process_folder_file, {
+      source("data processing/DataProcessing_GEM.R",
+             local = TRUE)
+      output$gem_data_processed <-
+        renderPrint({
+          "Data process complete"
+        })
+    })
+    
     # Refresh AID Button ------------------------------------------------------
     
     observeEvent(input$aid_refresh, {
+      output$aid_data_refreshed <-
+        renderPrint({
+          "Refreshing Dashboard..."
+        })
       source("data/refresh_AID_data.R", local = TRUE)
+      session$reload()
+    })
+    
+    # Refresh GEM Button ------------------------------------------------------
+    
+    observeEvent(input$gem_refresh, {
+      output$gem_data_refreshed <-
+        renderPrint({
+          "Refreshing Dashboard..."
+        })
+      source("data/refresh_GEM_data.R", local = TRUE)
       session$reload()
     })
     
@@ -495,9 +515,7 @@ homepage_server <- function(id) {
         })
     })
     
-    
-    
-    # AID data last updated output --------------------------------------------
+    # GEM data last updated output --------------------------------------------
     
     observe({
       output$gem_data_update_date <-
@@ -509,8 +527,44 @@ homepage_server <- function(id) {
         })
     })
     
-    # Source Data -------------------------------------------------------------
-    source("data/import_data.R", local = TRUE)
-    return(data)
+    # # Company Logo Button -----------------------------------------------------
+    # observe({
+    #   shinyFileChoose(
+    #     input,
+    #     "company_logo",
+    #     roots = volumes,
+    #     session = session,
+    #     filetypes=c('png','jpeg'),
+    #     restrictions = system.file(package = "base")
+    #   )
+    #   
+    #   output$company_logopath <- renderPrint({
+    #     if (is.integer(input$company_logo)) {
+    #       cat("Please select a folder/file")
+    #     } else if (!(is.integer(input$company_log))) {
+    #       file.path(parseFilePaths(volumes, input$company_logo))[4]
+    #     }
+    #   })
+    # })
+    # 
+    # # Change Logo & Refresh ---------------------------------------------------
+    # 
+    # observeEvent(input$ch_logo_and_refresh, {
+    #   company_logo_path <-
+    #     file.path(parseFilePaths(volumes, input$company_logo))[4]
+    #   
+    #   file.copy(from = company_logo_path,
+    #             to = "www/company_logo.png",
+    #             overwrite = T)
+    #   
+    #   session$reload()
+    # })
+    
+   # Source AID Data ---------------------------------------------------------
+    source("data/import_data.R")
+    
+    # Source GEM Data ---------------------------------------------------------
+    source("data/import_data_gem.R")
   })
+  
 }

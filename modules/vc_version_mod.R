@@ -270,7 +270,7 @@ vc_version_server <- function(id, data) {
             x = data[(data$FORECAST_FLAG == "EA") &
                        (data$variable == input$Selections[1]), "Dates"],
             y = 1,
-            text = "              Forecast",
+            text = "               Forecast",
             yref = "paper",
             showarrow = FALSE
           ) %>% 
