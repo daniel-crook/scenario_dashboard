@@ -328,14 +328,14 @@ ic_version_server <- function(id, data) {
                 ) %>%
                 add_annotations(
                   x = data[(data$FORECAST_FLAG == "EA") &
-                             (data$variable == input$Selections), "Dates"],
+                             (data$variable == input$Selections[1]), "Dates"],
                   y = 1,
                   text = "              Forecast",
                   yref = "paper",
                   showarrow = FALSE
                 ) %>% 
                 add_annotations(
-                  x = min(ic_version_data$Dates[!is.na(ic_version_data[[input$Selections[1]]])]),
+                  x = min(ic_version_data$Dates),
                   y = 1.035,
                   text = "% of Total GVA",
                   yref = "paper",

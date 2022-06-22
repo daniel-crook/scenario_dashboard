@@ -89,6 +89,7 @@ ui <-  tagList(
         navbarMenu(title = h4(strong("Austalia In Detail")),
         tabPanel(
             h5(icon("fas fa-chart-line"), strong("Variable Comparison")),
+            titlePanel(h1(icon("fas fa-chart-line"), "Variable Comparison")),
             tabsetPanel(
                 type = "pills",
                 vc_version_ui("vc_version"),
@@ -98,6 +99,8 @@ ui <-  tagList(
         ),
         tabPanel(
             h5(icon("fas fa-map-marked-alt"), strong("State Composition")),
+            titlePanel(h1(icon("fas fa-map-marked-alt"), "State Composition")),
+            br(),
             tabsetPanel(
                 type = "pills",
                 sc_version_ui("sc_version"),
@@ -107,6 +110,7 @@ ui <-  tagList(
         ),
         tabPanel(
             h5(icon("fas fa-industry"), strong("Industry Comparison")),
+            titlePanel(h1(icon("fas fa-industry"), "Industry Comparison")),
             tabsetPanel(
                 type = "pills",
                 ic_version_ui("ic_version"),
@@ -117,6 +121,7 @@ ui <-  tagList(
         ),
         tabPanel(
             h5(icon("fas fa-user"), strong("Demographics")),
+            titlePanel(h1(icon("fas fa-user"), "Demographics")),
             tabsetPanel(
                 type = "pills",
                 d_region_breakdown_ui("d_region_breakdown"),
