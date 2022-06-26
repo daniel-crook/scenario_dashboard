@@ -310,7 +310,7 @@ br(),
               "; margin-bottom: 0.5em"
             ),
             fluidRow(column(10, h4(
-              strong("GEM Checks"),
+              strong("Macro Comparison"),
               style = paste0("color: black")
             )),
             column(2,

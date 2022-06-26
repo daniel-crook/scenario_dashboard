@@ -359,7 +359,8 @@ vc_version_server <- function(id, data) {
       if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
                                data$STATE == input$State &
                                data$ATTRIBUTE == input$Attribute &
-                               data$RELEASE_VERSION %in% input$Selections]) == length(variables$variable)) {
+                               data$RELEASE_VERSION %in% input$Selections]) >= 1 &
+          all(variables$variable %in% data$variable)) {
       
       if (length(variables$variable) >= 2) {
         for (i in 2:length(variables$variable)) {

@@ -34,6 +34,7 @@ vc_scenario_ui <- function(id) {
                        ns("state_national"),
                        NULL,
                        c("State", "Aus"),
+                       selected = "Aus",
                        justified = TRUE,
                        status = "primary"
                      )

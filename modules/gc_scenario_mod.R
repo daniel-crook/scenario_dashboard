@@ -17,23 +17,34 @@ gc_scenario_ui <- function(id) {
                    3, h4("Display:", style = "margin-top: -0.5em")
                  )),
                  fluidRow(column(
-                   5,
+                   6,
                    radioGroupButtons(
                      ns("display"),
                      NULL,
-                     c("Levels", "% y/y"),
+                     c("Levels", "% y/y", "% q/q"),
                      selected = "% y/y",
                      justified = TRUE,
                      status = "primary"
                    )
                  ),
                  column(
-                   5,
+                   6,
                    radioGroupButtons(
                      inputId = ns("title"),
                      NULL,
                      c("Title On", "Title Off"),
                      selected = "Title On",
+                     justified = TRUE,
+                     status = "primary"
+                   )
+                 ),
+                 column(
+                   10,
+                   radioGroupButtons(
+                     ns("P_T_A"),
+                     NULL,
+                     c("Point", "Annual Total", "Annual Average"),
+                     selected = "Point",
                      justified = TRUE,
                      status = "primary"
                    )
@@ -51,7 +62,7 @@ gc_scenario_ui <- function(id) {
                    12,
                    selectInput(
                      ns("Attribute"),
-                     label = h4("State", style = "margin-bottom:-0.1em"),
+                     label = h4("Attribute", style = "margin-bottom:-0.1em"),
                      var_list,
                      selectize = FALSE
                    )
@@ -100,21 +111,26 @@ gc_scenario_ui <- function(id) {
 
 # 2.0 Module Server -------------------------------------------------------
 
-gc_scenario_server <- function(input, output, session) {
-  
+gc_scenario_server <- function(id, gem_data) {
+  moduleServer(id, function(input, output, session) {
   # Update checkboxgroup options based on selected inputs -------------------
   observe({
-    if (length(gem_data$variable[gem_data$Attribute == input$Attribute]) >= 1) {
-      gem_data_f <- filter(gem_data, gem_data$Attribute == input$Attribute)
-      
+    if (input$Attribute %in% gem_data$Attribute) {
+      gem_data_f <- filter(gem_data, gem_data$Attribute == input$Attribute[1])
+
       sv_list <-
-        unique(gem_data_f[c("Scenario", "Release")]) %>% mutate(Release = as.yearqtr(Release, format = "Q%q %Y"))
-      
+        unique(gem_data_f[c("Scenario", "Release")]) %>% separate(Release, c('Release_Date', 'Version'))
+
+      sv_list$Release_Date <-
+        parse_date_time(sv_list$Release_Date, "my")
+
       sv_list <-
         arrange(sv_list,
                 Scenario,
-                desc(Release)) %>%
-        mutate(Release = format(Release, format = "Q%q %Y")) %>%
+                desc(Release_Date),
+                desc(Version)) %>%
+        transmute(Scenario,
+                  Release = paste(format(Release_Date, format = "%b%y"), Version, sep = " ")) %>%
         distinct(Scenario, .keep_all = TRUE)
 
       version_list <-
@@ -122,14 +138,19 @@ gc_scenario_server <- function(input, output, session) {
           Attribute = input$Attribute,
           Scenario = sv_list$Scenario,
           Release = sv_list$Release
-        ) %>% add.var.col.gem(.)
-      
+        ) %>%
+        add.var.col.gem(.)
+
       updatePrettyCheckboxGroup(
         session,
         "Selections",
         label = NULL,
         version_list$variable,
-        selected = version_list$variable,
+        selected = if (length(version_list$variable) >= 3) {
+          version_list$variable[1:3]
+        } else {
+          version_list$variable[1]
+        },
         prettyOptions = list(
           shape = "round",
           outline = TRUE,
@@ -146,13 +167,16 @@ gc_scenario_server <- function(input, output, session) {
       transmute(., Dates,
                 variable,
                 value = round(as.numeric(value), 2))
-    if (unique(gem_data$Aggregation[gem_data$variable %in% input$Selections]) == "Sum") {
+    if (input$P_T_A == "Annual Total") {
       gc_scenario_data <- trail_sum(gc_scenario_data)
-    } else if (unique(gem_data$Aggregation[gem_data$variable %in% input$Selections]) == "Avg") {
+    } else if (input$P_T_A == "Annual Average") {
       gc_scenario_data <- trail_avg(gc_scenario_data)
     }
     if (input$display == "% y/y") {
       gc_scenario_data <- growth(gc_scenario_data, 4)
+    }
+    if (input$display == "% q/q") {
+      gc_scenario_data <- growth(gc_scenario_data, 1)
     }
     gc_scenario_data <-
       mutate(gc_scenario_data, value = round(value, 2)) %>%
@@ -183,7 +207,7 @@ gc_scenario_server <- function(input, output, session) {
           ticks = "outside",
           tickcolor = "#495057",
           tickformat = ",",
-          ticksuffix = if(input$display == "% y/y"){"%"} else {NULL}
+          ticksuffix = if(input$display == "% y/y" | input$display == "% q/q"){"%"} else {NULL}
           ),
           xaxis = list(
             title = "",
@@ -208,14 +232,16 @@ gc_scenario_server <- function(input, output, session) {
           text = "              Forecast",
           yref = "paper",
           showarrow = FALSE
-        ) %>% 
+        ) %>%
         add_annotations(
           x = min(gc_scenario_data$Dates[!is.na(gc_scenario_data[[input$Selections[1]]])]),
           y = 1.035,
           text = if (input$display == "% y/y") {
             "% y/y"
+          } else if (input$display == "% q/q") {
+            "% q/q"
           } else {
-            unique(gem_data$Units[gem_data$variable == gc_version_input[1]])
+            unique(gem_data$Units[gem_data$variable == gc_scenario_input[1]])
           },
           yref = "paper",
           xanchor = "left",
@@ -230,7 +256,7 @@ gc_scenario_server <- function(input, output, session) {
             hoverlabel = list(namelength = -1)
           )
         }
-      } 
+      }
       if (input$title == "Title On") {
         fig <- fig %>%
           layout(title = list(
@@ -252,6 +278,7 @@ gc_scenario_server <- function(input, output, session) {
   })
 
   # Render Table ------------------------------------------------------------
+  
   observe({
 
     cagr_dates <-
@@ -310,7 +337,7 @@ gc_scenario_server <- function(input, output, session) {
 
       vc_version_table_data1 <-
         rbind(vc_version_table_data1, vc_version_table_data2)
-      
+
       names(vc_version_table_data1) <-
         gsub(paste0(input$Attribute,", "),"",
              names(vc_version_table_data1))
@@ -318,19 +345,7 @@ gc_scenario_server <- function(input, output, session) {
     },
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
   })
+    
+  })
 }
 
-# 3.0 Test Module ---------------------------------------------------------
-
-# gc_scenario_demo <- function() {
-#
-#   select <- data.frame(SCENARIO_VALUE = c("CENTRAL","EXPORT_SUPERPOWER","SUSTAINABLE_GROWTH","RAPID_DECARB"))
-#   ui <- navbarPage("Module Demo",
-#                    gc_scenario_ui("Version", "By Region"))
-#   server <- function(input, output, session) {
-#     callModule(gc_scenario_server,"Version")
-#     }
-#   shinyApp(ui, server)
-# }
-#
-# gc_scenario_demo()

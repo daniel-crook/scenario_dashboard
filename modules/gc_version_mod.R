@@ -1,6 +1,4 @@
 
-
-
 # 1.0 Module UI -----------------------------------------------------------
 
 gc_version_ui <- function(id) {
@@ -18,31 +16,40 @@ gc_version_ui <- function(id) {
                  fluidRow(column(
                    3, h4("Display:", style = "margin-top: -0.5em")
                  )),
-                 fluidRow(
-                   column(
-                     5,
-                     radioGroupButtons(
-                       ns("display"),
-                       NULL,
-                       c("Levels", "% y/y"),
-                       selected = "% y/y",
-                       justified = TRUE,
-                       status = "primary"
-                     )
-                   ),
-                   column(
-                     5,
-                     radioGroupButtons(
-                       inputId = ns("title"),
-                       NULL,
-                       c("Title On", "Title Off"),
-                       selected = "Title On",
-                       justified = TRUE,
-                       status = "primary"
-                     )
-                   ),
-                   style = "margin-bottom:-2.0em"
-                 )
+                 fluidRow(column(
+                   6,
+                   radioGroupButtons(
+                     ns("display"),
+                     NULL,
+                     c("Levels", "% y/y", "% q/q"),
+                     selected = "% y/y",
+                     justified = TRUE,
+                     status = "primary"
+                   )
+                 ),
+                 column(
+                   6,
+                   radioGroupButtons(
+                     inputId = ns("title"),
+                     NULL,
+                     c("Title On", "Title Off"),
+                     selected = "Title On",
+                     justified = TRUE,
+                     status = "primary"
+                   )
+                 ),
+                 column(
+                   10,
+                   radioGroupButtons(
+                     ns("P_T_A"),
+                     NULL,
+                     c("Point", "Annual Total", "Annual Average"),
+                     selected = "Point",
+                     justified = TRUE,
+                     status = "primary"
+                   )
+                 ),
+                 style = "margin-bottom:-2.0em")
                ),
                wellPanel(
                  style = paste0(
@@ -63,7 +70,7 @@ gc_version_ui <- function(id) {
                    7,
                    selectInput(
                      ns("Attribute"),
-                     label = h4("State", style = "margin-bottom:-0.1em"),
+                     label = h4("Attribute", style = "margin-bottom:-0.1em"),
                      var_list,
                      selectize = FALSE
                    )
@@ -123,7 +130,6 @@ gc_version_server <- function(id, gem_data) {
       shinyFeedback::feedbackWarning(!start, paste0("Please select a year greater than ",min(unique(gem_data$Dates))))
     })
     
-    
     # Update checkboxgroup options based on selected inputs -------------------
     observe({
       if (length(gem_data$variable[gem_data$Scenario == input$Scenario &
@@ -172,13 +178,16 @@ gc_version_server <- function(id, gem_data) {
                   variable,
                   value = round(as.numeric(value), 2))
       
-      if (unique(gem_data$Aggregation[gem_data$variable %in% input$Selections]) == "Sum") {
+      if (input$P_T_A == "Annual Total") {
         gc_version_data <- trail_sum(gc_version_data)
-      } else if (unique(gem_data$Aggregation[gem_data$variable %in% input$Selections]) == "Avg") {
+      } else if (input$P_T_A == "Annual Average") {
         gc_version_data <- trail_avg(gc_version_data)
       }
       if (input$display == "% y/y") {
         gc_version_data <- growth(gc_version_data, 4)
+      }
+      if (input$display == "% q/q") {
+        gc_version_data <- growth(gc_version_data, 1)
       }
       gc_version_data <-
         mutate(gc_version_data, value = round(value, 2)) %>%
@@ -209,11 +218,7 @@ gc_version_server <- function(id, gem_data) {
               ticks = "outside",
               tickcolor = "#495057",
               tickformat = ",",
-              ticksuffix = if (input$display == "% y/y") {
-                "%"
-              } else {
-                NULL
-              }
+              ticksuffix = if(input$display == "% y/y" | input$display == "% q/q"){"%"} else {NULL}
             ),
             xaxis = list(
               title = "",
@@ -250,6 +255,8 @@ gc_version_server <- function(id, gem_data) {
             y = 1.035,
             text = if (input$display == "% y/y") {
               "% y/y"
+            } else if (input$display == "% q/q") {
+              "% q/q"
             } else {
               unique(gem_data$Units[gem_data$variable == gc_version_input[1]])
             },

@@ -165,7 +165,7 @@ ic_region_server <- function(id, data) {
   
   # Big 4 Button ------------------------------------------------------------
   observeEvent(input$big4, {
-    states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+    states <- c("AUS","NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
     
     version_list <-
       data.frame(
@@ -181,7 +181,7 @@ ic_region_server <- function(id, data) {
       "Selections",
       label = NULL,
       as.list(version_list$variable),
-      selected = as.list(version_list$variable[1:4]),
+      selected = as.list(version_list$variable[1:5]),
       prettyOptions = list(
         shape = "round",
         outline = TRUE,
@@ -192,7 +192,7 @@ ic_region_server <- function(id, data) {
   
   # Small 4 Button ----------------------------------------------------------
   observeEvent(input$small4, {
-    states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+    states <- c("AUS","NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
     
     version_list <-
       data.frame(
@@ -208,7 +208,7 @@ ic_region_server <- function(id, data) {
       "Selections",
       label = NULL,
       as.list(version_list$variable),
-      selected = as.list(version_list$variable[5:8]),
+      selected = as.list(version_list$variable[c(1,6:9)]),
       prettyOptions = list(
         shape = "round",
         outline = TRUE,
@@ -219,7 +219,7 @@ ic_region_server <- function(id, data) {
   
   # All States Button -------------------------------------------------------
   observeEvent(input$all, {
-    states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+    states <- c("AUS","NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
     
     version_list <-
       data.frame(
@@ -235,7 +235,7 @@ ic_region_server <- function(id, data) {
       "Selections",
       label = NULL,
       as.list(version_list$variable),
-      selected = as.list(version_list$variable[1:8]),
+      selected = as.list(version_list$variable[1:9]),
       prettyOptions = list(
         shape = "round",
         outline = TRUE,
@@ -249,7 +249,7 @@ ic_region_server <- function(id, data) {
     if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
                              data$RELEASE_VERSION == input$Version &
                              data$ATTRIBUTE == input$Attribute]) >= 1) {
-      states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+      states <- c("AUS","NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
       
       version_list <-
         data.frame(
@@ -268,7 +268,7 @@ ic_region_server <- function(id, data) {
         "Selections",
         label = NULL,
         as.list(version_list$variable),
-        selected = as.list(version_list$variable[1:4]),
+        selected = as.list(version_list$variable[1:5]),
         prettyOptions = list(
           shape = "round",
           outline = TRUE,

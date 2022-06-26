@@ -130,15 +130,14 @@ ui <-  tagList(
         )),
         navbarMenu(title = h4(strong("Global Economic Model")),
         tabPanel(
-            h5(icon("fas fa-globe-asia"), strong("GEM Checks")),
+            h5(icon("fas fa-globe-asia"), strong("Macro Comparison")),
+            titlePanel(h1(icon("fas fa-globe-asia"), "Macro Comparison")),
             tabsetPanel(
                 type = "pills",
                 gc_version_ui("gc_version"),
-                # gc_scenario_ui("gc_scenario"),
-                tabPanel("AC - % of GDP")
+                gc_scenario_ui("gc_scenario")
             )
         )),
-        
         tabPanel(
           h4(strong(icon("fas fa-cog"), "Settings")),
           settings_ui("settings")
@@ -169,7 +168,7 @@ server <- function(input, output, session) {
     d_total_increase_by_region_server("d_total_increase_by_region", data)
     
     gc_version_server("gc_version", gem_data)
-    # gc_scenario_server("gc_scenario", gem_data)
+    gc_scenario_server("gc_scenario", gem_data)
     
     settings_server("settings")
 }
