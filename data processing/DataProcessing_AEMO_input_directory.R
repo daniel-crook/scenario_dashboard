@@ -372,17 +372,24 @@ for (i in file) {
           dplyr::select(-Series, -Division)  %>%
           tidyr::spread(key = Series_ID, value = value) %>%
           dplyr::mutate(SFDLCC = CLCC + GCLCC + IFLCC + GILCC) %>%
-          dplyr::mutate(INDPRODLCC = GVACLCC + GVADLCC + GVAELCC) %>%
-          dplyr::mutate(
-            SVCSGVALCC = GVAG1LCC + GVAG2LCC + GVAHLCC + GVAI1LCC +
+          dplyr::mutate(INDPRODLCC = GVACLCC + GVADLCC + GVAELCC)
+          names <- names(temp_df)
+          temp_df <- temp_df %>% mutate(
+            SVCSGVALCC = if("GVAOLCC" %in% names) {GVAG1LCC + GVAG2LCC + GVAHLCC + GVAI1LCC +
               GVAI2LCC + GVAJLCC + GVAK1LCC + GVAK2LCC + GVAK3LCC +
-              GVALLCC + GVAMLCC + GVANLCC + GVAOLCC + GVAPLCC
+              GVALLCC + GVAMLCC + GVANLCC + GVAOLCC + GVAPLCC} else {
+                GVAG1LCC + GVAG2LCC + GVAHLCC + GVAI1LCC +
+                  GVAI2LCC + GVAJLCC + GVAK1LCC + GVAK2LCC + GVAK3LCC +
+                  GVALLCC + GVAMLCC + GVANLCC +GVAO_PLCC
+              }
           ) 
+          if("NATTOT" %in% names) {
         if(j == "AUS") {temp_df <- temp_df %>%
           dplyr::mutate(
             POPINC = NOMTOT + NATTOT)} else {temp_df <- temp_df %>%
                                               dplyr::mutate(
                                                 POPINC = NOMTOT + NATTOT + NIMTOT)}
+          }
         temp_df <- temp_df %>%
           dplyr::select(-GCLCC, -CLCC, -GILCC, -IFLCC) %>%
           tidyr::gather(key = Series_ID,

@@ -170,16 +170,17 @@ vc_region_server <- function(id, data) {
     })
 
 # Update Checkgroup options based on selected inputs ----------------------
-
+   
     observe({
       if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
                                data$RELEASE_VERSION == input$Version &
                                data$ATTRIBUTE == input$Attribute]) >= 1) {
-        states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+        states <- c("AUS","NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
         
         version_list <-
           data.frame(
-            ATTRIBUTE = input$Attribute,
+            ATTRIBUTE = c(unique(data$ATTRIBUTE[data$STATE == "AUS" & data$Series_ID == unique(data$Series_ID[data$ATTRIBUTE == input$Attribute])]),
+                          rep(input$Attribute,length(states)-1)),
             STATE = states,
             SCENARIO_VALUE = input$Scenario,
             RELEASE_VERSION = input$Version
@@ -191,7 +192,7 @@ vc_region_server <- function(id, data) {
           "Selections",
           label = NULL,
           as.list(version_list$variable),
-          selected = as.list(version_list$variable[1:4]),
+          selected = as.list(version_list$variable[1:5]),
           prettyOptions = list(
             shape = "round",
             outline = TRUE,
@@ -204,23 +205,24 @@ vc_region_server <- function(id, data) {
 # Big State Button --------------------------------------------------------
 
     observeEvent(input$big4, {
-      states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
-      
+      states <- c("AUS" ,"NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+
       version_list <-
         data.frame(
-          ATTRIBUTE = input$Attribute,
+          ATTRIBUTE = c(unique(data$ATTRIBUTE[data$STATE == "AUS" & data$Series_ID == unique(data$Series_ID[data$ATTRIBUTE == input$Attribute])]),
+                        rep(input$Attribute,length(states)-1)),
           STATE = states,
           SCENARIO_VALUE = input$Scenario,
           RELEASE_VERSION = input$Version
         )  %>%
         add.var.col(.)
-      
+
       updatePrettyCheckboxGroup(
         session,
         "Selections",
         label = NULL,
         as.list(version_list$variable),
-        selected = as.list(version_list$variable[1:4]),
+        selected = as.list(version_list$variable[1:5]),
         prettyOptions = list(
           shape = "round",
           outline = TRUE,
@@ -228,27 +230,28 @@ vc_region_server <- function(id, data) {
         )
       )
     })
-    
+
 # Small States Button -----------------------------------------------------
 
     observeEvent(input$small4, {
-      states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
-      
+      states <- c("AUS" ,"NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+
       version_list <-
         data.frame(
-          ATTRIBUTE = input$Attribute,
+          ATTRIBUTE = c(unique(data$ATTRIBUTE[data$STATE == "AUS" & data$Series_ID == unique(data$Series_ID[data$ATTRIBUTE == input$Attribute])]),
+                        rep(input$Attribute,length(states)-1)),
           STATE = states,
           SCENARIO_VALUE = input$Scenario,
           RELEASE_VERSION = input$Version
         )  %>%
         add.var.col(.)
-      
+
       updatePrettyCheckboxGroup(
         session,
         "Selections",
         label = NULL,
         as.list(version_list$variable),
-        selected = as.list(version_list$variable[5:8]),
+        selected = as.list(version_list$variable[c(1,6:9)]),
         prettyOptions = list(
           shape = "round",
           outline = TRUE,
@@ -256,27 +259,28 @@ vc_region_server <- function(id, data) {
         )
       )
     })
-    
+
 # All States Button -------------------------------------------------------
 
     observeEvent(input$all, {
-      states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
-      
+      states <- c("AUS" ,"NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
+
       version_list <-
         data.frame(
-          ATTRIBUTE = input$Attribute,
+          ATTRIBUTE = c(unique(data$ATTRIBUTE[data$STATE == "AUS" & data$Series_ID == unique(data$Series_ID[data$ATTRIBUTE == input$Attribute])]),
+                        rep(input$Attribute,length(states)-1)),
           STATE = states,
           SCENARIO_VALUE = input$Scenario,
           RELEASE_VERSION = input$Version
         )  %>%
         add.var.col(.)
-      
+
       updatePrettyCheckboxGroup(
         session,
         "Selections",
         label = NULL,
         as.list(version_list$variable),
-        selected = as.list(version_list$variable[1:8]),
+        selected = as.list(version_list$variable[1:9]),
         prettyOptions = list(
           shape = "round",
           outline = TRUE,
