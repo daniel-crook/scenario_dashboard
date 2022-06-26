@@ -234,124 +234,128 @@ vc_version_server <- function(id, data) {
     
     # Render Plot -------------------------------------------------------------
 
-    # observe({
-    # if(length(variables$variable) >= 1) {
-    #   
-    #   vc_version_data <- filter(data,
-    #                             variable %in% variables$variable) %>%
-    #     transmute(., Dates,
-    #               variable,
-    #               value = round(value, 2))
-    #   if (input$display == "% y/y") {
-    #     vc_version_data <- growth(vc_version_data, 1)
-    #   }
-    #   vc_version_data <-
-    #     mutate(vc_version_data, value = round(value, 2)) %>%
-    #     spread(., variable, value)
-    #   vc_version_data <-
-    #     vc_version_data[, append("Dates", variables$variable)]
-    # 
-    #   output$Plot <- renderPlotly({
-    #     fig  <-  plot_ly(
-    #       vc_version_data,
-    #       x = ~ Dates,
-    #       y = vc_version_data[[variables$variable[1]]],
-    #       name = str_after_last(variables$variable[1], ", "),
-    #       type = 'scatter',
-    #       mode = 'lines',
-    #       color = I(ox_pallette()[1]),
-    #       hoverlabel = list(namelength = -1)
-    #     ) %>%
-    #       layout(
-    #         shapes = vline(data[(data$FORECAST_FLAG == "EA") &
-    #                               (data$variable == variables$variable[1]), "Dates"]),
-    #         yaxis = list(
-    #           showgrid = F,
-    #           showline = T,
-    #           linecolor = "#495057",
-    #           ticks = "outside",
-    #           tickcolor = "#495057",
-    #           tickformat = ",",
-    #           ticksuffix = if (input$display == "% y/y") {
-    #             "%"
-    #           } else {
-    #             NULL
-    #           }
-    #         ),
-    #         xaxis = list(
-    #           title = "",
-    #           zerolinecolor = "#495057",
-    #           showgrid = F,
-    #           showline = T,
-    #           linecolor = "#495057",
-    #           ticks = "outside",
-    #           tickcolor = "#495057",
-    #           range
-    #         ),
-    #         legend = list(
-    #           orientation = "h",
-    #           xanchor = "center",
-    #           x = 0.5,
-    #           y = -0.05
-    #         ),
-    #         margin = list(
-    #           l = 0,
-    #           r = 0,
-    #           b = 0,
-    #           t = 50
-    #         ),
-    #         hovermode = "x unified"
-    #       ) %>%
-    #       add_annotations(
-    #         x = data[(data$FORECAST_FLAG == "EA") &
-    #                    (data$variable == variables$variable[1]), "Dates"],
-    #         y = 1,
-    #         text = "               Forecast",
-    #         yref = "paper",
-    #         showarrow = FALSE
-    #       ) %>%
-    #       add_annotations(
-    #         x = min(vc_version_data$Dates[!is.na(vc_version_data[[variables$variable[1]]])]),
-    #         y = 1.035,
-    #         text = if (input$display == "% y/y") {
-    #           "% y/y"
-    #         } else {
-    #           unique(data$UNIT[data$variable == variables$variable[1]])
-    #         },
-    #         yref = "paper",
-    #         xanchor = "left",
-    #         showarrow = FALSE
-    #       )
-    #     if (length(variables$variable) >= 2) {
-    #       for (i in 2:length(variables$variable)) {
-    #         fig <- fig %>% add_trace(
-    #           y = vc_version_data[[variables$variable[i]]],
-    #           color = I(ox_pallette()[i]),
-    #           name = str_after_last(variables$variable[i], ", "),
-    #           hoverlabel = list(namelength = -1)
-    #         )
-    #       }
-    #     }
-    #     if (input$title == "Title On") {
-    #       fig <- fig %>%
-    #         layout(title = list(
-    #           text = paste0(
-    #             str_before_last(variables$variable[1], ","),
-    #             " - By Version Comparison"
-    #           ),
-    #           x = 0.035,
-    #           y = 1.2,
-    #           font = list(
-    #             family = "segoe ui",
-    #             size = 24,
-    #             color = "#495057"
-    #           )
-    #         ))
-    #     }
-    #     return(fig)
-    #   })
-    # }
-    # })
+    observe({
+      if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
+                               data$STATE == input$State &
+                               data$ATTRIBUTE == input$Attribute &
+                               data$RELEASE_VERSION %in% input$Selections]) >= 1 &
+          all(variables$variable %in% data$variable)) {
+
+      vc_version_data <- filter(data,
+                                variable %in% variables$variable) %>%
+        transmute(., Dates,
+                  variable,
+                  value = round(value, 2))
+      if (input$display == "% y/y") {
+        vc_version_data <- growth(vc_version_data, 1)
+      }
+      vc_version_data <-
+        mutate(vc_version_data, value = round(value, 2)) %>%
+        spread(., variable, value)
+      vc_version_data <-
+        vc_version_data[, append("Dates", variables$variable)]
+
+      output$Plot <- renderPlotly({
+        fig  <-  plot_ly(
+          vc_version_data,
+          x = ~ Dates,
+          y = vc_version_data[[variables$variable[1]]],
+          name = str_after_last(variables$variable[1], ", "),
+          type = 'scatter',
+          mode = 'lines',
+          color = I(ox_pallette()[1]),
+          hoverlabel = list(namelength = -1)
+        ) %>%
+          layout(
+            shapes = vline(data[(data$FORECAST_FLAG == "EA") &
+                                  (data$variable == variables$variable[1]), "Dates"]),
+            yaxis = list(
+              showgrid = F,
+              showline = T,
+              linecolor = "#495057",
+              ticks = "outside",
+              tickcolor = "#495057",
+              tickformat = ",",
+              ticksuffix = if (input$display == "% y/y") {
+                "%"
+              } else {
+                NULL
+              }
+            ),
+            xaxis = list(
+              title = "",
+              zerolinecolor = "#495057",
+              showgrid = F,
+              showline = T,
+              linecolor = "#495057",
+              ticks = "outside",
+              tickcolor = "#495057",
+              range
+            ),
+            legend = list(
+              orientation = "h",
+              xanchor = "center",
+              x = 0.5,
+              y = -0.05
+            ),
+            margin = list(
+              l = 0,
+              r = 0,
+              b = 0,
+              t = 50
+            ),
+            hovermode = "x unified"
+          ) %>%
+          add_annotations(
+            x = data[(data$FORECAST_FLAG == "EA") &
+                       (data$variable == variables$variable[1]), "Dates"],
+            y = 1,
+            text = "               Forecast",
+            yref = "paper",
+            showarrow = FALSE
+          ) %>%
+          add_annotations(
+            x = min(vc_version_data$Dates[!is.na(vc_version_data[[variables$variable[1]]])]),
+            y = 1.035,
+            text = if (input$display == "% y/y") {
+              "% y/y"
+            } else {
+              unique(data$UNIT[data$variable == variables$variable[1]])
+            },
+            yref = "paper",
+            xanchor = "left",
+            showarrow = FALSE
+          )
+        if (length(variables$variable) >= 2) {
+          for (i in 2:length(variables$variable)) {
+            fig <- fig %>% add_trace(
+              y = vc_version_data[[variables$variable[i]]],
+              color = I(ox_pallette()[i]),
+              name = str_after_last(variables$variable[i], ", "),
+              hoverlabel = list(namelength = -1)
+            )
+          }
+        }
+        if (input$title == "Title On") {
+          fig <- fig %>%
+            layout(title = list(
+              text = paste0(
+                str_before_last(variables$variable[1], ","),
+                " - By Version Comparison"
+              ),
+              x = 0.035,
+              y = 1.2,
+              font = list(
+                family = "segoe ui",
+                size = 24,
+                color = "#495057"
+              )
+            ))
+        }
+        return(fig)
+      })
+    }
+    })
 
     # Render Table ------------------------------------------------------------
 
