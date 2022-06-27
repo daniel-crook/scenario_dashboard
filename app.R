@@ -1,6 +1,11 @@
 
 rm(list = ls())
 
+if (!"devtools" %in% installed.packages()) {install.packages("devtools")}
+library("devtools")
+if(!"devtools" %in% installed.packages()){
+install_github('slangcake/oxgraphs',build=FALSE)}
+
 list.of.packages <-
     c(
         "shiny",
