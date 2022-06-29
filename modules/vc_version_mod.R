@@ -174,25 +174,41 @@ vc_version_server <- function(id, data) {
           unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == input$Scenario &
                                         data$STATE == input$State &
                                         data$ATTRIBUTE == input$Attribute])
-        global$checked <- possible[(possible %in% input$Selections)]  
-    })
-    
-    observe({
-      if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
-                               data$STATE == input$State &
-                               data$ATTRIBUTE == input$Attribute &
-                               data$RELEASE_VERSION %in% input$Selections]) >= 1) {
+        global$checked <- possible[(possible %in% input$Selections)]
+        
+        if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
+                                                            data$STATE == input$State &
+                                                            data$ATTRIBUTE == input$Attribute &
+                                                            data$RELEASE_VERSION %in% input$Selections]) >= 1) {
         checked_list <-
           data.frame(
             ATTRIBUTE = input$Attribute,
             STATE = input$State,
             SCENARIO_VALUE = input$Scenario,
-            RELEASE_VERSION = input$Selections
+            RELEASE_VERSION =  possible[(possible %in% input$Selections)]
           ) %>%
           add.var.col(.)
         variables$variable <- checked_list$variable
-      }
+        }
+        
     })
+    
+    # observe({
+    #   if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
+    #                            data$STATE == input$State &
+    #                            data$ATTRIBUTE == input$Attribute &
+    #                            data$RELEASE_VERSION %in% input$Selections]) >= 1) {
+    #     checked_list <-
+    #       data.frame(
+    #         ATTRIBUTE = input$Attribute,
+    #         STATE = input$State,
+    #         SCENARIO_VALUE = input$Scenario,
+    #         RELEASE_VERSION = input$Selections
+    #       ) %>%
+    #       add.var.col(.)
+    #     variables$variable <- checked_list$variable
+    #   }
+    # })
     
     # Update checkboxgroup options based on selected inputs -------------------
     observe({
