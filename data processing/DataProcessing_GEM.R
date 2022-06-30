@@ -6,13 +6,27 @@ volumes <- getVolumes()()
 if (!(is.integer(input$gem_directory))) {
   GEM_db_folder <-
     file.path(parseDirPath(volumes, input$gem_directory), "/")
-  file <- list.files(GEM_db_folder, pattern = ".db")
+  file <- as.data.frame(list(
+      "files" = list.files(path = GEM_db_folder, pattern = ".db"),
+      "mtime" = file.mtime(list.files(path = GEM_db_folder, full.names = T))
+    )) %>% arrange(., mtime) %>% select(-mtime)
+  file <- file$files
+  
 } else if (!(is.integer(input$gem_file))) {
   full_db_path <-
     file.path(parseFilePaths(volumes, input$gem_file))[4]
   GEM_db_folder <- paste0(str_before_last(full_db_path, "/"), "/")
   file <- str_after_last(full_db_path, "/")
 }
+
+# GEM_db_folder <- "C:/AID/AEMO/Dashboard Bases/"
+# 
+# file <- as.data.frame(list(
+#   "files" = list.files(path = GEM_db_folder, pattern = ".db"),
+#   "mtime" = file.mtime(list.files(path = GEM_db_folder))
+# )) %>% arrange(., mtime) %>% select(-mtime)
+# file <- file$files
+
 
 file <- file %>% str_replace_all(".db", "")
 

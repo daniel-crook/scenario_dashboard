@@ -162,6 +162,7 @@ gc_scenario_server <- function(id, gem_data) {
 
   # Render Plot -------------------------------------------------------------
   observe({
+    if(length(input$Selections) >= 1) {
     gc_scenario_data <- filter(gem_data,
                               variable %in% input$Selections) %>%
       transmute(., Dates,
@@ -275,12 +276,13 @@ gc_scenario_server <- function(id, gem_data) {
       }
       return(fig)
     })
+    }
   })
 
   # Render Table ------------------------------------------------------------
   
   observe({
-
+if(length(input$Selections) >= 1) {
     cagr_dates <-
       c("2000",
         "2010",
@@ -344,6 +346,7 @@ gc_scenario_server <- function(id, gem_data) {
       return(vc_version_table_data1)
     },
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
+}
   })
     
   })

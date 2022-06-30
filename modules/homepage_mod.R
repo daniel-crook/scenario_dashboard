@@ -402,6 +402,7 @@ homepage_server <- function(id) {
         "aid_directory",
         roots = volumes,
         session = session,
+        filetypes = c('db'),
         restrictions = system.file(package = "base"),
         allowDirCreate = FALSE
       )
@@ -411,6 +412,7 @@ homepage_server <- function(id) {
         "aid_file",
         roots = volumes,
         session = session,
+        filetypes = c('db'),
         restrictions = system.file(package = "base")
       )
       
@@ -527,38 +529,7 @@ homepage_server <- function(id) {
         })
     })
     
-    # # Company Logo Button -----------------------------------------------------
-    # observe({
-    #   shinyFileChoose(
-    #     input,
-    #     "company_logo",
-    #     roots = volumes,
-    #     session = session,
-    #     filetypes=c('png','jpeg'),
-    #     restrictions = system.file(package = "base")
-    #   )
-    #   
-    #   output$company_logopath <- renderPrint({
-    #     if (is.integer(input$company_logo)) {
-    #       cat("Please select a folder/file")
-    #     } else if (!(is.integer(input$company_log))) {
-    #       file.path(parseFilePaths(volumes, input$company_logo))[4]
-    #     }
-    #   })
-    # })
-    # 
-    # # Change Logo & Refresh ---------------------------------------------------
-    # 
-    # observeEvent(input$ch_logo_and_refresh, {
-    #   company_logo_path <-
-    #     file.path(parseFilePaths(volumes, input$company_logo))[4]
-    #   
-    #   file.copy(from = company_logo_path,
-    #             to = "www/company_logo.png",
-    #             overwrite = T)
-    #   
-    #   session$reload()
-    # })
+    
     
    # Source AID Data ---------------------------------------------------------
     source("data/import_data.R")
