@@ -47,7 +47,8 @@ list.of.indicators <-
 
 gem_data <-
   left_join(gem_data, list.of.indicators, by =  "Mnemonic") %>%
-  add.var.col.gem()
+  add.var.col.gem(.) %>% 
+  add.sv.col.gem(.)
 
 categories <- unique(gem_data$Category)
 

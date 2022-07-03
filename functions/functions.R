@@ -67,6 +67,14 @@ add.var.col.gem <- function(x) {
                           sep = ", "))
 }
 
+## -- function that adds a concat scenario_version column for the macro comparison tab -- ##
+add.sv.col.gem <- function(x) {
+  mutate(x,
+         sv = paste(Scenario,
+                    Release,
+                    sep = ", "))
+}
+
 ### --- forecast line function --- ###
 vline <- function(x) {
   list(
