@@ -141,8 +141,9 @@ ui <-  tagList(
             titlePanel(h1(icon("fas fa-globe-asia"), "Macro Comparison")),
             tabsetPanel(
                 type = "pills",
-                gc_version_ui("gc_version"),
-                gc_scenario_ui("gc_scenario")
+                gc_scenario_ui("gc_scenario"),
+                gc_version_ui("gc_version")
+                
             )
         )),
         tabPanel(

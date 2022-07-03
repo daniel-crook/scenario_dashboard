@@ -380,17 +380,17 @@ homepage_server <- function(id) {
   moduleServer(id, function(input, output, session, data, gem_data) {
     
     # Scenario Description Table ----------------------------------------------
-    observe({
-      output$Table <- function() {
-        kbl(scenario_table, format = "html") %>%
-          kable_styling(
-            bootstrap_options = c("striped", "hover", "condensed"),
-            full_width = T
-          ) %>%
-          column_spec(1, bold = T) %>%
-          row_spec(c(0:length(scenario_table$Scenario)), extra_css = "border-bottom: 1px solid; border-top: 1px solid;")
-      }
-    })
+    # observe({
+    #   output$Table <- function() {
+    #     kbl(scenario_table, format = "html") %>%
+    #       kable_styling(
+    #         bootstrap_options = c("striped", "hover", "condensed"),
+    #         full_width = T
+    #       ) %>%
+    #       column_spec(1, bold = T) %>%
+    #       row_spec(c(0:length(scenario_table$Scenario)), extra_css = "border-bottom: 1px solid; border-top: 1px solid;")
+    #   }
+    # })
     
     # Shiny AID Directory/File Select -----------------------------------------
     
@@ -528,8 +528,6 @@ homepage_server <- function(id) {
           )))
         })
     })
-    
-    
     
    # Source AID Data ---------------------------------------------------------
     source("data/import_data.R")
