@@ -88,9 +88,9 @@ vc_scenario_ui <- function(id) {
                      ns("Selections"),
                      label = NULL,
                      choices = unique(data$variable[data$STATE == "ACT" &
-                                                      data$ATTRIBUTE == "Attached Dwellings"])[1],
+                                                      data$ATTRIBUTE == "Attached Dwellings"]),
                      selected = unique(data$variable[data$STATE == "ACT" &
-                                                       data$ATTRIBUTE == "Attached Dwellings"])[1],
+                                                       data$ATTRIBUTE == "Attached Dwellings"]),
                      shape = "round",
                      outline = TRUE,
                      status = "primary"

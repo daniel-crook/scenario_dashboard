@@ -95,11 +95,9 @@ ic_industry_ui <- function(id) {
                      ns("Selections"),
                      label = NULL,
                      choices = unique(data$variable[data$STATE == "ACT" &
-                                                      data$SCENARIO_VALUE == "Central" &
-                                                      data$RELEASE_VERSION == "May22 V1"])[1],
+                                                      data$SCENARIO_VALUE == unique(data$SCENARIO_VALUE)[1]])[1],
                      selected = unique(data$variable[data$STATE == "ACT" &
-                                                       data$SCENARIO_VALUE == "Central" &
-                                                       data$RELEASE_VERSION == "May22 V1"])[1],
+                                                       data$SCENARIO_VALUE == unique(data$SCENARIO_VALUE)[1]])[1],
                      shape = "round",
                      outline = TRUE,
                      status = "primary"

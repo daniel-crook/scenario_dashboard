@@ -100,8 +100,8 @@ ui <-  tagList(
             tabsetPanel(
                 type = "pills",
                 vc_version_ui("vc_version"),
-                vc_scenario_ui("vc_scenario"),
-                vc_region_ui("vc_region")
+                #vc_scenario_ui("vc_scenario"),
+                #vc_region_ui("vc_region")
             )
         ),
         tabPanel(
@@ -110,9 +110,9 @@ ui <-  tagList(
             br(),
             tabsetPanel(
                 type = "pills",
-                sc_version_ui("sc_version"),
-                sc_scenario_ui("sc_scenario"),
-                sc_region_ui("sc_region")
+                #sc_version_ui("sc_version"),
+                #sc_scenario_ui("sc_scenario"),
+                #sc_region_ui("sc_region")
             )
         ),
         tabPanel(
@@ -160,13 +160,13 @@ server <- function(input, output, session) {
     homepage_server("homepage")
     
     vc_version_server("vc_version", data)
-    vc_scenario_server("vc_scenario", data)
-    vc_region_server("vc_region", data)
-    
-    sc_version_server("sc_version", data)
-    sc_scenario_server("sc_scenario", data)
-    sc_region_server("sc_region", data)
-    
+    # vc_scenario_server("vc_scenario", data)
+    # vc_region_server("vc_region", data)
+    # 
+    # sc_version_server("sc_version", data)
+    # sc_scenario_server("sc_scenario", data)
+    # sc_region_server("sc_region", data)
+    # 
     ic_version_server("ic_version", data)
     ic_scenario_server("ic_scenario", data)
     ic_region_server("ic_region", data)
