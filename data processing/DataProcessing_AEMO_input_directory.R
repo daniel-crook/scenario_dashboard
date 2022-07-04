@@ -51,13 +51,10 @@ for (i in file) {
   # 2.1 Parameters that don't require adjusting -----------------------------
   {
     #set building mapping frame
-    state_list <-
-      c("AUS", "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT")
-    state_list_states <-
-      c("AUS", "NSW", "VIC", "QSL", "SAL", "WAL", "TAS", "NTY", "ACT")
+    state_list <- c("AUS", "NSW", "VIC", "QLD", "SA", "WA", "TAS", "NT", "ACT")
+    state_list_states <- c("AUS", "NSW", "VIC", "QSL", "SAL", "WAL", "TAS", "NTY", "ACT")
     state_id <- c("0", "1", "2", "3", "4", "5", "6", "7", "8")
-    Buildings_Series_State_Mapping <-
-      data.frame(State = state_list, ID = state_id)
+    Buildings_Series_State_Mapping <- data.frame(State = state_list, ID = state_id)
     
     AID_db_filename <- substr(
       AID_db_filepath,
