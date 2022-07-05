@@ -64,7 +64,7 @@ vc_scenario_ui <- function(id) {
                    selectInput(
                      ns("State"),
                      label = h4(str_to_title("State"), style = "margin-bottom:-0.1em"),
-                     sort(unique(data$STATE)),
+                     sort(unique(data$STATE[data$STATE == "AUS"])),
                      selectize = FALSE
                    )
                  ),
