@@ -43,7 +43,7 @@ start_time <- Sys.time()
 
 for (i in file) {
   print(i)
-  AID_db_filepath <- paste0(AID_db_folder, i)
+  #AID_db_filepath <- paste0(AID_db_folder, i)
   
   ############################################################################
   ############################################################################
@@ -56,79 +56,84 @@ for (i in file) {
     state_id <- c("0", "1", "2", "3", "4", "5", "6", "7", "8")
     Buildings_Series_State_Mapping <- data.frame(State = state_list, ID = state_id)
     
-    AID_db_filename <- substr(
-      AID_db_filepath,
-      stringi::stri_locate_last_fixed(AID_db_filepath, "/") + 1,
-      nchar(AID_db_filepath)
-    )
+    AID_db_filename <- str_before_first(i,".db")
     
-    #Check file type
-    if (substr(AID_db_filename,
-               nchar(AID_db_filename) - 2,
-               nchar(AID_db_filename)) != ".db") {
-      name_checks1 <- "Failed - File is not a AID db"
-      stop("File is not a AID db")
-    } else {
-      name_checks1 <- "Passed"
-    }
+    # #Check file type
+    # if (substr(AID_db_filename,
+    #            nchar(AID_db_filename) - 2,
+    #            nchar(AID_db_filename)) != ".db") {
+    #   name_checks1 <- "Failed - File is not a AID db"
+    #   stop("File is not a AID db")
+    # } else {
+    #   name_checks1 <- "Passed"
+    # }
     
-    Scenario_name <-
-      toupper(substr(
-        AID_db_filename,
-        1,
-        stringi::stri_locate_first_fixed(AID_db_filename, "_") - 1
-      ))
+    # Scenario_name <-
+    #   toupper(substr(
+    #     AID_db_filename,
+    #     1,
+    #     stringi::stri_locate_first_fixed(AID_db_filename, "_") - 1
+    #   ))
     
-    #Adjust Scenario Names
-    if (Scenario_name == "EXPORTSUPERPOWER") {
-      Scenario_name <- "EXPORT_SUPERPOWER"
-      name_checks2 <- "Passed"
-    } else if (Scenario_name == "SLOWGROWTH") {
-      Scenario_name <- "SLOW_GROWTH"
-      name_checks2 <- "Passed"
-    } else if (Scenario_name == "RAPIDDECARB") {
-      Scenario_name <- "RAPID_DECARB"
-      name_checks2 <- "Passed"
-    } else if (Scenario_name == "SUSTAINABLEGROWTH") {
-      Scenario_name <- "SUSTAINABLE_GROWTH"
-      name_checks2 <- "Passed"
-    } else if (Scenario_name == "CENTRAL") {
-      name_checks2 <- "Passed"
-    } else {
-      name_checks2 <- "Failed - invalid scenario name"
-      stop("Invalid scenario name")
-    }
+    Scenario_name <- str_before_first(AID_db_filename,"_AID")
     
-    #Split off Release Date
-    if (as.numeric(str_count(AID_db_filename, "AID_")) == 1 &
-        as.numeric(str_count(AID_db_filename, "_")) == 3) {
-      date <- format(parse_date_time(
-        substr(
-          AID_db_filename,
-          stringi::stri_locate_last_fixed(AID_db_filename, "AID_") + 4,
-          stringi::stri_locate_last_fixed(AID_db_filename, "_") - 1
-        ),
-        "my",
-        tz = "UTC"
-      ), "%b-%y")
-      name_checks3 <- "Passed"
-    } else {
-      name_checks3 <- "Failed - missing date"
-      stop("Missing date")
-    }
+    # #Adjust Scenario Names
+    # if (Scenario_name == "EXPORTSUPERPOWER") {
+    #   Scenario_name <- "EXPORT_SUPERPOWER"
+    #   name_checks2 <- "Passed"
+    # } else if (Scenario_name == "SLOWGROWTH") {
+    #   Scenario_name <- "SLOW_GROWTH"
+    #   name_checks2 <- "Passed"
+    # } else if (Scenario_name == "RAPIDDECARB") {
+    #   Scenario_name <- "RAPID_DECARB"
+    #   name_checks2 <- "Passed"
+    # } else if (Scenario_name == "SUSTAINABLEGROWTH") {
+    #   Scenario_name <- "SUSTAINABLE_GROWTH"
+    #   name_checks2 <- "Passed"
+    # } else if (Scenario_name == "CENTRAL") {
+    #   name_checks2 <- "Passed"
+    # } else {
+    #   name_checks2 <- "Failed - invalid scenario name"
+    #   stop("Invalid scenario name")
+    # }
     
-    #Split off Version Number
-    if (as.numeric(str_count(AID_db_filename, "_V")) == 1) {
-      version <- substr(
-        AID_db_filename,
-        stringi::stri_locate_last_fixed(AID_db_filename, "_V") + 2,
-        nchar(AID_db_filename) - 3
-      )
-      name_checks4 <- "Passed"
-    } else {
-      name_checks4 <- "Failed - missing version number"
-      stop("Missing version number")
-    }
+    date <- format(parse_date_time(str_before_first(str_after_first(AID_db_filename,"_AID_"),"_V"),
+                                   "my",
+                                   tz = "UTC"
+    ), "%b-%y")
+    
+    # #Split off Release Date
+    # if (as.numeric(str_count(AID_db_filename, "AID_")) == 1 &
+    #     as.numeric(str_count(AID_db_filename, "_")) == 3) {
+    #   date <- format(parse_date_time(
+    #     substr(
+    #       AID_db_filename,
+    #       stringi::stri_locate_last_fixed(AID_db_filename, "AID_") + 4,
+    #       stringi::stri_locate_last_fixed(AID_db_filename, "_") - 1
+    #     ),
+    #     "my",
+    #     tz = "UTC"
+    #   ), "%b-%y")
+    #   name_checks3 <- "Passed"
+    # } else {
+    #   name_checks3 <- "Failed - missing date"
+    #   stop("Missing date")
+    # }
+    
+    version <- str_after_last(AID_db_filename,"_V")
+    
+    # #Split off Version Number
+    # if (as.numeric(str_count(AID_db_filename, "_V")) == 1) {
+    #   version <- substr(
+    #     AID_db_filename,
+    #     stringi::stri_locate_last_fixed(AID_db_filename, "_V") + 2,
+    #     nchar(AID_db_filename) - 3
+    #   )
+    #   name_checks4 <- "Passed"
+    # } else {
+    #   name_checks4 <- "Failed - missing version number"
+    #   stop("Missing version number")
+    # }
     
     #Change Scenario Status if 99 (final base)
     if (version == "99") {
@@ -371,15 +376,16 @@ for (i in file) {
           dplyr::mutate(SFDLCC = CLCC + GCLCC + IFLCC + GILCC) %>%
           dplyr::mutate(INDPRODLCC = GVACLCC + GVADLCC + GVAELCC)
           names <- names(temp_df)
+          if("GVAOLCC" %in% names) {
           temp_df <- temp_df %>% mutate(
-            SVCSGVALCC = if("GVAOLCC" %in% names) {GVAG1LCC + GVAG2LCC + GVAHLCC + GVAI1LCC +
+            SVCSGVALCC = GVAG1LCC + GVAG2LCC + GVAHLCC + GVAI1LCC +
               GVAI2LCC + GVAJLCC + GVAK1LCC + GVAK2LCC + GVAK3LCC +
-              GVALLCC + GVAMLCC + GVANLCC + GVAOLCC + GVAPLCC} else {
-                GVAG1LCC + GVAG2LCC + GVAHLCC + GVAI1LCC +
+              GVALLCC + GVAMLCC + GVANLCC + GVAOLCC + GVAPLCC)} else {
+                temp_df <- temp_df %>% mutate(
+                  SVCSGVALCC = GVAG1LCC + GVAG2LCC + GVAHLCC + GVAI1LCC +
                   GVAI2LCC + GVAJLCC + GVAK1LCC + GVAK2LCC + GVAK3LCC +
-                  GVALLCC + GVAMLCC + GVANLCC +GVAO_PLCC
-              }
-          ) 
+                  GVALLCC + GVAMLCC + GVANLCC + GVAO_PLCC
+              )} 
           if("NATTOT" %in% names) {
         if(j == "AUS") {temp_df <- temp_df %>%
           dplyr::mutate(
@@ -708,7 +714,7 @@ for (i in file) {
       saveRDS(Tot_Output_Data_FY,
               file = file.path(
                 "data processing/RDS Files/",
-                paste0(Scenario_name, "_", release_version, "_Output_Data.rds")
+                paste0(Scenario_name, "_", release_version, ".rds")
               ))
       
       #tidy folder - remove ".sel" & ".csv" files

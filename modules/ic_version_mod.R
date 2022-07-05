@@ -53,6 +53,7 @@ ic_version_ui <- function(id) {
                      ns("Scenario"),
                      label = h4(str_to_title("Scenario"), style = "margin-bottom:-0.1em"),
                      sort(unique(data$SCENARIO_VALUE)),
+                     selected = sort(unique(data$SCENARIO_VALUE))[1],
                      selectize = FALSE
                    )
                  ),
@@ -86,12 +87,8 @@ ic_version_ui <- function(id) {
                    prettyCheckboxGroup(
                      ns("Selections"),
                      label = NULL,
-                     choices = unique(data$variable[data$STATE == "ACT" &
-                                                      data$SCENARIO_VALUE == "Central" &
-                                                      data$ATTRIBUTE == "Attached Dwellings"])[1],
-                     selected = unique(data$variable[data$STATE == "ACT" &
-                                                       data$SCENARIO_VALUE == "Central" &
-                                                       data$ATTRIBUTE == "Attached Dwellings"])[1],
+                     choices = NULL,
+                     selected = NULL,
                      shape = "round",
                      outline = TRUE,
                      status = "primary"
@@ -186,6 +183,7 @@ ic_version_server <- function(id, data) {
 # Render Plot -------------------------------------------------------------
 
   observe({
+    if(length(input$Selections) >= 1) {
     output$Plot <- renderPlotly({
       bar_dates <- seq(2020, 2050, 10)
       
@@ -370,11 +368,13 @@ ic_version_server <- function(id, data) {
             }
           }
     })
+    }
   })
   
 # Render Table ------------------------------------------------------------
 
   observe({
+    if(length(input$Selections) >= 1) {
     if (length(input$Selections) >= 2) {
       for (i in 2:length(input$Selections)) {
         if (i == 2) {
@@ -481,6 +481,7 @@ ic_version_server <- function(id, data) {
       return(ic_version_p_avg_table)
     },
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
+    }
   })
   
 })

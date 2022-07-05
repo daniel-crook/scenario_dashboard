@@ -71,7 +71,7 @@ vc_region_ui <- function(id) {
                    selectInput(
                      ns("Version"),
                      label = h4("Version", style = "margin-bottom:-0.1em"),
-                     sort(unique(data$RELEASE_VERSION)),
+                     sort(unique(data$RELEASE_VERSION[data$SCENARIO_VALUE == sort(unique(data$SCENARIO_VALUE))[1]])),
                      selectize = FALSE
                    )
                  ), style = "margin-bottom:-2em; margin-top:-2em"),
@@ -96,12 +96,12 @@ vc_region_ui <- function(id) {
                    prettyCheckboxGroup(
                      ns("Selections"),
                      label = NULL,
-                     choices = unique(data$variable[data$RELEASE_VERSION == "May22 V1" &
-                                                      data$SCENARIO_VALUE == "Central" &
-                                                      data$ATTRIBUTE == "Attached Dwellings"])[1],
-                     selected = unique(data$variable[data$RELEASE_VERSION == "May22 V1" &
-                                                       data$SCENARIO_VALUE == "Central" &
-                                                       data$ATTRIBUTE == "Attached Dwellings"])[1],
+                     choices = unique(data$variable[data$SCENARIO_VALUE == sort(unique(data$SCENARIO_VALUE))[1] &
+                                                      data$RELEASE_VERSION == data$RELEASE_VERSION[data$SCENARIO_VALUE == sort(unique(data$SCENARIO_VALUE))[1]][1] &
+                                                      data$ATTRIBUTE == "Attached Dwellings"]),
+                     selected = unique(data$variable[data$SCENARIO_VALUE == sort(unique(data$SCENARIO_VALUE))[1] &
+                                                       data$RELEASE_VERSION == data$RELEASE_VERSION[data$SCENARIO_VALUE == sort(unique(data$SCENARIO_VALUE))[1]][1] &
+                                                       data$ATTRIBUTE == "Attached Dwellings"]),
                      shape = "round",
                      outline = TRUE,
                      status = "primary"

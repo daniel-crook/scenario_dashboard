@@ -1,5 +1,4 @@
 
-
 # 1.0 Module UI -----------------------------------------------------------
 
 ic_region_ui <- function(id) {
@@ -280,6 +279,7 @@ ic_region_server <- function(id, data) {
   
   # Render Plot -------------------------------------------------------------
   observe({
+    if(length(input$Selections) >= 1) {
     output$Plot <- renderPlotly({
       bar_dates <- seq(2020, 2050, 10)
       
@@ -466,10 +466,12 @@ ic_region_server <- function(id, data) {
           }
         }
     })
+    }
   })
   
   # Render Table ------------------------------------------------------------
   observe({
+    if(length(input$Selections) >= 1) {
     if (length(input$Selections) >= 2) {
       for (i in 2:length(input$Selections)) {
         if (i == 2) {
@@ -582,7 +584,9 @@ ic_region_server <- function(id, data) {
       return(ic_region_p_avg_table)
     },
     spacing = "s", striped = TRUE, hover = TRUE, align = "l")
+    }
   })
+    
   
 })
 }

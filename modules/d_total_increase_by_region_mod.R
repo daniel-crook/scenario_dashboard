@@ -50,7 +50,7 @@ d_total_increase_by_region_ui <- function(id) {
                           selectInput(
                             ns("Version"),
                             label = h4(str_to_title("Version"), style = "margin-bottom:-0.1em"),
-                            sort(unique(data$RELEASE_VERSION)),
+                            sort(unique(data$RELEASE_VERSION[data$Series_ID == "POPINC"])),
                             selectize = FALSE
                           )),
                    style = "margin-bottom:-2em; margin-top:-2em"
@@ -65,12 +65,8 @@ d_total_increase_by_region_ui <- function(id) {
                    prettyCheckboxGroup(
                      ns("Selections"),
                      label = NULL,
-                     choices = unique(data$variable[data$Series_ID %in% c("POPINC")  &
-                                                      data$SCENARIO_VALUE == "Central" &
-                                                      data$RELEASE_VERSION == "May22 V1"]),
-                     selected = unique(data$variable[data$Series_ID %in% c("POPINC") & 
-                                                       data$SCENARIO_VALUE == "Central" &
-                                                       data$RELEASE_VERSION == "May22 V1"]),
+                     choices = unique(data$variable[data$Series_ID %in% c("POPINC")]),
+                     selected = unique(data$variable[data$Series_ID %in% c("POPINC")]),
                      shape = "round",
                      outline = TRUE,
                      status = "primary"

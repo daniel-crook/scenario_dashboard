@@ -1,5 +1,4 @@
 
-
 # 1.0 Module UI -----------------------------------------------------------
 
 sc_region_ui <- function(id) {
@@ -73,6 +72,7 @@ sc_region_ui <- function(id) {
                      ns("Version"),
                      label = h4("Version", style = "margin-bottom:-0.1em"),
                      sort(unique(data$RELEASE_VERSION)),
+                     selected = unique(data$RELEASE_VERSION[sort(unique(data$SCENARIO_VALUE))[1]])[1],
                      selectize = FALSE
                    )
                  ), style = "margin-bottom:-2em; margin-top:-2em"),
@@ -87,12 +87,10 @@ sc_region_ui <- function(id) {
                    prettyCheckboxGroup(
                      ns("Selections"),
                      label = NULL,
-                     choices = unique(data$variable[data$RELEASE_VERSION == "May22 V1" &
-                                                      data$SCENARIO_VALUE == "Central" &
-                                                      data$ATTRIBUTE == "Attached Dwellings"])[1],
-                     selected = unique(data$variable[data$RELEASE_VERSION == "May22 V1" &
-                                                       data$SCENARIO_VALUE == "Central" &
-                                                       data$ATTRIBUTE == "Attached Dwellings"])[1],
+                     choices = unique(data$variable[data$SCENARIO_VALUE == unique(data$SCENARIO_VALUE)[1] &
+                                                      data$ATTRIBUTE == "Attached Dwellings"]),
+                     selected = unique(data$variable[data$SCENARIO_VALUE == unique(data$SCENARIO_VALUE)[1] &
+                                                       data$ATTRIBUTE == "Attached Dwellings"]),
                      shape = "round",
                      outline = TRUE,
                      status = "primary"
@@ -249,8 +247,7 @@ sc_region_server <- function(id, data) {
     
     observe({
       if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
-                               data$RELEASE_VERSION == input$Version &
-                               data$ATTRIBUTE == input$Attribute]) >= 1) {
+                               data$RELEASE_VERSION == input$Version]) >= 1) {
         states <- c("NSW", "VIC", "QLD", "WA", "SA", "TAS", "NT", "ACT")
         
         version_list <-
@@ -286,7 +283,9 @@ sc_region_server <- function(id, data) {
     # Render Plot -------------------------------------------------------------
     
     observe({
-      if (str_after_nth(input$Selections[1], ", ", 2) == paste(input$Scenario, input$Version, sep = ", ")) {
+      if(length(input$Selections) >= 1) {
+      if (length(data$variable[data$SCENARIO_VALUE == input$Scenario &
+                               data$RELEASE_VERSION == input$Version]) >= 1) {
         sc_region_data <- filter(data,
                                  sc_variable %in% unique(data$sc_variable[data$variable %in% input$Selections]))
         AUS_GDP <-
@@ -633,12 +632,14 @@ sc_region_server <- function(id, data) {
           }
         })
       }
+      }
       })
     
     # Render Table ------------------------------------------------------------
     
     observe({
-      if(input$display != "Cont. to GDP bar") {
+      if(length(input$Selections) >= 1) {
+      if(input$display != "Cont. to GDP bar" & length(input$Selections) >= 1) {
       if (length(input$Selections) >= 2) {
         for (i in 2:length(input$Selections)) {
           if (i == 2) {
@@ -739,6 +740,7 @@ sc_region_server <- function(id, data) {
       spacing = "s", striped = TRUE, hover = TRUE, align = "l")
       } else {
         output$Table <- renderTable({NULL})
+      }
       }
     })
     

@@ -319,7 +319,7 @@ br(),
                      style = paste0("color: black; margin-top: 0.1em")
                    ))),
             h5(
-              "General variable of GEM variables across scenarios as well as energy specific charts: by version, scenario or region.",
+              "General comparison of GEM variables across scenarios as well as energy specific charts: by version, scenario or region.",
               style = paste0("color: black")
             )
           )

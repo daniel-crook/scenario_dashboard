@@ -91,10 +91,10 @@ sc_version_ui <- function(id) {
                      ns("Selections"),
                      label = NULL,
                      choices = unique(data$variable[data$STATE == "ACT" &
-                                                      data$SCENARIO_VALUE == "Central" &
+                                                      data$SCENARIO_VALUE == sort(unique(data$SCENARIO_VALUE))[1] &
                                                       data$ATTRIBUTE == "Attached Dwellings"])[1],
                      selected = unique(data$variable[data$STATE == "ACT" &
-                                                       data$SCENARIO_VALUE == "Central" &
+                                                       data$SCENARIO_VALUE == sort(unique(data$SCENARIO_VALUE))[1] &
                                                        data$ATTRIBUTE == "Attached Dwellings"])[1],
                      shape = "round",
                      outline = TRUE,

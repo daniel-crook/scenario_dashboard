@@ -64,7 +64,7 @@ vc_scenario_ui <- function(id) {
                    selectInput(
                      ns("State"),
                      label = h4(str_to_title("State"), style = "margin-bottom:-0.1em"),
-                     sort(unique(data$STATE)),
+                     sort(unique(data$STATE[data$STATE == "AUS"])),
                      selectize = FALSE
                    )
                  ),
@@ -88,9 +88,9 @@ vc_scenario_ui <- function(id) {
                      ns("Selections"),
                      label = NULL,
                      choices = unique(data$variable[data$STATE == "ACT" &
-                                                      data$ATTRIBUTE == "Attached Dwellings"])[1],
+                                                      data$ATTRIBUTE == "Attached Dwellings"]),
                      selected = unique(data$variable[data$STATE == "ACT" &
-                                                       data$ATTRIBUTE == "Attached Dwellings"])[1],
+                                                       data$ATTRIBUTE == "Attached Dwellings"]),
                      shape = "round",
                      outline = TRUE,
                      status = "primary"

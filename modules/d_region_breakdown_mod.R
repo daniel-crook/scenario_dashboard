@@ -56,7 +56,7 @@ d_region_breakdown_ui <- function(id) {
                           selectInput(
                             ns("Version"),
                             label = h4(str_to_title("Version"), style = "margin-bottom:-0.1em"),
-                            sort(unique(data$RELEASE_VERSION)),
+                            sort(unique(data$RELEASE_VERSION[data$Series_ID == "NATTOT"])),
                             selectize = FALSE
                           )),
                    style = "margin-bottom:-2em; margin-top:-2em"
@@ -71,14 +71,12 @@ d_region_breakdown_ui <- function(id) {
                    prettyCheckboxGroup(
                      ns("Selections"),
                      label = NULL,
-                     choices = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
-                                                      data$STATE == "ACT" &
-                                                      data$SCENARIO_VALUE == "Central" &
-                                                      data$RELEASE_VERSION == "May22 V1"]),
-                     selected = unique(data$variable[data$Series_ID %in% c("NOMTOT", "NIMTOT", "NATTOT", "POPINC") &
-                                                       data$STATE == "ACT" &
-                                                       data$SCENARIO_VALUE == "Central" &
-                                                       data$RELEASE_VERSION == "May22 V1"]),
+                     choices = unique(data$variable[data$Series_ID %in% c("POPINC") & 
+                                                      data$State == unique(data$State)[1] &
+                                                      data$SCENARIO_VALUE == unique(data$SCENARIO_VALUE)[1]]),
+                     selected = unique(data$variable[data$Series_ID %in% c("POPINC") & 
+                                                       data$State == unique(data$State)[1] &
+                                                       data$SCENARIO_VALUE == unique(data$SCENARIO_VALUE)[1]]),
                      shape = "round",
                      outline = TRUE,
                      status = "primary"
@@ -159,6 +157,7 @@ d_region_breakdown_server <- function(id, data) {
   
   # # Render Plot -------------------------------------------------------------
   observe({
+    if(length(input$Selections) >= 1) {
       output$Plot <- renderPlotly({
       d_region_breakdown_data <-
         filter(data, variable %in% input$Selections) %>%
@@ -268,6 +267,7 @@ d_region_breakdown_server <- function(id, data) {
       fig
       
     })
+    }
   })
   
   # # Render Table ------------------------------------------------------------

@@ -17,7 +17,7 @@
   }
   
   data <- data %>%
-    mutate(SCENARIO_VALUE = str_to_title(gsub("_", " ", SCENARIO_VALUE))) %>%
+    mutate(SCENARIO_VALUE = gsub("_", " ", SCENARIO_VALUE)) %>%
     mutate(RELEASE_VERSION = gsub("_", " ", RELEASE_VERSION))
   
   data <- mutate(
