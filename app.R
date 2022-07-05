@@ -99,8 +99,8 @@ ui <-  tagList(
             titlePanel(h1(icon("fas fa-chart-line"), "Variable Comparison")),
             tabsetPanel(
                 type = "pills",
-                vc_version_ui("vc_version"),
                 vc_scenario_ui("vc_scenario"),
+                vc_version_ui("vc_version"),
                 vc_region_ui("vc_region")
             )
         ),
@@ -110,8 +110,8 @@ ui <-  tagList(
             br(),
             tabsetPanel(
                 type = "pills",
-                sc_version_ui("sc_version"),
                 sc_scenario_ui("sc_scenario"),
+                sc_version_ui("sc_version"),
                 sc_region_ui("sc_region")
             )
         ),
@@ -120,8 +120,8 @@ ui <-  tagList(
             titlePanel(h1(icon("fas fa-industry"), "Industry Comparison")),
             tabsetPanel(
                 type = "pills",
-                ic_version_ui("ic_version"),
                 ic_scenario_ui("ic_scenario"),
+                ic_version_ui("ic_version"),
                 ic_region_ui("ic_region"),
                 ic_industry_ui("ic_industry")
             )
