@@ -74,7 +74,7 @@ vc_version_ui <- function(id) {
                    selectInput(
                      ns("State"),
                      label = h4("State", style = "margin-bottom:-0.1em"),
-                     sort(unique(data$STATE)),
+                     sort(unique(data$STATE[data$STATE == "AUS"])),
                      selectize = FALSE
                    )
                  ), style = "margin-bottom:-2em; margin-top:-2em"),
@@ -100,7 +100,7 @@ vc_version_ui <- function(id) {
                      ns("Selections"),
                      label = NULL,
                      choices = unique(data$RELEASE_VERSION[data$STATE == "AUS" &
-                                                             data$SCENARIO_VALUE == "Central" &
+                                                             data$SCENARIO_VALUE == sort(unique(data$SCENARIO_VALUE))[1] &
                                                              data$ATTRIBUTE == "Attached Dwellings"])[1],
                      selected = NULL,
                      shape = "round",
