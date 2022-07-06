@@ -41,8 +41,19 @@ start_time <- Sys.time()
 
 }
 
+aid_rds_folder <- "data processing/RDS Files/"
+
+aid_rds_filename <-
+  list.files(path = aid_rds_folder) %>% str_replace_all(".rds", ".db")
+
 for (i in file) {
   print(i)
+  
+  if (i %in% aid_rds_filename) {
+    print(paste0("The RDS file -- ",
+                 str_before_first(i,".db"),
+                 ".rds -- already exists"))
+  } else {
   #AID_db_filepath <- paste0(AID_db_folder, i)
   
   ############################################################################
@@ -725,6 +736,7 @@ for (i in file) {
     
     end_time <- Sys.time()
     print(difftime(end_time, start_time, units = "secs"))
-    
+   
+  } 
   }
 }
