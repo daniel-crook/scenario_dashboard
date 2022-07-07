@@ -159,19 +159,6 @@ for (i in file) {
     release_version <- paste0(gsub("-", "", date), "_V", version)
   }
   
-  # 2.2 Loop over all ".db" files in folder ---------------------------------
-  rds_files <- list.files("data processing/RDS Files/")
-  
-  if (paste0(Scenario_name, "_", release_version, "_Output_Data.rds") %in% rds_files) {
-    print(
-      paste0(
-        Scenario_name,
-        "_",
-        release_version,
-        "_Output_Data.rds RDS file already exists"
-      )
-    )
-  } else {
     # 3.0 Create Functions ----------------------------------------------------
     {
       project_forward_YoY <- function(x) {
@@ -213,7 +200,7 @@ for (i in file) {
       setwd(AID_db_folder)
       AID_db <-
         oxgraphs::oxaiddb(
-          db = i,
+          db = paste0(i,".db"),
           sect = list.of.indicators$Sector[list.of.indicators$Database == "AID"],
           vars = list.of.indicators$Mnemonic[list.of.indicators$Database == "AID"]
         )
@@ -740,5 +727,5 @@ for (i in file) {
     print(difftime(end_time, start_time, units = "secs"))
    
   } 
-  }
+  
 }
