@@ -87,10 +87,10 @@ vc_scenario_ui <- function(id) {
                    prettyCheckboxGroup(
                      ns("Selections"),
                      label = NULL,
-                     choices = unique(data$variable[data$STATE == "ACT" &
-                                                      data$ATTRIBUTE == "Attached Dwellings"]),
-                     selected = unique(data$variable[data$STATE == "ACT" &
-                                                       data$ATTRIBUTE == "Attached Dwellings"]),
+                     choices = sort(unique(data$variable[data$STATE == "ACT" &
+                                                      data$ATTRIBUTE == "Attached Dwellings"]), decreasing = T),
+                     selected = sort(unique(data$variable[data$STATE == "ACT" &
+                                                            data$ATTRIBUTE == "Attached Dwellings"]), decreasing = T)[1:5],
                      shape = "round",
                      outline = TRUE,
                      status = "primary"
@@ -185,11 +185,11 @@ vc_scenario_server <- function(id, data) {
         session,
         "Selections",
         label = NULL,
-        as.list(variable_list$variable),
+        as.list(sort(variable_list$variable, decreasing = T)),
         selected = if (length(variable_list$variable) >= 3) {
-          variable_list$variable
+          sort(variable_list$variable, decreasing = T)[1:5]
         } else {
-          variable_list$variable[1]
+          sort(variable_list$variable, decreasing = T)[1]
         },
         prettyOptions = list(
           shape = "round",
