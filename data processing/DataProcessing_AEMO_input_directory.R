@@ -44,14 +44,16 @@ start_time <- Sys.time()
 aid_rds_folder <- "data processing/RDS Files/"
 
 aid_rds_filename <-
-  list.files(path = aid_rds_folder) %>% str_replace_all(".rds", ".db")
+  list.files(path = aid_rds_folder) %>% str_replace_all(".rds", "")
+
+file <- file %>% str_replace_all(".db", "")
 
 for (i in file) {
   print(i)
   
   if (i %in% aid_rds_filename) {
     print(paste0("The RDS file -- ",
-                 str_before_first(i,".db"),
+                 i,
                  ".rds -- already exists"))
   } else {
   #AID_db_filepath <- paste0(AID_db_folder, i)
@@ -67,7 +69,7 @@ for (i in file) {
     state_id <- c("0", "1", "2", "3", "4", "5", "6", "7", "8")
     Buildings_Series_State_Mapping <- data.frame(State = state_list, ID = state_id)
     
-    AID_db_filename <- str_before_first(i,".db")
+    AID_db_filename <- i
     
     # #Check file type
     # if (substr(AID_db_filename,
