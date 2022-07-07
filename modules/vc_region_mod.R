@@ -222,7 +222,7 @@ vc_region_server <- function(id, data) {
         "Selections",
         label = NULL,
         as.list(version_list$variable),
-        selected = as.list(version_list$variable[1:5]),
+        selected = as.list(version_list$variable[2:5]),
         prettyOptions = list(
           shape = "round",
           outline = TRUE,
@@ -251,7 +251,7 @@ vc_region_server <- function(id, data) {
         "Selections",
         label = NULL,
         as.list(version_list$variable),
-        selected = as.list(version_list$variable[c(1,6:9)]),
+        selected = as.list(version_list$variable[c(6:9)]),
         prettyOptions = list(
           shape = "round",
           outline = TRUE,
