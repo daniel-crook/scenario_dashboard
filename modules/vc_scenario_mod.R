@@ -73,7 +73,7 @@ vc_scenario_ui <- function(id) {
                    selectInput(
                      ns("Attribute"),
                      label = h4(str_to_title("Attribute"), style = "margin-bottom:-0.1em"),
-                     sort(unique(data$ATTRIBUTE)),
+                     sort(unique(data$ATTRIBUTE[data$STATE == "AUS"])),
                      selectize = FALSE
                    )
                  ), style = "margin-bottom:-2em; margin-top:-2em")
@@ -87,9 +87,9 @@ vc_scenario_ui <- function(id) {
                    prettyCheckboxGroup(
                      ns("Selections"),
                      label = NULL,
-                     choices = sort(unique(data$variable[data$STATE == "ACT" &
+                     choices = sort(unique(data$variable[data$STATE == "AUS" &
                                                       data$ATTRIBUTE == "Attached Dwellings"]), decreasing = T),
-                     selected = sort(unique(data$variable[data$STATE == "ACT" &
+                     selected = sort(unique(data$variable[data$STATE == "AUS" &
                                                             data$ATTRIBUTE == "Attached Dwellings"]), decreasing = T)[1:5],
                      shape = "round",
                      outline = TRUE,
