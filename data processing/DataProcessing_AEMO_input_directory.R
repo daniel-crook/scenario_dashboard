@@ -41,19 +41,26 @@ start_time <- Sys.time()
 
 }
 
+# setwd("C:/Users/dcrook/Documents/scenario_dashboard/")
+
 aid_rds_folder <- "data processing/RDS Files/"
 
 aid_rds_filename <-
   list.files(path = aid_rds_folder) %>% str_replace_all(".rds", "")
 
+# file <-
+#   list.files(path = "C:/AID/AEMO/Dashboard Bases/AID/")
+
 file <- file %>% str_replace_all(".db", "")
+# 
+# print(file %nin% aid_rds_filename)
 
 for (i in file) {
   print(i)
-  
-  if (i %in% aid_rds_filename) {
+  a <- str_replace_all(i,"_AID", "")
+  if (a %in% aid_rds_filename) {
     print(paste0("The RDS file -- ",
-                 i,
+                 a,
                  ".rds -- already exists"))
   } else {
   #AID_db_filepath <- paste0(AID_db_folder, i)
